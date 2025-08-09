@@ -3,170 +3,341 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Netlify + Ably Chat</title>
+  <title>Gapkar Chat</title>
   <style>
-    :root{
-      --panel:#111b21; --accent:#00a884; --incoming:#202c33; --outgoing:#005c4b;
-      --text:#e9edef; --muted:#8696a0; --bubble-radius:16px; --max-width:900px;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:linear-gradient(180deg,#0a1318,#0d171d); color:var(--text);
-      min-height:100vh; display:grid; place-items:center;
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #f4d03f 0%, #f7dc6f 50%, #f4d03f 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-    .app{
-      width:100%; max-width:var(--max-width); height:100vh; max-height:860px;
-      background:var(--panel); display:grid; grid-template-rows:auto 1fr auto;
-      border-radius:12px; overflow:hidden; border:1px solid #1f2c33;
-      box-shadow:0 10px 30px rgba(0,0,0,0.35);
+
+    .chat-container {
+      width: 100%;
+      max-width: 400px;
+      height: 100vh;
+      max-height: 700px;
+      background: #f4d03f;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      position: relative;
     }
-    .chat-header{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#1f2c33; border-bottom:1px solid #26343c;}
-    .chat-peer{display:flex; align-items:center; gap:12px;}
-    .avatar{width:40px; height:40px; border-radius:50%; object-fit:cover;}
-    .peer-info{line-height:1.2;}
-    .peer-name{font-weight:600;}
-    .peer-status{color:var(--muted); font-size:12px;}
-    .chat-actions .icon-btn{margin-left:6px;}
-    .chat-area{
-      padding:12px; overflow-y:auto;
-      background:
-        radial-gradient(900px 400px at -10% -5%, #0e1c22, transparent 40%),
-        radial-gradient(800px 500px at 110% 10%, #0f1d23, transparent 35%),
-        var(--panel);
+
+    /* Header */
+    .chat-header {
+      background: #f4d03f;
+      padding: 15px 20px 10px;
+      text-align: left;
     }
-    .day-sep{display:grid; place-items:center; margin:10px 0 14px;}
-    .day-sep span{background:#24323a; color:var(--muted); font-size:12px; padding:4px 10px; border-radius:999px; border:1px solid #2a3a42;}
-    .msg-row{display:flex; align-items:flex-end; gap:8px; margin:8px 0;}
-    .msg-row.incoming{justify-content:flex-start;}
-    .msg-row.outgoing{justify-content:flex-end;}
-    .bubble{
-      max-width:min(75%,520px); background:var(--incoming); padding:10px 12px 18px;
-      border-radius:var(--bubble-radius); position:relative; line-height:1.35;
-      border:1px solid rgba(255,255,255,0.05); overflow-wrap:anywhere;
+
+    .app-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .outgoing .bubble{background:var(--outgoing);}
-    .bubble p{margin:0;}
-    .time{position:absolute; right:8px; bottom:4px; font-size:11px; color:var(--muted);}
-    .input-bar{
-      display:grid; grid-template-columns:auto auto 1fr auto; gap:8px; align-items:center;
-      padding:10px; background:#1f2c33; border-top:1px solid #26343c;
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .name{width:140px; padding:10px 12px; border-radius:999px; border:1px solid #2b3b43; background:#0e191f; color:var(--text); outline:none;}
-    .input-bar input[type="text"]{width:100%; padding:10px 12px; border-radius:999px; border:1px solid #2b3b43; background:#0e191f; color:var(--text); outline:none;}
-    .input-bar input::placeholder{color:#6f828b;}
-    .icon-btn,.send-btn{
-      background:#0e191f; color:var(--text); border:1px solid #2b3b43; border-radius:999px; padding:9px 12px; cursor:pointer;
-      transition:transform .08s ease, background .15s ease, border-color .15s ease;
+
+    .logo-icon {
+      width: 30px;
+      height: 30px;
+      background: #e74c3c;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
     }
-    .icon-btn:hover,.send-btn:hover{background:#132027; border-color:#34515b;}
-    .icon-btn:active,.send-btn:active{transform:scale(0.98);}
-    .send-btn{background:var(--accent); border-color:#04b995; color:#021a14; font-weight:600;}
-    @media (max-width:520px){.app{border-radius:0; height:100vh; max-height:none;} .bubble{max-width:86%} .name{display:none}}
+
+    .app-name {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .connection-info {
+      font-size: 14px;
+      color: #34495e;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .anchor-icon {
+      font-size: 16px;
+    }
+
+    /* Chat Messages Area */
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .message {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .message-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .username {
+      background: #2c3e50;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .username.user1 { background: #2c3e50; }
+    .username.user2 { background: #8e44ad; }
+    .username.user3 { background: #27ae60; }
+
+    .timestamp {
+      color: #7f8c8d;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .message-bubble {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 12px 16px;
+      border-radius: 18px;
+      max-width: 85%;
+      color: #2c3e50;
+      font-size: 14px;
+      line-height: 1.4;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    /* Input Area */
+    .chat-input {
+      padding: 15px 20px 25px;
+      background: #f4d03f;
+    }
+
+    .input-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 25px;
+      padding: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .message-input {
+      flex: 1;
+      border: none;
+      outline: none;
+      padding: 10px 15px;
+      background: transparent;
+      color: #2c3e50;
+      font-size: 14px;
+    }
+
+    .message-input::placeholder {
+      color: #95a5a6;
+      font-style: italic;
+    }
+
+    .send-button {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .send-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 3px 12px rgba(231, 76, 60, 0.4);
+    }
+
+    .send-button:active {
+      transform: scale(0.95);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 480px) {
+      .chat-container {
+        max-width: 100%;
+        height: 100vh;
+        max-height: none;
+        border-radius: 0;
+      }
+      
+      .chat-messages {
+        padding: 15px;
+      }
+      
+      .message-bubble {
+        max-width: 90%;
+      }
+    }
+
+    /* Scrollbar Styling */
+    .chat-messages::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.5);
+    }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header class="chat-header">
-      <div class="chat-peer">
-        <img src="https://via.placeholder.com/40" alt="Avatar" class="avatar" />
-        <div class="peer-info">
-          <div class="peer-name">Public Chat</div>
-          <div class="peer-status" id="status">Connecting…</div>
+  <div class="chat-container">
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="app-title">
+        <div class="logo">
+          <div class="logo-icon">🐿</div>
+          <span class="app-name">gapkar</span>
+        </div>
+        <div class="connection-info">
+          connected to <span class="anchor-icon">⚓</span><br>
+          <small>vijaywada 214</small>
         </div>
       </div>
-      <div class="chat-actions">
-        <button class="icon-btn" aria-label="Search">🔎</button>
-        <button class="icon-btn" aria-label="More">⋮</button>
+    </div>
+
+    <!-- Chat Messages -->
+    <div class="chat-messages" id="chatMessages">
+      <div class="message">
+        <div class="message-header">
+          <span class="username user1">@armann87</span>
+          <span class="timestamp">10:38 AM</span>
+        </div>
+        <div class="message-bubble">
+          Bhai aap sahi keh rahe ho mine keh to rakha tha aisa hi ho raha hai
+        </div>
       </div>
-    </header>
 
-    <main class="chat-area" id="chatArea">
-      <div class="day-sep"><span>Today</span></div>
-    </main>
+      <div class="message">
+        <div class="message-header">
+          <span class="username user2">@yashayyan2</span>
+          <span class="timestamp">10:39 AM</span>
+        </div>
+        <div class="message-bubble">
+          Bhai aapki baat sahi hai lakin
+        </div>
+      </div>
 
-    <form class="input-bar" id="messageForm">
-      <input class="name" id="nameInput" placeholder="Name (optional)" maxlength="50" />
-      <button type="button" class="icon-btn" title="Emoji">😊</button>
-      <input type="text" id="messageInput" placeholder="Type a message" autocomplete="off" />
-      <button type="submit" class="send-btn">Send</button>
-    </form>
+      <div class="message">
+        <div class="message-header">
+          <span class="username user3">@rehmaan</span>
+          <span class="timestamp">10:52 AM</span>
+        </div>
+        <div class="message-bubble">
+          maine to aisa kuch kaha bhi nahi tha aise hi aakfn dsjfdndf
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input">
+      <div class="input-container">
+        <input 
+          type="text" 
+          class="message-input" 
+          placeholder="Type your message here ..." 
+          id="messageInput"
+        >
+        <button class="send-button" onclick="sendMessage()">
+          ➤
+        </button>
+      </div>
+    </div>
   </div>
 
-  <script type="module">
-    import Ably from 'https://cdn.skypack.dev/ably/promises';
-
-    const form = document.getElementById('messageForm');
-    const input = document.getElementById('messageInput');
-    const nameInput = document.getElementById('nameInput');
-    const area = document.getElementById('chatArea');
-    const statusEl = document.getElementById('status');
-
-    function escapeHtml(s){
-      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-                      .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-    }
-    function fmtTime(iso){ try{ return new Date(iso).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});}catch{return '';} }
-    function renderMessage(msg, isSelf=false){
-      const row = document.createElement('div');
-      row.className = 'msg-row ' + (isSelf ? 'outgoing' : 'incoming');
-      const name = msg.user ? `<strong>${escapeHtml(msg.user)}</strong><br/>` : '';
-      row.innerHTML = `
-        <div class="bubble">
-          <p>${name}${escapeHtml(msg.text)}</p>
-          <span class="time">${fmtTime(msg.ts)}</span>
-        </div>`;
-      area.appendChild(row);
-      area.scrollTop = area.scrollHeight;
-    }
-
-    async function setupChat() {
-      try {
-        statusEl.textContent = 'Connecting…';
-        const client = new Ably.Realtime.Promise({
-          authUrl: '/.netlify/functions/ably-token-request'
+  <script>
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      
+      if (message) {
+        // Add new message to chat
+        const chatMessages = document.getElementById('chatMessages');
+        const newMessage = document.createElement('div');
+        newMessage.className = 'message';
+        
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { 
+          hour: 'numeric', 
+          minute: '2-digit',
+          hour12: true 
         });
         
-        await client.connection.once('connected');
-        statusEl.textContent = 'Connected';
+        newMessage.innerHTML = `
+          <div class="message-header">
+            <span class="username user1">@you</span>
+            <span class="timestamp">${timeString}</span>
+          </div>
+          <div class="message-bubble">
+            ${message}
+          </div>
+        `;
         
-        const channel = client.channels.get('public-chat');
+        chatMessages.appendChild(newMessage);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
         
-        // Listen for new messages
-        channel.subscribe('message', (msg) => {
-          renderMessage(msg.data, false);
-        });
-
-        // Send message function
-        window.sendMessage = async (user, text) => {
-          const ts = new Date().toISOString();
-          await channel.publish('message', { user, text, ts });
-        };
-
-      } catch (error) {
-        console.error('Ably connection failed:', error);
-        statusEl.textContent = 'Connection failed';
+        // Clear input
+        input.value = '';
       }
     }
 
-    // Form submission
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const text = input.value.trim();
-      if (!text) return;
-      
-      const user = nameInput.value.trim() || 'Anonymous';
-      
-      try {
-        await window.sendMessage(user, text);
-        input.value = '';
-      } catch (error) {
-        console.error('Failed to send message:', error);
+    // Send message on Enter key
+    document.getElementById('messageInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        sendMessage();
       }
     });
 
-    // Initialize
-    setupChat();
+    // Auto-scroll to bottom
+    document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
   </script>
 </body>
 </html>
