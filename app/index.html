@@ -1,31 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <title>Example</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta charset="utf-8">
-    <script src="./script.ts" type="module"></script>
-    <link rel="stylesheet" href="./style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Netlify + Ably Chat</title>
+  <style>
+    :root{
+      --panel:#111b21; --accent:#00a884; --incoming:#202c33; --outgoing:#005c4b;
+      --text:#e9edef; --muted:#8696a0; --bubble-radius:16px; --max-width:900px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:linear-gradient(180deg,#0a1318,#0d171d); color:var(--text);
+      min-height:100vh; display:grid; place-items:center;
+    }
+    .app{
+      width:100%; max-width:var(--max-width); height:100vh; max-height:860px;
+      background:var(--panel); display:grid; grid-template-rows:auto 1fr auto;
+      border-radius:12px; overflow:hidden; border:1px solid #1f2c33;
+      box-shadow:0 10px 30px rgba(0,0,0,0.35);
+    }
+    .chat-header{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#1f2c33; border-bottom:1px solid #26343c;}
+    .chat-peer{display:flex; align-items:center; gap:12px;}
+    .avatar{width:40px; height:40px; border-radius:50%; object-fit:cover;}
+    .peer-info{line-height:1.2;}
+    .peer-name{font-weight:600;}
+    .peer-status{color:var(--muted); font-size:12px;}
+    .chat-actions .icon-btn{margin-left:6px;}
+    .chat-area{
+      padding:12px; overflow-y:auto;
+      background:
+        radial-gradient(900px 400px at -10% -5%, #0e1c22, transparent 40%),
+        radial-gradient(800px 500px at 110% 10%, #0f1d23, transparent 35%),
+        var(--panel);
+    }
+    .day-sep{display:grid; place-items:center; margin:10px 0 14px;}
+    .day-sep span{background:#24323a; color:var(--muted); font-size:12px; padding:4px 10px; border-radius:999px; border:1px solid #2a3a42;}
+    .msg-row{display:flex; align-items:flex-end; gap:8px; margin:8px 0;}
+    .msg-row.incoming{justify-content:flex-start;}
+    .msg-row.outgoing{justify-content:flex-end;}
+    .bubble{
+      max-width:min(75%,520px); background:var(--incoming); padding:10px 12px 18px;
+      border-radius:var(--bubble-radius); position:relative; line-height:1.35;
+      border:1px solid rgba(255,255,255,0.05); overflow-wrap:anywhere;
+    }
+    .outgoing .bubble{background:var(--outgoing);}
+    .bubble p{margin:0;}
+    .time{position:absolute; right:8px; bottom:4px; font-size:11px; color:var(--muted);}
+    .input-bar{
+      display:grid; grid-template-columns:auto auto 1fr auto; gap:8px; align-items:center;
+      padding:10px; background:#1f2c33; border-top:1px solid #26343c;
+    }
+    .name{width:140px; padding:10px 12px; border-radius:999px; border:1px solid #2b3b43; background:#0e191f; color:var(--text); outline:none;}
+    .input-bar input[type="text"]{width:100%; padding:10px 12px; border-radius:999px; border:1px solid #2b3b43; background:#0e191f; color:var(--text); outline:none;}
+    .input-bar input::placeholder{color:#6f828b;}
+    .icon-btn,.send-btn{
+      background:#0e191f; color:var(--text); border:1px solid #2b3b43; border-radius:999px; padding:9px 12px; cursor:pointer;
+      transition:transform .08s ease, background .15s ease, border-color .15s ease;
+    }
+    .icon-btn:hover,.send-btn:hover{background:#132027; border-color:#34515b;}
+    .icon-btn:active,.send-btn:active{transform:scale(0.98);}
+    .send-btn{background:var(--accent); border-color:#04b995; color:#021a14; font-weight:600;}
+    @media (max-width:520px){.app{border-radius:0; height:100vh; max-height:none;} .bubble{max-width:86%} .name{display:none}}
+  </style>
 </head>
-
 <body>
-    <h1>Ably 💚 Netlify</h1>
-    <div>
-        <p>
-            This application uses Netlify serverless functions to host an API, and a plain HTML application to render the response.
-        </p>
-        <p>
-            We're using the Netlify serverless function to manage an Ably API Key - there is a tokenRequest API that serves on /.netlify/functions/ably-tokenRequest that provides
-            the in-browser SDK with your API key.
-        </p>
-        <p>
-            Once this page loads, it'll connect to an ably channel, and send a message - the raw messages will appear below:
-        </p>
-    </div>
-    <div id="response">
-        <h2>Ably messages will append here.</h2>
-    </div>
-</body>
+  <div class="app">
+    <header class="chat-header">
+      <div class="chat-peer">
+        <img src="https://via.placeholder.com/40" alt="Avatar" class="avatar" />
+        <div class="peer-info">
+          <div class="peer-name">Public Chat</div>
+          <div class="peer-status" id="status">Connecting…</div>
+        </div>
+      </div>
+      <div class="chat-actions">
+        <button class="icon-btn" aria-label="Search">🔎</button>
+        <button class="icon-btn" aria-label="More">⋮</button>
+      </div>
+    </header>
 
+    <main class="chat-area" id="chatArea">
+      <div class="day-sep"><span>Today</span></div>
+    </main>
+
+    <form class="input-bar" id="messageForm">
+      <input class="name" id="nameInput" placeholder="Name (optional)" maxlength="50" />
+      <button type="button" class="icon-btn" title="Emoji">😊</button>
+      <input type="text" id="messageInput" placeholder="Type a message" autocomplete="off" />
+      <button type="submit" class="send-btn">Send</button>
+    </form>
+  </div>
+
+  <script type="module">
+    import Ably from 'https://cdn.skypack.dev/ably/promises';
+
+    const form = document.getElementById('messageForm');
+    const input = document.getElementById('messageInput');
+    const nameInput = document.getElementById('nameInput');
+    const area = document.getElementById('chatArea');
+    const statusEl = document.getElementById('status');
+
+    function escapeHtml(s){
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+                      .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+    }
+    function fmtTime(iso){ try{ return new Date(iso).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});}catch{return '';} }
+    function renderMessage(msg, isSelf=false){
+      const row = document.createElement('div');
+      row.className = 'msg-row ' + (isSelf ? 'outgoing' : 'incoming');
+      const name = msg.user ? `<strong>${escapeHtml(msg.user)}</strong><br/>` : '';
+      row.innerHTML = `
+        <div class="bubble">
+          <p>${name}${escapeHtml(msg.text)}</p>
+          <span class="time">${fmtTime(msg.ts)}</span>
+        </div>`;
+      area.appendChild(row);
+      area.scrollTop = area.scrollHeight;
+    }
+
+    async function setupChat() {
+      try {
+        statusEl.textContent = 'Connecting…';
+        const client = new Ably.Realtime.Promise({
+          authUrl: '/.netlify/functions/ably-token-request'
+        });
+        
+        await client.connection.once('connected');
+        statusEl.textContent = 'Connected';
+        
+        const channel = client.channels.get('public-chat');
+        
+        // Listen for new messages
+        channel.subscribe('message', (msg) => {
+          renderMessage(msg.data, false);
+        });
+
+        // Send message function
+        window.sendMessage = async (user, text) => {
+          const ts = new Date().toISOString();
+          await channel.publish('message', { user, text, ts });
+        };
+
+      } catch (error) {
+        console.error('Ably connection failed:', error);
+        statusEl.textContent = 'Connection failed';
+      }
+    }
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      
+      const user = nameInput.value.trim() || 'Anonymous';
+      
+      try {
+        await window.sendMessage(user, text);
+        input.value = '';
+      } catch (error) {
+        console.error('Failed to send message:', error);
+      }
+    });
+
+    // Initialize
+    setupChat();
+  </script>
+</body>
 </html>
