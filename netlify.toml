@@ -1,14 +1,9 @@
 [build]
-  publish = "dist"
   command = "npm run build"
-
-[functions]
-  directory = "api"
+  functions = "api"
+  publish = "app"
 
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  from = "/*"
+  to = "/index.html"
   status = 200
-
-[template.environment]
-  ABLY_API_KEY = "change me to your Ably API key"
