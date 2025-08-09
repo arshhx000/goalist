@@ -1,30 +1,27 @@
-import * as dotenv from "dotenv";
-import * as Ably from "ably/promises";
-import { HandlerEvent, HandlerContext } from "@netlify/functions";
+import type { Handler } from '@netlify/functions';
+import Ably from 'ably';
 
-dotenv.config();
-
-export async function handler(event: HandlerEvent, context: HandlerContext) {
-
-  if (!process.env.ABLY_API_KEY) {
+export const handler: Handler = async () => {
+  const apiKey = process.env.ABLY_API_KEY;
+  if (!apiKey) {
     return {
       statusCode: 500,
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(`Missing ABLY_API_KEY environment variable.
-        If you're running locally, please ensure you have a ./.env file with a value for ABLY_API_KEY=your-key.
-        If you're running in Netlify, make sure you've configured env variable ABLY_API_KEY. 
-        Please see README.md for more details on configuring your Ably API Key.`)
-    }
+      body: 'Missing ABLY_API_KEY env var',
+    };
   }
 
-  const clientId = event.queryStringParameters["clientId"] || process.env.DEFAULT_CLIENT_ID || "NO_CLIENT_ID";
-  const client = new Ably.Rest(process.env.ABLY_API_KEY);
-  const tokenRequestData = await client.auth.createTokenRequest({ clientId: clientId });
-
-  return {
-    statusCode: 200,
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(tokenRequestData)
-  };
-
-}
+  try {
+    const rest = new Ably.Rest(apiKey);
+    const tokenRequest = await rest.auth.createTokenRequest({ clientId: 'netlify-chat' });
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+      body: JSON.stringify(tokenRequest),
+    };
+  } catch (e: any) {
+    return {
+      statusCode: 500,
+      body: 'Failed to create Ably token request: ' + (e?.message || String(e)),
+    };
+  }
+};
