@@ -357,11 +357,11 @@
             transform: translateX(26px);
         }
 
-        /* FIXED: Enhanced Chat Interface - No scrolling issues */
+        /* FIXED: Enhanced Chat Interface - Better mobile support */
         .chat-container {
             display: none;
             height: 100vh;
-            max-height: 600px; /* Fixed height to prevent scrolling */
+            max-height: 600px;
             flex-direction: column;
         }
 
@@ -369,7 +369,7 @@
             display: flex;
         }
 
-        /* FIXED: Simplified chat header - removed duplicate logo */
+        /* Chat header */
         .chat-header {
             background: var(--primary-color);
             padding: 15px 20px;
@@ -377,7 +377,7 @@
             justify-content: flex-end;
             align-items: center;
             border-bottom: 1px solid rgba(0,0,0,0.1);
-            flex-shrink: 0; /* Prevent header from shrinking */
+            flex-shrink: 0;
         }
 
         .user-info {
@@ -415,7 +415,7 @@
             padding: 20px;
             overflow-y: auto;
             background: linear-gradient(to bottom, var(--primary-color), #f7dc6f);
-            min-height: 0; /* Allow flex shrinking */
+            min-height: 0;
         }
 
         .message {
@@ -447,7 +447,6 @@
             gap: 10px;
         }
 
-        /* FIXED: Different color for @system */
         .username {
             background: var(--text-primary);
             color: white;
@@ -458,7 +457,7 @@
         }
 
         .username.system {
-            background: #9b59b6; /* Purple color for system messages */
+            background: #9b59b6;
             color: white;
         }
 
@@ -524,12 +523,12 @@
             background: rgba(0,0,0,0.2);
         }
 
-        /* FIXED: Enhanced Input Area - Removed file attachment */
+        /* Chat input */
         .chat-input {
             padding: 15px 20px;
             background: var(--primary-color);
             border-top: 1px solid rgba(0,0,0,0.1);
-            flex-shrink: 0; /* Prevent input from shrinking */
+            flex-shrink: 0;
         }
 
         .input-wrapper {
@@ -620,26 +619,167 @@
             to { transform: rotate(360deg); }
         }
 
-        /* FIXED: Responsive Design - Better mobile experience */
+        /* FIXED: Better Mobile Responsive Design */
         @media (max-width: 480px) {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            
             .app-container {
                 padding: 0;
-                align-items: stretch;
+                align-items: flex-start;
+                min-height: 100vh;
             }
             
             .main-container {
                 max-width: 100%;
+                width: 100%;
                 height: 100vh;
                 border-radius: 0;
+                display: flex;
+                flex-direction: column;
             }
             
             .setup-content {
                 padding: 20px;
+                flex: 1;
+                overflow-y: auto;
             }
             
+            /* FIXED: Mobile chat container */
             .chat-container {
                 height: 100vh;
                 max-height: 100vh;
+                width: 100%;
+            }
+            
+            .chat-container.active {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            /* Mobile chat header */
+            .chat-header {
+                padding: 10px 15px;
+                flex-shrink: 0;
+            }
+            
+            .user-info {
+                font-size: 13px;
+            }
+            
+            /* Mobile chat messages */
+            .chat-messages {
+                flex: 1;
+                padding: 15px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* Mobile chat input */
+            .chat-input {
+                padding: 10px 15px;
+                flex-shrink: 0;
+                background: var(--primary-color);
+            }
+            
+            .input-wrapper {
+                padding: 5px;
+            }
+            
+            .message-input {
+                padding: 8px 12px;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            .send-btn {
+                width: 35px;
+                height: 35px;
+            }
+            
+            /* Mobile message styling */
+            .message-bubble {
+                max-width: 90%;
+                font-size: 13px;
+            }
+            
+            .username {
+                font-size: 11px;
+            }
+            
+            .timestamp {
+                font-size: 10px;
+            }
+            
+            /* Hide message actions on mobile to save space */
+            .message-actions {
+                display: none;
+            }
+            
+            /* Mobile app header */
+            .app-header {
+                padding: 15px;
+                flex-shrink: 0;
+            }
+            
+            .logo-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+            
+            .app-title {
+                font-size: 24px;
+            }
+            
+            .app-subtitle {
+                font-size: 13px;
+            }
+        }
+
+        /* Extra small mobile devices */
+        @media (max-width: 360px) {
+            .chat-messages {
+                padding: 10px;
+            }
+            
+            .chat-input {
+                padding: 8px 10px;
+            }
+            
+            .message-bubble {
+                padding: 10px 12px;
+                font-size: 12px;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .app-header {
+                padding: 10px 15px;
+            }
+            
+            .logo-container {
+                margin-bottom: 5px;
+            }
+            
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            
+            .app-title {
+                font-size: 20px;
+            }
+            
+            .chat-header {
+                padding: 8px 15px;
+            }
+            
+            .chat-messages {
+                padding: 10px 15px;
             }
         }
 
@@ -770,9 +910,8 @@
                 </div>
             </div>
 
-            <!-- FIXED: Enhanced Chat Interface - No duplicate logo, no scrolling issues -->
+            <!-- FIXED: Mobile-optimized Chat Interface -->
             <div class="chat-container" id="chatContainer">
-                <!-- FIXED: Simplified chat header - Only user info, no duplicate logo -->
                 <div class="chat-header">
                     <div class="user-info">
                         <div><strong id="userNameDisplay">User</strong>, <span id="userAgeDisplay">25</span></div>
@@ -802,7 +941,6 @@
                     Someone is typing<span class="typing-dots"></span>
                 </div>
 
-                <!-- FIXED: Chat input without file attachment -->
                 <div class="chat-input">
                     <div class="input-wrapper">
                         <input 
@@ -937,7 +1075,6 @@
             }
 
             async handleProfileSubmit() {
-                // Get values directly from form elements (FIXED VERSION)
                 const name = document.getElementById('userName').value.trim();
                 const age = parseInt(document.getElementById('userAge').value);
                 
@@ -946,7 +1083,6 @@
                     age: age
                 };
 
-                // Simplified validation - only name and age required
                 if (this.validateProfile(profile)) {
                     this.state.user = profile;
                     await this.services.storage.saveUser({
@@ -1009,12 +1145,10 @@
             }
 
             handleTyping() {
-                // Implement typing indicator logic
                 const input = document.getElementById('messageInput');
                 this.updateSendButton();
                 
-                // Simulate typing indicator
-                if (Math.random() < 0.1) { // 10% chance to show typing
+                if (Math.random() < 0.1) {
                     this.ui.showTypingIndicator();
                     setTimeout(() => this.ui.hideTypingIndicator(), 2000);
                 }
@@ -1121,7 +1255,6 @@
 
             async sendMessage(message) {
                 if (this.isOnline) {
-                    // Send to server when implemented
                     return Promise.resolve(message);
                 } else {
                     this.messageQueue.push(message);
@@ -1130,7 +1263,6 @@
             }
 
             async getMessages() {
-                // Fetch messages from server when implemented
                 return Promise.resolve([]);
             }
         }
@@ -1153,7 +1285,6 @@
             saveMessage(message) {
                 const messages = this.getMessages();
                 messages.push(message);
-                // Keep only last 100 messages
                 if (messages.length > 100) {
                     messages.splice(0, messages.length - 100);
                 }
@@ -1247,15 +1378,13 @@
             }
 
             showProfileError(message) {
-                // Implement profile error display
-                alert(message); // Temporary implementation
+                alert(message);
             }
 
             showChat() {
                 document.getElementById('setupContent').style.display = 'none';
                 document.getElementById('chatContainer').classList.add('active');
                 
-                // Update user info in header
                 document.getElementById('userNameDisplay').textContent = this.app.state.user.name;
                 document.getElementById('userAgeDisplay').textContent = this.app.state.user.age;
                 
@@ -1276,7 +1405,6 @@
                     hour12: true
                 });
 
-                // FIXED: Apply system class to system messages
                 const usernameClass = messageData.isSystem ? 'username system' : 'username';
 
                 messageEl.innerHTML = `
@@ -1378,7 +1506,7 @@
                     .catch((registrationError) => {
                         console.log('SW registration failed: ', registrationError);
                     });
-            });
+                });
         }
     </script>
 </body>
