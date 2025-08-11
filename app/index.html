@@ -102,6 +102,9 @@
             justify-content: center;
             box-shadow: var(--shadow-light);
             overflow: hidden;
+            font-weight: bold;
+            font-size: 28px;
+            color: white;
         }
 
         .logo-image {
@@ -308,6 +311,50 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        /* Privacy Settings */
+        .privacy-controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+
+        .privacy-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toggle-switch.active {
+            background: var(--secondary-color);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(26px);
         }
 
         /* Enhanced Chat Interface */
@@ -619,48 +666,9 @@
             background: #34495e;
         }
 
-        /* Privacy Settings */
-        .privacy-controls {
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(0,0,0,0.05);
-            border-radius: 10px;
-        }
-
-        .privacy-option {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 10px 0;
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 50px;
-            height: 24px;
-            background: #ccc;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .toggle-switch.active {
-            background: var(--secondary-color);
-        }
-
-        .toggle-slider {
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            transition: var(--transition);
-        }
-
-        .toggle-switch.active .toggle-slider {
-            transform: translateX(26px);
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
@@ -724,7 +732,7 @@
                     <div class="section-header">
                         <h2 class="section-title">👤 Create Your Profile</h2>
                         <p class="section-description">
-                            Tell us about yourself to get started. Your information helps us connect you with relevant people nearby.
+                            Just your name and age - that's all we need!
                         </p>
                     </div>
 
@@ -738,9 +746,7 @@
                                 placeholder="Enter your display name"
                                 maxlength="30"
                                 required
-                                aria-describedby="nameHelp"
                             >
-                            <small id="nameHelp" class="form-help">This name will be visible to other users</small>
                         </div>
 
                         <div class="form-group">
@@ -751,19 +757,13 @@
                                 class="form-input" 
                                 placeholder="Enter your age"
                                 min="13"
-                                max="35"
+                                max="100"
                                 required
-                                aria-describedby="ageHelp"
-                            >
-                            <small id="ageHelp" class="form-help">Must be between 13-100 years</small>
-                        </div>
-
-                       
                             >
                         </div>
 
                         <button type="submit" class="btn btn-success">
-                            Start Gapping
+                            Start Chatting 🚀
                         </button>
                     </form>
                 </div>
@@ -798,7 +798,7 @@
                             </div>
                         </div>
                         <div class="message-bubble">
-                            Welcome to Gappkar! Start gapping with people near you. 🎉
+                            Welcome to Gappkar! Start chatting with people near you. 🎉
                         </div>
                     </div>
                 </div>
@@ -947,13 +947,16 @@
             }
 
             async handleProfileSubmit() {
-                const formData = new FormData(document.getElementById('profileForm'));
+                // Get values directly from form elements (FIXED VERSION)
+                const name = document.getElementById('userName').value.trim();
+                const age = parseInt(document.getElementById('userAge').value);
+                
                 const profile = {
-                    name: formData.get('userName')?.trim(),
-                    age: parseInt(formData.get('userAge')),
-                    bio: formData.get('userBio')?.trim() || ''
+                    name: name,
+                    age: age
                 };
 
+                // Simplified validation - only name and age required
                 if (this.validateProfile(profile)) {
                     this.state.user = profile;
                     await this.services.storage.saveUser({
@@ -964,7 +967,7 @@
                     this.ui.showChat();
                     this.addSystemMessage(`Welcome ${profile.name}! You're now connected to your local area.`);
                 } else {
-                    this.ui.showProfileError('Please fill in valid information');
+                    this.ui.showProfileError('Please enter a valid name (2+ characters) and age (13-100)');
                 }
             }
 
