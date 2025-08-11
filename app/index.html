@@ -357,11 +357,11 @@
             transform: translateX(26px);
         }
 
-        /* Enhanced Chat Interface */
+        /* FIXED: Enhanced Chat Interface - No scrolling issues */
         .chat-container {
             display: none;
             height: 100vh;
-            max-height: 700px;
+            max-height: 600px; /* Fixed height to prevent scrolling */
             flex-direction: column;
         }
 
@@ -369,13 +369,15 @@
             display: flex;
         }
 
+        /* FIXED: Simplified chat header - removed duplicate logo */
         .chat-header {
             background: var(--primary-color);
             padding: 15px 20px;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
             border-bottom: 1px solid rgba(0,0,0,0.1);
+            flex-shrink: 0; /* Prevent header from shrinking */
         }
 
         .user-info {
@@ -413,6 +415,7 @@
             padding: 20px;
             overflow-y: auto;
             background: linear-gradient(to bottom, var(--primary-color), #f7dc6f);
+            min-height: 0; /* Allow flex shrinking */
         }
 
         .message {
@@ -444,6 +447,7 @@
             gap: 10px;
         }
 
+        /* FIXED: Different color for @system */
         .username {
             background: var(--text-primary);
             color: white;
@@ -451,6 +455,11 @@
             border-radius: 12px;
             font-size: 12px;
             font-weight: 600;
+        }
+
+        .username.system {
+            background: #9b59b6; /* Purple color for system messages */
+            color: white;
         }
 
         .timestamp {
@@ -515,11 +524,12 @@
             background: rgba(0,0,0,0.2);
         }
 
-        /* Enhanced Input Area */
+        /* FIXED: Enhanced Input Area - Removed file attachment */
         .chat-input {
             padding: 15px 20px;
             background: var(--primary-color);
             border-top: 1px solid rgba(0,0,0,0.1);
+            flex-shrink: 0; /* Prevent input from shrinking */
         }
 
         .input-wrapper {
@@ -530,21 +540,6 @@
             border-radius: 25px;
             padding: 8px;
             box-shadow: var(--shadow-light);
-        }
-
-        .attachment-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            color: var(--text-secondary);
-            transition: var(--transition);
-        }
-
-        .attachment-btn:hover {
-            background: rgba(0,0,0,0.1);
-            color: var(--text-primary);
         }
 
         .message-input {
@@ -625,10 +620,17 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Responsive Design */
+        /* FIXED: Responsive Design - Better mobile experience */
         @media (max-width: 480px) {
             .app-container {
-                padding: 10px;
+                padding: 0;
+                align-items: stretch;
+            }
+            
+            .main-container {
+                max-width: 100%;
+                height: 100vh;
+                border-radius: 0;
             }
             
             .setup-content {
@@ -637,8 +639,7 @@
             
             .chat-container {
                 height: 100vh;
-                max-height: none;
-                border-radius: 0;
+                max-height: 100vh;
             }
         }
 
@@ -769,16 +770,10 @@
                 </div>
             </div>
 
-            <!-- Enhanced Chat Interface -->
+            <!-- FIXED: Enhanced Chat Interface - No duplicate logo, no scrolling issues -->
             <div class="chat-container" id="chatContainer">
+                <!-- FIXED: Simplified chat header - Only user info, no duplicate logo -->
                 <div class="chat-header">
-                    <div class="logo-container">
-                        <div class="logo-icon" style="width: 30px; height: 30px; font-size: 16px;">
-                            <img src="mylogo.png" alt="Gappkar Logo" class="logo-image" onerror="this.style.display='none'; this.parentNode.innerHTML='G';">
-                        </div>
-                        <span class="app-title" style="font-size: 20px;">gappkar</span>
-                    </div>
-                    
                     <div class="user-info">
                         <div><strong id="userNameDisplay">User</strong>, <span id="userAgeDisplay">25</span></div>
                         <div class="online-status">
@@ -793,7 +788,7 @@
                     <div class="message">
                         <div class="message-header">
                             <div class="message-info">
-                                <span class="username">@system</span>
+                                <span class="username system">@system</span>
                                 <span class="timestamp">Now</span>
                             </div>
                         </div>
@@ -807,11 +802,9 @@
                     Someone is typing<span class="typing-dots"></span>
                 </div>
 
+                <!-- FIXED: Chat input without file attachment -->
                 <div class="chat-input">
                     <div class="input-wrapper">
-                        <button class="attachment-btn" onclick="handleAttachment()" aria-label="Attach file">
-                            📎
-                        </button>
                         <input 
                             type="text" 
                             class="message-input" 
@@ -828,9 +821,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Hidden file input for attachments -->
-    <input type="file" id="fileInput" style="display: none;" accept="image/*,.pdf,.doc,.docx" onchange="handleFileSelect(event)">
 
     <script>
         // Enhanced Application Class
@@ -1045,18 +1035,6 @@
             applyTheme() {
                 document.documentElement.setAttribute('data-theme', this.state.theme);
                 document.getElementById('themeIcon').textContent = this.state.theme === 'light' ? '🌙' : '☀️';
-            }
-
-            async handleAttachment() {
-                document.getElementById('fileInput').click();
-            }
-
-            async handleFileSelect(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    // Implement file upload logic
-                    this.addSystemMessage(`File "${file.name}" selected for upload`);
-                }
             }
 
             addReaction(messageId, emoji) {
@@ -1298,10 +1276,13 @@
                     hour12: true
                 });
 
+                // FIXED: Apply system class to system messages
+                const usernameClass = messageData.isSystem ? 'username system' : 'username';
+
                 messageEl.innerHTML = `
                     <div class="message-header">
                         <div class="message-info">
-                            <span class="username">@${messageData.username}</span>
+                            <span class="${usernameClass}">@${messageData.username}</span>
                             <span class="timestamp">${timeString}</span>
                         </div>
                         ${!messageData.isSystem ? `
@@ -1380,14 +1361,6 @@
 
         function toggleTheme() {
             app.toggleTheme();
-        }
-
-        function handleAttachment() {
-            app.handleAttachment();
-        }
-
-        function handleFileSelect(event) {
-            app.handleFileSelect(event);
         }
 
         // Initialize app when DOM is ready
