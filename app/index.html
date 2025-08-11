@@ -1,768 +1,1416 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gappkar Chat - Location Based</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gappkar Chat - Enhanced</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f4d03f">
+    <style>
+        :root {
+            --primary-color: #f4d03f;
+            --secondary-color: #e74c3c;
+            --text-primary: #2c3e50;
+            --text-secondary: #34495e;
+            --bg-light: rgba(255, 255, 255, 0.9);
+            --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-heavy: 0 10px 30px rgba(0, 0, 0, 0.2);
+            --border-radius: 15px;
+            --transition: all 0.3s ease;
+        }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-      background: linear-gradient(180deg, #f4d03f 0%, #f7dc6f 50%, #f4d03f 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+        [data-theme="dark"] {
+            --primary-color: #2c3e50;
+            --secondary-color: #e74c3c;
+            --text-primary: #ecf0f1;
+            --text-secondary: #bdc3c7;
+            --bg-light: rgba(52, 73, 94, 0.9);
+        }
 
-    .container {
-      width: 100%;
-      max-width: 400px;
-      min-height: 500px;
-      background: #f4d03f;
-      border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-      text-align: center;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    /* Logo Section */
-    .logo-section {
-      margin-bottom: 30px;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color), #f7dc6f);
+            min-height: 100vh;
+            transition: var(--transition);
+        }
 
-    .logo-icon {
-      width: 60px;
-      height: 60px;
-      background: #e74c3c;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-      font-size: 28px;
-      margin-bottom: 15px;
-      box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
-    }
+        /* Enhanced Container */
+        .app-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    .app-title {
-      font-size: 32px;
-      font-weight: bold;
-      color: #2c3e50;
-      margin-bottom: 10px;
-    }
+        .main-container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-heavy);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
 
-    .app-subtitle {
-      font-size: 16px;
-      color: #34495e;
-      margin-bottom: 30px;
-    }
+        /* Enhanced Header */
+        .app-header {
+            background: var(--primary-color);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
 
-    /* Location Setup */
-    .setup-section {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 25px;
-      border-radius: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    }
+        .theme-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
 
-    .section-title {
-      font-size: 20px;
-      font-weight: 600;
-      color: #2c3e50;
-      margin-bottom: 15px;
-    }
+        .theme-toggle:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
 
-    .location-info {
-      display: none;
-      background: #e8f5e8;
-      padding: 15px;
-      border-radius: 10px;
-      margin: 15px 0;
-      color: #2d5016;
-      font-size: 14px;
-    }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
 
-    .location-info.show {
-      display: block;
-    }
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-light);
+            overflow: hidden;
+        }
 
-    /* Form Styles */
-    .form-group {
-      margin-bottom: 20px;
-      text-align: left;
-    }
+        .logo-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
 
-    .form-label {
-      display: block;
-      color: #2c3e50;
-      font-weight: 600;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
+        .app-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
 
-    .form-input {
-      width: 100%;
-      padding: 12px 15px;
-      border: 2px solid #ecf0f1;
-      border-radius: 10px;
-      font-size: 16px;
-      color: #2c3e50;
-      background: white;
-      outline: none;
-      transition: border-color 0.3s ease;
-    }
+        .app-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
 
-    .form-input:focus {
-      border-color: #3498db;
-    }
+        /* Enhanced Setup Sections */
+        .setup-content {
+            padding: 30px;
+        }
 
-    .form-input::placeholder {
-      color: #95a5a6;
-    }
+        .section {
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
 
-    /* Button Styles */
-    .btn {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin: 10px 0;
-    }
+        .section.active {
+            display: block;
+        }
 
-    .btn-primary {
-      background: linear-gradient(135deg, #3498db, #2980b9);
-      color: white;
-      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-    }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
 
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-    }
+        .section-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
 
-    .btn-success {
-      background: linear-gradient(135deg, #27ae60, #229954);
-      color: white;
-      box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
-    }
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
 
-    .btn-success:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
-    }
+        .section-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
 
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
+        /* Enhanced Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-    /* Status Messages */
-    .status-message {
-      padding: 12px;
-      border-radius: 8px;
-      margin: 15px 0;
-      font-size: 14px;
-      font-weight: 500;
-    }
+        .form-label {
+            display: block;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
 
-    .status-loading {
-      background: #fff3cd;
-      color: #856404;
-      border: 1px solid #ffeaa7;
-    }
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 12px;
+            font-size: 16px;
+            color: var(--text-primary);
+            background: white;
+            transition: var(--transition);
+            outline: none;
+        }
 
-    .status-success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
+        .form-input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
 
-    .status-error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
+        /* Enhanced Buttons */
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
 
-    /* Hide sections */
-    .section {
-      display: none;
-    }
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
 
-    .section.active {
-      display: block;
-    }
+        .btn:hover:before {
+            left: 100%;
+        }
 
-    /* Loading spinner */
-    .spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-      margin-right: 10px;
-    }
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: var(--shadow-light);
+        }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            color: white;
+            box-shadow: var(--shadow-light);
+        }
 
-    /* Chat Container (hidden initially) */
-    .chat-container {
-      display: none;
-      width: 100%;
-      max-width: 400px;
-      height: 100vh;
-      max-height: 700px;
-      background: #f4d03f;
-      grid-template-rows: auto 1fr auto;
-      position: relative;
-    }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
 
-    .chat-container.show {
-      display: grid;
-    }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
 
-    /* Existing chat styles from previous design */
-    .chat-header {
-      background: #f4d03f;
-      padding: 15px 20px 10px;
-      text-align: left;
-    }
+        /* Status Messages */
+        .status-container {
+            margin: 15px 0;
+            min-height: 20px;
+        }
 
-    .app-title-small {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+        .status-message {
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: fadeIn 0.3s ease;
+        }
 
-    .logo-small {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+        .status-loading {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
 
-    .logo-icon-small {
-      width: 30px;
-      height: 30px;
-      background: #e74c3c;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-      font-size: 16px;
-    }
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
 
-    .app-name {
-      font-size: 24px;
-      font-weight: bold;
-      color: #2c3e50;
-    }
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
 
-    .user-info {
-      font-size: 14px;
-      color: #34495e;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 2px;
-    }
+        /* Location Info */
+        .location-card {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            color: #2d5016;
+            font-size: 14px;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
 
-    /* Chat messages and input styles (same as before) */
-    .chat-messages {
-      flex: 1;
-      padding: 20px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
+        .location-card.show {
+            display: block;
+        }
 
-    .message {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      animation: fadeIn 0.3s ease-in;
-    }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+        /* Enhanced Chat Interface */
+        .chat-container {
+            display: none;
+            height: 100vh;
+            max-height: 700px;
+            flex-direction: column;
+        }
 
-    .message-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+        .chat-container.active {
+            display: flex;
+        }
 
-    .username {
-      background: #2c3e50;
-      color: white;
-      padding: 4px 8px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 600;
-    }
+        .chat-header {
+            background: var(--primary-color);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
 
-    .timestamp {
-      color: #7f8c8d;
-      font-size: 12px;
-      font-weight: 500;
-    }
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
 
-    .message-bubble {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 12px 16px;
-      border-radius: 18px;
-      max-width: 85%;
-      color: #2c3e50;
-      font-size: 14px;
-      line-height: 1.4;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
+        .online-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+        }
 
-    .chat-input {
-      padding: 15px 20px 25px;
-      background: #f4d03f;
-    }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #27ae60;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
 
-    .input-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 25px;
-      padding: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
 
-    .message-input {
-      flex: 1;
-      border: none;
-      outline: none;
-      padding: 10px 15px;
-      background: transparent;
-      color: #2c3e50;
-      font-size: 14px;
-    }
+        /* Enhanced Message Area */
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: linear-gradient(to bottom, var(--primary-color), #f7dc6f);
+        }
 
-    .send-button {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, #e74c3c, #c0392b);
-      border: none;
-      border-radius: 50%;
-      color: white;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
-      transition: all 0.2s ease;
-    }
+        .message {
+            margin-bottom: 15px;
+            animation: messageSlide 0.3s ease;
+        }
 
-    .send-button:hover {
-      transform: scale(1.05);
-    }
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    .logo-icon {
-  width: 60px;
-  height: 60px;
-  background: #e74c3c;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-  font-size: 28px;
-  margin-bottom: 15px;
-  box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
-  overflow: hidden; /* This ensures the image stays within the circle */
-}
+        .message-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
 
-/* Large logo image */
-.logo-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
+        .message-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-/* Small logo image */
-.logo-image-small {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 50%;
-}
+        .username {
+            background: var(--text-primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
 
-  </style>
+        .timestamp {
+            color: var(--text-secondary);
+            font-size: 11px;
+        }
+
+        .message-actions {
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .message:hover .message-actions {
+            opacity: 1;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .message-bubble {
+            background: var(--bg-light);
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 85%;
+            color: var(--text-primary);
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: var(--shadow-light);
+            position: relative;
+        }
+
+        .message-reactions {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .reaction {
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .reaction:hover {
+            background: rgba(0,0,0,0.2);
+        }
+
+        /* Enhanced Input Area */
+        .chat-input {
+            padding: 15px 20px;
+            background: var(--primary-color);
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            border-radius: 25px;
+            padding: 8px;
+            box-shadow: var(--shadow-light);
+        }
+
+        .attachment-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .attachment-btn:hover {
+            background: rgba(0,0,0,0.1);
+            color: var(--text-primary);
+        }
+
+        .message-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 10px 15px;
+            background: transparent;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .send-btn {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--secondary-color), #c0392b);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-light);
+            transition: var(--transition);
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: none;
+            padding: 10px 20px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-style: italic;
+        }
+
+        .typing-indicator.show {
+            display: block;
+        }
+
+        .typing-dots {
+            display: inline-block;
+        }
+
+        .typing-dots::after {
+            content: '...';
+            animation: typing 1.5s infinite;
+        }
+
+        @keyframes typing {
+            0%, 60% { content: '...'; }
+            30% { content: '..'; }
+            60% { content: '.'; }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .app-container {
+                padding: 10px;
+            }
+            
+            .setup-content {
+                padding: 20px;
+            }
+            
+            .chat-container {
+                height: 100vh;
+                max-height: none;
+                border-radius: 0;
+            }
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Dark theme specific adjustments */
+        [data-theme="dark"] .form-input {
+            background: #34495e;
+            border-color: #5d6d7e;
+            color: #ecf0f1;
+        }
+
+        [data-theme="dark"] .input-wrapper {
+            background: #34495e;
+        }
+
+        /* Privacy Settings */
+        .privacy-controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+
+        .privacy-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toggle-switch.active {
+            background: var(--secondary-color);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(26px);
+        }
+    </style>
 </head>
 <body>
-  <!-- Setup Container -->
-  <div class="container" id="setupContainer">
-    <!-- Logo -->
-    <div class="logo-section">
-      <div class="logo-icon">
-  <img src="mylogo.png" alt="Gapkar Logo" class="logo-image">
-</div>
-      <div class="app-title">gappkar</div>
-      <div class="app-subtitle">Connect with people around you</div>
-    </div>
+    <div class="app-container">
+        <div class="main-container" id="mainContainer">
+            <!-- Enhanced Header -->
+            <div class="app-header">
+                <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+                    <span id="themeIcon">🌙</span>
+                </button>
+                
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <img src="mylogo.png" alt="Gappkar Logo" class="logo-image" onerror="this.style.display='none'; this.parentNode.innerHTML='G';">
+                    </div>
+                    <div>
+                        <div class="app-title">gappkar</div>
+                        <div class="app-subtitle">Connect with people around you</div>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Location Section -->
-    <div class="section active" id="locationSection">
-      <div class="setup-section">
-        <h2 class="section-title">📍 Your Location</h2>
-        <p style="color: #5d6d7e; margin-bottom: 20px;">
-          We need your location to connect you with nearby people
-        </p>
-        
-        <div id="statusMessage"></div>
-        <div id="locationInfo" class="location-info"></div>
-        
-        <button class="btn btn-primary" id="getLocationBtn">
-          <span id="locationBtnText">Get My Location</span>
-        </button>
-      </div>
-    </div>
+            <!-- Setup Content -->
+            <div class="setup-content" id="setupContent">
+                <!-- Location Section -->
+                <div class="section active" id="locationSection">
+                    <div class="section-header">
+                        <h2 class="section-title">📍 Your Location</h2>
+                        <p class="section-description">
+                            We need your location to connect you with nearby people. Your location data is stored locally and never shared without permission.
+                        </p>
+                    </div>
 
-    <!-- Profile Section -->
-    <div class="section" id="profileSection">
-      <div class="setup-section">
-        <h2 class="section-title">👤 Create Your Profile</h2>
-        <p style="color: #5d6d7e; margin-bottom: 20px;">
-          Tell us about yourself to get started
-        </p>
+                    <div class="status-container" id="locationStatus"></div>
+                    <div class="location-card" id="locationInfo"></div>
 
-        <form id="profileForm">
-          <div class="form-group">
-            <label class="form-label" for="userName">Your Name</label>
-            <input 
-              type="text" 
-              id="userName" 
-              class="form-input" 
-              placeholder="Enter your name"
-              maxlength="30"
-              required
-            >
-          </div>
+                    <div class="privacy-controls">
+                        <h3>Privacy Settings</h3>
+                        <div class="privacy-option">
+                            <span>Share precise location</span>
+                            <div class="toggle-switch active" id="preciseLocationToggle">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                        <div class="privacy-option">
+                            <span>Allow location sharing</span>
+                            <div class="toggle-switch active" id="locationSharingToggle">
+                                <div class="toggle-slider"></div>
+                            </div>
+                        </div>
+                    </div>
 
-          <div class="form-group">
-            <label class="form-label" for="userAge">Your Age</label>
-            <input 
-              type="number" 
-              id="userAge" 
-              class="form-input" 
-              placeholder="Enter your age"
-              min="13"
-              max="100"
-              required
-            >
-          </div>
+                    <button class="btn btn-primary" id="getLocationBtn" onclick="requestLocation()">
+                        <span id="locationBtnText">Get My Location</span>
+                    </button>
+                </div>
 
-          <button type="submit" class="btn btn-success">
-            Start Chatting 🚀
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
+                <!-- Profile Section -->
+                <div class="section" id="profileSection">
+                    <div class="section-header">
+                        <h2 class="section-title">👤 Create Your Profile</h2>
+                        <p class="section-description">
+                            Tell us about yourself to get started. Your information helps us connect you with relevant people nearby.
+                        </p>
+                    </div>
 
-  <!-- Chat Container (hidden initially) -->
-  <div class="chat-container" id="chatContainer">
-    <!-- Chat Header -->
-    <div class="chat-header">
-      <div class="app-title-small">
-        <div class="logo-small">
-      
-<div class="logo-icon-small">
-  <img src="mylogo.png" alt="Gapkar Logo" class="logo-image-small">
-</div>
+                    <form id="profileForm" novalidate>
+                        <div class="form-group">
+                            <label class="form-label" for="userName">Your Name</label>
+                            <input 
+                                type="text" 
+                                id="userName" 
+                                class="form-input" 
+                                placeholder="Enter your display name"
+                                maxlength="30"
+                                required
+                                aria-describedby="nameHelp"
+                            >
+                            <small id="nameHelp" class="form-help">This name will be visible to other users</small>
+                        </div>
 
-          <span class="app-name">gappkar</span>
+                        <div class="form-group">
+                            <label class="form-label" for="userAge">Your Age</label>
+                            <input 
+                                type="number" 
+                                id="userAge" 
+                                class="form-input" 
+                                placeholder="Enter your age"
+                                min="13"
+                                max="100"
+                                required
+                                aria-describedby="ageHelp"
+                            >
+                            <small id="ageHelp" class="form-help">Must be between 13-100 years</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="userBio">About You (Optional)</label>
+                            <input 
+                                type="text" 
+                                id="userBio" 
+                                class="form-input" 
+                                placeholder="Tell us something about yourself"
+                                maxlength="100"
+                            >
+                        </div>
+
+                        <button type="submit" class="btn btn-success">
+                            Start Chatting 🚀
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Enhanced Chat Interface -->
+            <div class="chat-container" id="chatContainer">
+                <div class="chat-header">
+                    <div class="logo-container">
+                        <div class="logo-icon" style="width: 30px; height: 30px; font-size: 16px;">
+                            <img src="mylogo.png" alt="Gappkar Logo" class="logo-image" onerror="this.style.display='none'; this.parentNode.innerHTML='G';">
+                        </div>
+                        <span class="app-title" style="font-size: 20px;">gappkar</span>
+                    </div>
+                    
+                    <div class="user-info">
+                        <div><strong id="userNameDisplay">User</strong>, <span id="userAgeDisplay">25</span></div>
+                        <div class="online-status">
+                            <span class="status-dot"></span>
+                            <span>Online</span>
+                        </div>
+                        <small id="locationDisplay">Loading location...</small>
+                    </div>
+                </div>
+
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message">
+                        <div class="message-header">
+                            <div class="message-info">
+                                <span class="username">@system</span>
+                                <span class="timestamp">Now</span>
+                            </div>
+                        </div>
+                        <div class="message-bubble">
+                            Welcome to Gappkar! Start chatting with people near you. 🎉
+                        </div>
+                    </div>
+                </div>
+
+                <div class="typing-indicator" id="typingIndicator">
+                    Someone is typing<span class="typing-dots"></span>
+                </div>
+
+                <div class="chat-input">
+                    <div class="input-wrapper">
+                        <button class="attachment-btn" onclick="handleAttachment()" aria-label="Attach file">
+                            📎
+                        </button>
+                        <input 
+                            type="text" 
+                            class="message-input" 
+                            placeholder="Type your message here..." 
+                            id="messageInput"
+                            maxlength="500"
+                            aria-label="Message input"
+                        >
+                        <button class="send-btn" onclick="sendMessage()" id="sendButton" aria-label="Send message">
+                            ➤
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="user-info">
-          <div><strong id="userNameDisplay">User</strong>, <span id="userAgeDisplay">25</span></div>
-          <small id="locationDisplay">Loading location...</small>
-        </div>
-      </div>
     </div>
 
-    <!-- Chat Messages -->
-    <div class="chat-messages" id="chatMessages">
-      <div class="message">
-        <div class="message-header">
-          <span class="username">@system</span>
-          <span class="timestamp">Now</span>
-        </div>
-        <div class="message-bubble">
-          Welcome to Gappkar! Start gapping with people near you.
-        </div>
-      </div>
-    </div>
+    <!-- Hidden file input for attachments -->
+    <input type="file" id="fileInput" style="display: none;" accept="image/*,.pdf,.doc,.docx" onchange="handleFileSelect(event)">
 
-    <!-- Chat Input -->
-    <div class="chat-input">
-      <div class="input-container">
-        <input 
-          type="text" 
-          class="message-input" 
-          placeholder="Type your message here ..." 
-          id="messageInput"
-        >
-        <button class="send-button" onclick="sendMessage()">
-          ➤
-        </button>
-      </div>
-    </div>
-  </div>
+    <script>
+        // Enhanced Application Class
+        class GappkarApp {
+            constructor() {
+                this.state = {
+                    user: null,
+                    location: null,
+                    theme: localStorage.getItem('gappkar_theme') || 'light',
+                    isOnline: navigator.onLine,
+                    messages: [],
+                    typingUsers: new Set(),
+                    lastActivity: Date.now()
+                };
+                
+                this.services = {
+                    location: new LocationService(),
+                    chat: new ChatService(),
+                    storage: new StorageService(),
+                    notification: new NotificationService()
+                };
+                
+                this.ui = new UIManager(this);
+                this.init();
+            }
 
-  <script>
-    // Global variables
-    let userLocation = null;
-    let userProfile = null;
+            async init() {
+                this.setupEventListeners();
+                this.applyTheme();
+                await this.checkExistingUser();
+                this.startHeartbeat();
+            }
 
-    // DOM elements
-    const setupContainer = document.getElementById('setupContainer');
-    const chatContainer = document.getElementById('chatContainer');
-    const locationSection = document.getElementById('locationSection');
-    const profileSection = document.getElementById('profileSection');
-    const statusMessage = document.getElementById('statusMessage');
-    const locationInfo = document.getElementById('locationInfo');
-    const getLocationBtn = document.getElementById('getLocationBtn');
-    const locationBtnText = document.getElementById('locationBtnText');
+            setupEventListeners() {
+                // Online/offline detection
+                window.addEventListener('online', () => this.handleConnectionChange(true));
+                window.addEventListener('offline', () => this.handleConnectionChange(false));
+                
+                // Activity tracking
+                document.addEventListener('click', () => this.updateActivity());
+                document.addEventListener('keypress', () => this.updateActivity());
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
 
-    // Show status message
-    function showStatus(message, type) {
-      statusMessage.innerHTML = `<div class="status-message status-${type}">${message}</div>`;
-    }
+                // Form submissions
+                document.getElementById('profileForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleProfileSubmit();
+                });
 
-    // Get user location
-    function getUserLocation() {
-      if (!navigator.geolocation) {
-        showStatus('❌ Geolocation is not supported by this browser', 'error');
-        return;
-      }
+                // Message input
+                const messageInput = document.getElementById('messageInput');
+                messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                });
 
-      // Show loading state
-      getLocationBtn.disabled = true;
-      locationBtnText.innerHTML = '<span class="spinner"></span>Getting location...';
-      showStatus('📍 Getting your location...', 'loading');
+                // Typing indicators
+                messageInput.addEventListener('input', () => this.handleTyping());
+            }
 
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
-          
-          userLocation = { latitude, longitude };
-          
-          try {
-            // Get location name using reverse geocoding
-            const locationName = await getLocationName(latitude, longitude);
-            
-            showStatus('✅ Location detected successfully!', 'success');
-            locationInfo.innerHTML = `
-              <strong>📍 Your Location:</strong><br>
-              ${locationName}<br>
-              <small>Lat: ${latitude.toFixed(4)}, Lng: ${longitude.toFixed(4)}</small>
-            `;
-            locationInfo.classList.add('show');
-            
-            // Update button
-            getLocationBtn.innerHTML = 'Continue to Profile';
-            getLocationBtn.disabled = false;
-            getLocationBtn.onclick = () => showProfileSection();
-            
-          } catch (error) {
-            showStatus('✅ Location detected! Ready to continue.', 'success');
-            locationInfo.innerHTML = `
-              <strong>📍 Your Location:</strong><br>
-              Coordinates: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}
-            `;
-            locationInfo.classList.add('show');
-            
-            getLocationBtn.innerHTML = 'Continue to Profile';
-            getLocationBtn.disabled = false;
-            getLocationBtn.onclick = () => showProfileSection();
-          }
-        },
-        (error) => {
-          let errorMessage = 'Unable to get your location. ';
-          switch(error.code) {
-            case error.PERMISSION_DENIED:
-              errorMessage += 'Please allow location access and try again.';
-              break;
-            case error.POSITION_UNAVAILABLE:
-              errorMessage += 'Location information is unavailable.';
-              break;
-            case error.TIMEOUT:
-              errorMessage += 'Location request timed out.';
-              break;
-            default:
-              errorMessage += 'An unknown error occurred.';
-              break;
-          }
-          
-          showStatus(`❌ ${errorMessage}`, 'error');
-          getLocationBtn.disabled = false;
-          locationBtnText.textContent = 'Try Again';
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 60000
+            async checkExistingUser() {
+                const savedUser = this.services.storage.getUser();
+                if (savedUser && this.isValidUser(savedUser)) {
+                    this.state.user = savedUser.profile;
+                    this.state.location = savedUser.location;
+                    this.ui.showChat();
+                }
+            }
+
+            isValidUser(userData) {
+                return userData && 
+                       userData.profile && 
+                       userData.profile.name && 
+                       userData.profile.age &&
+                       userData.location;
+            }
+
+            handleConnectionChange(isOnline) {
+                this.state.isOnline = isOnline;
+                this.ui.updateConnectionStatus(isOnline);
+            }
+
+            updateActivity() {
+                this.state.lastActivity = Date.now();
+            }
+
+            startHeartbeat() {
+                setInterval(() => {
+                    const inactive = Date.now() - this.state.lastActivity > 300000; // 5 minutes
+                    if (inactive && this.state.isOnline) {
+                        this.ui.updateUserStatus('away');
+                    }
+                }, 60000); // Check every minute
+            }
+
+            async requestLocation() {
+                try {
+                    this.ui.showLocationLoading();
+                    const location = await this.services.location.getCurrentLocation();
+                    this.state.location = location;
+                    this.ui.showLocationSuccess(location);
+                    this.ui.enableProfileSection();
+                } catch (error) {
+                    this.ui.showLocationError(error.message);
+                }
+            }
+
+            async handleProfileSubmit() {
+                const formData = new FormData(document.getElementById('profileForm'));
+                const profile = {
+                    name: formData.get('userName')?.trim(),
+                    age: parseInt(formData.get('userAge')),
+                    bio: formData.get('userBio')?.trim() || ''
+                };
+
+                if (this.validateProfile(profile)) {
+                    this.state.user = profile;
+                    await this.services.storage.saveUser({
+                        profile: profile,
+                        location: this.state.location,
+                        joinedAt: new Date().toISOString()
+                    });
+                    this.ui.showChat();
+                    this.addSystemMessage(`Welcome ${profile.name}! You're now connected to your local area.`);
+                } else {
+                    this.ui.showProfileError('Please fill in valid information');
+                }
+            }
+
+            validateProfile(profile) {
+                return profile.name && 
+                       profile.name.length >= 2 && 
+                       profile.age >= 13 && 
+                       profile.age <= 100;
+            }
+
+            sendMessage() {
+                const input = document.getElementById('messageInput');
+                const message = input.value.trim();
+                
+                if (message && this.state.user) {
+                    const messageData = {
+                        id: Date.now(),
+                        username: this.state.user.name,
+                        content: this.sanitizeMessage(message),
+                        timestamp: new Date(),
+                        reactions: {}
+                    };
+                    
+                    this.addMessage(messageData);
+                    input.value = '';
+                    this.updateSendButton();
+                }
+            }
+
+            sanitizeMessage(message) {
+                return message.replace(/[<>]/g, '').slice(0, 500);
+            }
+
+            addMessage(messageData) {
+                this.state.messages.push(messageData);
+                this.ui.renderMessage(messageData);
+                this.services.storage.saveMessage(messageData);
+            }
+
+            addSystemMessage(content) {
+                const systemMessage = {
+                    id: Date.now(),
+                    username: 'system',
+                    content: content,
+                    timestamp: new Date(),
+                    isSystem: true
+                };
+                this.addMessage(systemMessage);
+            }
+
+            handleTyping() {
+                // Implement typing indicator logic
+                const input = document.getElementById('messageInput');
+                this.updateSendButton();
+                
+                // Simulate typing indicator
+                if (Math.random() < 0.1) { // 10% chance to show typing
+                    this.ui.showTypingIndicator();
+                    setTimeout(() => this.ui.hideTypingIndicator(), 2000);
+                }
+            }
+
+            updateSendButton() {
+                const input = document.getElementById('messageInput');
+                const button = document.getElementById('sendButton');
+                button.disabled = !input.value.trim();
+            }
+
+            toggleTheme() {
+                this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
+                this.applyTheme();
+                localStorage.setItem('gappkar_theme', this.state.theme);
+            }
+
+            applyTheme() {
+                document.documentElement.setAttribute('data-theme', this.state.theme);
+                document.getElementById('themeIcon').textContent = this.state.theme === 'light' ? '🌙' : '☀️';
+            }
+
+            async handleAttachment() {
+                document.getElementById('fileInput').click();
+            }
+
+            async handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    // Implement file upload logic
+                    this.addSystemMessage(`File "${file.name}" selected for upload`);
+                }
+            }
+
+            addReaction(messageId, emoji) {
+                const message = this.state.messages.find(m => m.id === messageId);
+                if (message) {
+                    if (!message.reactions[emoji]) {
+                        message.reactions[emoji] = [];
+                    }
+                    message.reactions[emoji].push(this.state.user.name);
+                    this.ui.updateMessageReactions(messageId, message.reactions);
+                }
+            }
         }
-      );
-    }
 
-    // Get location name using reverse geocoding
-    async function getLocationName(lat, lng) {
-      try {
-        const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`);
-        const data = await response.json();
-        return data.city + ', ' + data.principalSubdivision + ', ' + data.countryName;
-      } catch (error) {
-        throw error;
-      }
-    }
+        // Location Service
+        class LocationService {
+            async getCurrentLocation() {
+                return new Promise((resolve, reject) => {
+                    if (!navigator.geolocation) {
+                        reject(new Error('Geolocation is not supported'));
+                        return;
+                    }
 
-    // Show profile section
-    function showProfileSection() {
-      locationSection.classList.remove('active');
-      profileSection.classList.add('active');
-    }
+                    navigator.geolocation.getCurrentPosition(
+                        async (position) => {
+                            const location = {
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude,
+                                accuracy: position.coords.accuracy
+                            };
+                            
+                            try {
+                                location.address = await this.reverseGeocode(location.latitude, location.longitude);
+                            } catch (e) {
+                                location.address = `${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}`;
+                            }
+                            
+                            resolve(location);
+                        },
+                        (error) => {
+                            reject(new Error(this.getLocationErrorMessage(error)));
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 300000
+                        }
+                    );
+                });
+            }
 
-    // Handle profile form submission
-    document.getElementById('profileForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const name = document.getElementById('userName').value.trim();
-      const age = parseInt(document.getElementById('userAge').value);
-      
-      if (name && age >= 13 && age <= 100) {
-        userProfile = { name, age };
-        
-        // Save to localStorage
-        localStorage.setItem('gapkar_user', JSON.stringify({
-          name: name,
-          age: age,
-          location: userLocation,
-          joinedAt: new Date().toISOString()
-        }));
-        
-        // Start chat
-        startChat();
-      } else {
-        alert('Please fill in valid information (age must be between 13-100)');
-      }
-    });
+            async reverseGeocode(lat, lng) {
+                try {
+                    const response = await fetch(
+                        `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`
+                    );
+                    const data = await response.json();
+                    return `${data.city || data.locality || 'Unknown'}, ${data.principalSubdivision || data.countryName || 'Unknown'}`;
+                } catch (error) {
+                    throw error;
+                }
+            }
 
-    // Start chat function
-    function startChat() {
-      // Update chat header with user info
-      document.getElementById('userNameDisplay').textContent = userProfile.name;
-      document.getElementById('userAgeDisplay').textContent = userProfile.age;
-      
-      if (userLocation) {
-        getLocationName(userLocation.latitude, userLocation.longitude)
-          .then(locationName => {
-            document.getElementById('locationDisplay').textContent = locationName;
-          })
-          .catch(() => {
-            document.getElementById('locationDisplay').textContent = 
-              `${userLocation.latitude.toFixed(2)}, ${userLocation.longitude.toFixed(2)}`;
-          });
-      }
-      
-      // Hide setup and show chat
-      setupContainer.style.display = 'none';
-      chatContainer.classList.add('show');
-      
-      // Add welcome message
-      addMessage('system', `Welcome ${userProfile.name}! You're connected to your local area.`);
-    }
+            getLocationErrorMessage(error) {
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        return 'Location access denied. Please allow location access and try again.';
+                    case error.POSITION_UNAVAILABLE:
+                        return 'Location information is unavailable.';
+                    case error.TIMEOUT:
+                        return 'Location request timed out.';
+                    default:
+                        return 'An unknown error occurred while getting location.';
+                }
+            }
+        }
 
-    // Add message to chat
-    function addMessage(username, message) {
-      const chatMessages = document.getElementById('chatMessages');
-      const messageDiv = document.createElement('div');
-      messageDiv.className = 'message';
-      
-      const now = new Date();
-      const timeString = now.toLocaleTimeString('en-US', { 
-        hour: 'numeric', 
-        minute: '2-digit',
-        hour12: true 
-      });
-      
-      messageDiv.innerHTML = `
-        <div class="message-header">
-          <span class="username">@${username}</span>
-          <span class="timestamp">${timeString}</span>
-        </div>
-        <div class="message-bubble">
-          ${message}
-        </div>
-      `;
-      
-      chatMessages.appendChild(messageDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+        // Chat Service
+        class ChatService {
+            constructor() {
+                this.messageQueue = [];
+                this.isOnline = navigator.onLine;
+            }
 
-    // Send message function
-    function sendMessage() {
-      const input = document.getElementById('messageInput');
-      const message = input.value.trim();
-      
-      if (message && userProfile) {
-        addMessage(userProfile.name, message);
-        input.value = '';
-      }
-    }
+            async sendMessage(message) {
+                if (this.isOnline) {
+                    // Send to server when implemented
+                    return Promise.resolve(message);
+                } else {
+                    this.messageQueue.push(message);
+                    return Promise.resolve(message);
+                }
+            }
 
-    // Send message on Enter
-    document.getElementById('messageInput')?.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        sendMessage();
-      }
-    });
+            async getMessages() {
+                // Fetch messages from server when implemented
+                return Promise.resolve([]);
+            }
+        }
 
-    // Initialize location request on page load
-    getLocationBtn.onclick = getUserLocation;
+        // Storage Service
+        class StorageService {
+            constructor() {
+                this.prefix = 'gappkar_';
+            }
 
-    // Check if user data exists
-    const savedUser = localStorage.getItem('gapkar_user');
-    if (savedUser) {
-      const userData = JSON.parse(savedUser);
-      userProfile = { name: userData.name, age: userData.age };
-      userLocation = userData.location;
-      
-      // Skip setup and go directly to chat
-      setTimeout(() => {
-        startChat();
-      }, 1000);
-    }
-  </script>
+            saveUser(userData) {
+                localStorage.setItem(`${this.prefix}user`, JSON.stringify(userData));
+            }
+
+            getUser() {
+                const data = localStorage.getItem(`${this.prefix}user`);
+                return data ? JSON.parse(data) : null;
+            }
+
+            saveMessage(message) {
+                const messages = this.getMessages();
+                messages.push(message);
+                // Keep only last 100 messages
+                if (messages.length > 100) {
+                    messages.splice(0, messages.length - 100);
+                }
+                localStorage.setItem(`${this.prefix}messages`, JSON.stringify(messages));
+            }
+
+            getMessages() {
+                const data = localStorage.getItem(`${this.prefix}messages`);
+                return data ? JSON.parse(data) : [];
+            }
+
+            clearData() {
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith(this.prefix)) {
+                        localStorage.removeItem(key);
+                    }
+                });
+            }
+        }
+
+        // Notification Service
+        class NotificationService {
+            constructor() {
+                this.permission = Notification.permission;
+                this.requestPermission();
+            }
+
+            async requestPermission() {
+                if ('Notification' in window && this.permission === 'default') {
+                    this.permission = await Notification.requestPermission();
+                }
+            }
+
+            show(title, options = {}) {
+                if (this.permission === 'granted') {
+                    return new Notification(title, {
+                        icon: 'mylogo.png',
+                        badge: 'mylogo.png',
+                        ...options
+                    });
+                }
+            }
+        }
+
+        // UI Manager
+        class UIManager {
+            constructor(app) {
+                this.app = app;
+            }
+
+            showLocationLoading() {
+                const btn = document.getElementById('getLocationBtn');
+                const btnText = document.getElementById('locationBtnText');
+                btn.disabled = true;
+                btnText.innerHTML = '<span class="spinner"></span>Getting location...';
+                this.showStatus('📍 Getting your location...', 'loading', 'locationStatus');
+            }
+
+            showLocationSuccess(location) {
+                const btn = document.getElementById('getLocationBtn');
+                const locationInfo = document.getElementById('locationInfo');
+                
+                btn.innerHTML = 'Continue to Profile';
+                btn.disabled = false;
+                btn.onclick = () => this.showProfileSection();
+                
+                locationInfo.innerHTML = `
+                    <strong>📍 Your Location:</strong><br>
+                    ${location.address}<br>
+                    <small>Accuracy: ${location.accuracy}m</small>
+                `;
+                locationInfo.classList.add('show');
+                
+                this.showStatus('✅ Location detected successfully!', 'success', 'locationStatus');
+            }
+
+            showLocationError(message) {
+                const btn = document.getElementById('getLocationBtn');
+                btn.disabled = false;
+                btn.innerHTML = 'Try Again';
+                this.showStatus(`❌ ${message}`, 'error', 'locationStatus');
+            }
+
+            showProfileSection() {
+                document.getElementById('locationSection').classList.remove('active');
+                document.getElementById('profileSection').classList.add('active');
+            }
+
+            enableProfileSection() {
+                this.showProfileSection();
+            }
+
+            showProfileError(message) {
+                // Implement profile error display
+                alert(message); // Temporary implementation
+            }
+
+            showChat() {
+                document.getElementById('setupContent').style.display = 'none';
+                document.getElementById('chatContainer').classList.add('active');
+                
+                // Update user info in header
+                document.getElementById('userNameDisplay').textContent = this.app.state.user.name;
+                document.getElementById('userAgeDisplay').textContent = this.app.state.user.age;
+                
+                if (this.app.state.location) {
+                    document.getElementById('locationDisplay').textContent = this.app.state.location.address;
+                }
+            }
+
+            renderMessage(messageData) {
+                const messagesContainer = document.getElementById('chatMessages');
+                const messageEl = document.createElement('div');
+                messageEl.className = 'message';
+                messageEl.dataset.messageId = messageData.id;
+                
+                const timeString = messageData.timestamp.toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+
+                messageEl.innerHTML = `
+                    <div class="message-header">
+                        <div class="message-info">
+                            <span class="username">@${messageData.username}</span>
+                            <span class="timestamp">${timeString}</span>
+                        </div>
+                        ${!messageData.isSystem ? `
+                            <div class="message-actions">
+                                <button class="action-btn" onclick="app.addReaction(${messageData.id}, '👍')" aria-label="Like">👍</button>
+                                <button class="action-btn" onclick="app.addReaction(${messageData.id}, '❤️')" aria-label="Love">❤️</button>
+                                <button class="action-btn" onclick="app.addReaction(${messageData.id}, '😄')" aria-label="Laugh">😄</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="message-bubble">
+                        ${messageData.content}
+                    </div>
+                    <div class="message-reactions" id="reactions-${messageData.id}"></div>
+                `;
+                
+                messagesContainer.appendChild(messageEl);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+
+            updateMessageReactions(messageId, reactions) {
+                const reactionsEl = document.getElementById(`reactions-${messageId}`);
+                if (reactionsEl) {
+                    reactionsEl.innerHTML = Object.entries(reactions)
+                        .map(([emoji, users]) => `
+                            <span class="reaction" title="${users.join(', ')}">
+                                ${emoji} ${users.length}
+                            </span>
+                        `).join('');
+                }
+            }
+
+            showTypingIndicator() {
+                document.getElementById('typingIndicator').classList.add('show');
+            }
+
+            hideTypingIndicator() {
+                document.getElementById('typingIndicator').classList.remove('show');
+            }
+
+            updateConnectionStatus(isOnline) {
+                const statusDot = document.querySelector('.status-dot');
+                const statusText = document.querySelector('.online-status span:last-child');
+                
+                if (statusDot && statusText) {
+                    statusDot.style.background = isOnline ? '#27ae60' : '#e74c3c';
+                    statusText.textContent = isOnline ? 'Online' : 'Offline';
+                }
+            }
+
+            updateUserStatus(status) {
+                const statusText = document.querySelector('.online-status span:last-child');
+                if (statusText) {
+                    statusText.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+                }
+            }
+
+            showStatus(message, type, containerId) {
+                const container = document.getElementById(containerId);
+                if (container) {
+                    container.innerHTML = `<div class="status-message status-${type}">${message}</div>`;
+                }
+            }
+        }
+
+        // Global functions for HTML event handlers
+        let app;
+
+        function requestLocation() {
+            app.requestLocation();
+        }
+
+        function sendMessage() {
+            app.sendMessage();
+        }
+
+        function toggleTheme() {
+            app.toggleTheme();
+        }
+
+        function handleAttachment() {
+            app.handleAttachment();
+        }
+
+        function handleFileSelect(event) {
+            app.handleFileSelect(event);
+        }
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new GappkarApp();
+        });
+
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
