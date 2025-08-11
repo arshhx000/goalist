@@ -408,8 +408,8 @@
         /* FIXED: Chat Interface with Guaranteed Visible Input */
         .chat-container {
             display: none;
-            height: 100vh;
-            max-height: 700px;
+            height: 120vh;
+            max-height: 900px;
             flex-direction: column;
             background: var(--white);
             position: relative;
@@ -592,7 +592,7 @@
             flex-shrink: 0;
             position: relative;
             z-index: 1000;
-            min-height: 80px;
+            min-height: 100px;
             display: flex !important;
             align-items: center;
         }
@@ -600,13 +600,13 @@
         .input-container {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             background: var(--very-light-gray);
             border-radius: var(--border-radius-xl);
-            padding: 12px;
+            padding: 10px;
             width: 100%;
             transition: all 0.3s ease;
-            border: 2px solid transparent;
+            border: 4px solid transparent;
         }
 
         .input-container:focus-within {
@@ -697,7 +697,7 @@
             }
             
             .app-header {
-                border-radius: 0;
+                border-radius: 2;
                 flex-shrink: 0;
             }
             
