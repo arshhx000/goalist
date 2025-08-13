@@ -4,13 +4,16 @@ import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gsta
 import { getFirestore, addDoc, collection, onSnapshot, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // Your Firebase configuration (replace with YOUR config from Step 4)
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "your-api-key-here",
-  authDomain: "your-project.firebaseapp.com", 
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "your-app-id"
+  apiKey: "AIzaSyCOmLxxqPesNaBr4Z9fVIU6K2BLW6OsED0",
+  authDomain: "gappkar-v1-b3afe.firebaseapp.com",
+  databaseURL: "https://gappkar-v1-b3afe-default-rtdb.firebaseio.com",
+  projectId: "gappkar-v1-b3afe",
+  storageBucket: "gappkar-v1-b3afe.firebasestorage.app",
+  messagingSenderId: "726018257415",
+  appId: "1:726018257415:web:12142708abdf47952af0a2",
+  measurementId: "G-EWK4436NRB"
 };
 
 // Initialize Firebase
