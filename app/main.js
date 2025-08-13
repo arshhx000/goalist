@@ -3,15 +3,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebas
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getFirestore, addDoc, collection, onSnapshot, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-// Your Firebase configuration (replace with YOUR config from Step 4)
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Your REAL Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyC1234567890...", // Real API key
-  authDomain: "gappkar-chat-123.firebaseapp.com", // Real domain
-  projectId: "gappkar-chat-123", // Real project ID
-  storageBucket: "gappkar-chat-123.appspot.com", // Real storage bucket
-  messagingSenderId: "987654321", // Real sender ID
-  appId: "1:987654321:web:abc123def456" // Real app ID
+  apiKey: "AIzaSyCOmLxxqPesNaBr4Z9fVIU6K2BLW6OsED0",
+  authDomain: "gappkar-v1-b3afe.firebaseapp.com",
+  databaseURL: "https://gappkar-v1-b3afe-default-rtdb.firebaseio.com",
+  projectId: "gappkar-v1-b3afe",
+  storageBucket: "gappkar-v1-b3afe.firebasestorage.app",
+  messagingSenderId: "726018257415",
+  appId: "1:726018257415:web:12142708abdf47952af0a2",
+  measurementId: "G-EWK4436NRB"
 };
 
 // Initialize Firebase
@@ -22,7 +23,6 @@ const auth = getAuth(app);
 // Global variables
 let currentUser = null;
 let currentUsername = "";
-
 
 // Auto-login user when page loads
 onAuthStateChanged(auth, (user) => {
@@ -46,9 +46,12 @@ async function joinChat(username) {
     await signInAnonymously(auth);
     currentUsername = username;
     
+    // Update user display
+    document.getElementById("userNameDisplay").textContent = username;
+    
     // Hide join form, show chat
     document.getElementById("joinView").style.display = "none";
-    document.getElementById("chatsView").style.display = "block";
+    document.getElementById("chatsView").style.display = "flex";
     
     // Start listening for messages
     listenForMessages();
@@ -59,6 +62,7 @@ async function joinChat(username) {
     alert("Failed to join chat. Please try again.");
   }
 }
+
 // Function to send a message
 async function sendMessage() {
   const messageInput = document.getElementById("messageInput");
@@ -121,7 +125,7 @@ function displayMessage(messageData) {
   
   // Create message element
   const messageDiv = document.createElement("div");
-  messageDiv.className = "message-item p-3 border-b border-gray-200";
+  messageDiv.className = "message";
   
   // Format timestamp
   let timeString = "Just now";
@@ -132,21 +136,20 @@ function displayMessage(messageData) {
     });
   }
   
+  // FIXED: Proper template literals (not escaped backticks)
   messageDiv.innerHTML = `
-    <div class="flex items-start space-x-3">
-      <div class="flex-1">
-        <div class="flex items-baseline space-x-2">
-          <span class="font-medium text-gray-900">${messageData.user}</span>
-          <span class="text-xs text-gray-500">${timeString}</span>
-        </div>
-        <p class="text-gray-700 mt-1">${messageData.message}</p>
-        <span class="text-xs text-gray-400">${messageData.location}</span>
-      </div>
+    <div class="message-header">
+      <span class="username">${messageData.user}</span>
+      <span class="timestamp">${timeString}</span>
+    </div>
+    <div class="message-bubble">
+      ${messageData.message}
     </div>
   `;
   
   messageContainer.appendChild(messageDiv);
 }
+
 // Wait for DOM to load, then add event listeners
 document.addEventListener("DOMContentLoaded", function() {
   
@@ -187,4 +190,3 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
 });
-
