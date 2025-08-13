@@ -271,7 +271,7 @@
 
         /* Chat Interface - Firebase Compatible */
         #chatsView {
-            display: none !important;
+            display: none;
             height: 100vh;
             max-height: 900px;
             flex-direction: column;
@@ -279,7 +279,7 @@
             position: relative;
         }
 
-        #chatsView.show {
+        #chatsView:not(.hidden) {
             display: flex !important;
         }
 
@@ -564,7 +564,7 @@
                 flex-direction: column;
             }
             
-            #chatsView.show {
+            #chatsView:not(.hidden) {
                 display: flex !important;
             }
             
@@ -725,7 +725,12 @@
         }
         
         // Add event listener for theme toggle
-        document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', toggleTheme);
+            }
+        });
     </script>
 </body>
 </html>
