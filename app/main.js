@@ -6,14 +6,12 @@ import { getFirestore, addDoc, collection, onSnapshot, orderBy, query, serverTim
 // Your Firebase configuration (replace with YOUR config from Step 4)
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyCOmLxxqPesNaBr4Z9fVIU6K2BLW6OsED0",
-  authDomain: "https://gappkar.netlify.app",
-  databaseURL: "https://gappkar-v1-b3afe-default-rtdb.firebaseio.com",
-  projectId: "gappkar-v1-b3afe",
-  storageBucket: "gappkar-v1-b3afe.firebasestorage.app",
-  messagingSenderId: "726018257415",
-  appId: "1:726018257415:web:12142708abdf47952af0a2",
-  measurementId: "G-EWK4436NRB"
+  apiKey: "AIzaSyC1234567890...", // Real API key
+  authDomain: "gappkar-chat-123.firebaseapp.com", // Real domain
+  projectId: "gappkar-chat-123", // Real project ID
+  storageBucket: "gappkar-chat-123.appspot.com", // Real storage bucket
+  messagingSenderId: "987654321", // Real sender ID
+  appId: "1:987654321:web:abc123def456" // Real app ID
 };
 
 // Initialize Firebase
