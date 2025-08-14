@@ -135,7 +135,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Join chat function
+// Enhanced join chat function with proper header hiding
 async function joinChat(username, dob, location) {
   if (!username.trim()) {
     alert("Please enter your name");
@@ -182,9 +182,31 @@ async function joinChat(username, dob, location) {
     document.getElementById("userAgeDisplay").textContent = age;
     document.getElementById("userLocationDisplay").textContent = location.length > 15 ? location.substring(0, 15) + '...' : location;
     
-    // Switch views
-    document.getElementById("joinView").classList.add("hidden");
-    document.getElementById("chatsView").classList.remove("hidden");
+    // Hide app header completely
+    const appHeader = document.querySelector('.app-header');
+    if (appHeader) {
+        appHeader.style.display = 'none';
+    }
+    
+    // Switch views with proper styling
+    const joinView = document.getElementById("joinView");
+    const chatsView = document.getElementById("chatsView");
+    const mainContainer = document.querySelector('.main-container');
+    
+    joinView.classList.add("hidden");
+    chatsView.classList.remove("hidden");
+    
+    // Ensure full screen chat on mobile
+    if (window.innerWidth <= 480) {
+        chatsView.style.position = 'fixed';
+        chatsView.style.top = '0';
+        chatsView.style.left = '0';
+        chatsView.style.width = '100vw';
+        chatsView.style.height = '100vh';
+        chatsView.style.zIndex = '9999';
+        mainContainer.style.borderRadius = '0';
+        document.body.style.overflow = 'hidden';
+    }
     
     // Start listening for messages
     listenForMessages();
@@ -306,7 +328,7 @@ function displayMessage(messageData) {
   messageCount++;
 }
 
-// Check existing session
+// Updated checkExistingSession function
 function checkExistingSession() {
   const savedUsername = localStorage.getItem('gappkar_username');
   const savedAge = localStorage.getItem('gappkar_age');
@@ -320,11 +342,37 @@ function checkExistingSession() {
     
     setTimeout(() => {
       isJoined = true;
+      
+      // Hide app header
+      const appHeader = document.querySelector('.app-header');
+      if (appHeader) {
+          appHeader.style.display = 'none';
+      }
+      
+      // Update user info
       document.getElementById("userNameDisplay").textContent = savedUsername;
       document.getElementById("userAgeDisplay").textContent = savedAge;
       document.getElementById("userLocationDisplay").textContent = savedLocation.length > 15 ? savedLocation.substring(0, 15) + '...' : savedLocation;
+      
+      // Switch views
       document.getElementById("joinView").classList.add("hidden");
       document.getElementById("chatsView").classList.remove("hidden");
+      
+      // Full screen on mobile
+      const chatsView = document.getElementById("chatsView");
+      const mainContainer = document.querySelector('.main-container');
+      
+      if (window.innerWidth <= 480) {
+          chatsView.style.position = 'fixed';
+          chatsView.style.top = '0';
+          chatsView.style.left = '0';
+          chatsView.style.width = '100vw';
+          chatsView.style.height = '100vh';
+          chatsView.style.zIndex = '9999';
+          mainContainer.style.borderRadius = '0';
+          document.body.style.overflow = 'hidden';
+      }
+      
       listenForMessages();
     }, 500);
   }
@@ -402,7 +450,7 @@ window.logout = function() {
   location.reload();
 };
 
-// Handle mobile keyboard issues
+// Handle mobile keyboard and resize issues
 window.addEventListener('resize', () => {
     if (document.getElementById('chatsView').classList.contains('hidden') === false) {
         setTimeout(() => {
