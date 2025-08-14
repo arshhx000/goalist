@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Gappkar - Connect Locally</title>
+    <title>Gappkar-Connect Locally</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f4d03f">
     <!-- Modern Font -->
@@ -82,6 +82,16 @@
             text-align: center;
             position: relative;
             border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+            display: block;
+        }
+
+        /* Hide app header when chat is active */
+        .main-container:has(#chatsView:not(.hidden)) .app-header {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            opacity: 0 !important;
         }
 
         .theme-toggle {
@@ -303,7 +313,7 @@
             transform: none;
         }
 
-        /* Chat Interface - Fixed */
+        /* Chat Interface - Fixed Full Screen */
         #chatsView {
             display: none;
             flex-direction: column;
@@ -315,6 +325,13 @@
 
         #chatsView:not(.hidden) {
             display: flex !important;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1000;
+            border-radius: 0;
         }
 
         /* Fixed Chat Header */
@@ -704,9 +721,18 @@
                 overflow-y: auto;
             }
             
-            #chatsView {
-                height: 100vh;
-                max-height: 100vh;
+            #chatsView:not(.hidden) {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                z-index: 9999 !important;
+                border-radius: 0;
+            }
+            
+            body:has(#chatsView:not(.hidden)) {
+                overflow: hidden;
             }
             
             .chat-header {
@@ -740,6 +766,7 @@
             
             .chat-input {
                 padding: 10px 12px 16px;
+                padding-bottom: env(safe-area-inset-bottom, 16px);
             }
             
             .message-input {
@@ -759,13 +786,6 @@
             
             .message-wrapper.other-user-wrapper {
                 margin-right: 15%;
-            }
-        }
-
-        /* iOS Safari keyboard fix */
-        @supports (-webkit-touch-callout: none) {
-            .chat-input {
-                padding-bottom: env(safe-area-inset-bottom, 16px);
             }
         }
 
