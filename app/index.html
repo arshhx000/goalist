@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Gappkar-Connect Locally</title>
+    <title>Gappkar - Connect Locally</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f4d03f">
-    <!-- Modern Font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -75,23 +74,17 @@
             position: relative;
         }
 
-        /* Modern Header - Only shown in join view */
+        /* App Header */
         .app-header {
             background: linear-gradient(135deg, var(--primary-yellow), var(--accent-yellow));
             padding: 24px 20px;
             text-align: center;
             position: relative;
             border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
-            display: block;
         }
 
-        /* Hide app header when chat is active */
         .main-container:has(#chatsView:not(.hidden)) .app-header {
             display: none !important;
-            visibility: hidden !important;
-            height: 0 !important;
-            overflow: hidden !important;
-            opacity: 0 !important;
         }
 
         .theme-toggle {
@@ -236,7 +229,7 @@
             color: var(--light-gray);
         }
 
-        /* Location button styles */
+        /* Location button */
         .btn-location {
             background: linear-gradient(135deg, #3498db, #2980b9);
             color: var(--white);
@@ -313,28 +306,20 @@
             transform: none;
         }
 
-        /* Chat Interface - Fixed Full Screen */
+        /* Chat Interface */
         #chatsView {
             display: none;
             flex-direction: column;
             background: var(--white);
             position: relative;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 500px;
         }
 
         #chatsView:not(.hidden) {
             display: flex !important;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: 1000;
-            border-radius: 0;
         }
 
-        /* Fixed Chat Header */
+        /* Chat Header */
         .chat-header {
             background: linear-gradient(135deg, var(--primary-yellow), var(--accent-yellow));
             padding: 16px;
@@ -343,10 +328,8 @@
             gap: 10px;
             box-shadow: var(--shadow-md);
             flex-shrink: 0;
-            position: relative;
         }
 
-        /* Top row with branding and user info */
         .chat-header-top {
             display: flex;
             align-items: center;
@@ -401,7 +384,6 @@
             line-height: 1;
         }
 
-        /* User profile section */
         .user-profile-section {
             display: flex;
             flex-direction: column;
@@ -436,7 +418,6 @@
             text-align: right;
         }
 
-        /* Bottom row with stats */
         .chat-header-bottom {
             display: flex;
             justify-content: space-between;
@@ -482,7 +463,7 @@
             50% { opacity: 0.5; }
         }
 
-        /* Fixed Message List */
+        /* Message List */
         #messageList {
             flex: 1;
             padding: 12px;
@@ -495,7 +476,6 @@
             scroll-behavior: smooth;
         }
 
-        /* Message Styles */
         .message {
             animation: messageSlide 0.3s ease;
             width: 100%;
@@ -512,240 +492,71 @@
             }
         }
 
-       /* ===== Nothing-style (square, minimal, monochrome) ===== */
+        /* Current User Messages */
+        .message-wrapper.current-user-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            margin-left: 20%;
+        }
 
-:root {
-  --surface: #0f0f10;          /* dark bg */
-  --elev-1: #161617;           /* bubble bg */
-  --ink: #f5f5f7;              /* primary text */
-  --muted: #a5a7ab;            /* timestamp */
-  --stroke: rgba(245,245,247,.16); /* 1px outlines */
-  --shadow-0: 0 1px 0 rgba(0,0,0,.25);
-  --radius-sq: 6px;            /* square-ish corners */
-}
+        .message-content.current-user-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            max-width: 100%;
+        }
 
-/* Optional light mode */
-@media (prefers-color-scheme: light) {
-  :root {
-    --surface: #f7f7f8;
-    --elev-1: #ffffff;
-    --ink: #1a1b1e;
-    --muted: #6b6f76;
-    --stroke: rgba(0,0,0,.12);
-    --shadow-0: 0 1px 0 rgba(0,0,0,.06);
-  }
-}
+        .message-bubble.current-user-bubble {
+            background: var(--current-user-bg);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 18px 18px 4px 18px;
+            max-width: 100%;
+            word-wrap: break-word;
+            box-shadow: var(--shadow-sm);
+            font-size: 14px;
+            line-height: 1.4;
+        }
 
-/* Current User Messages (Right Side) */
-.message-wrapper.current-user-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  margin-left: min(22%, 220px);
-  padding-inline: 8px;
-}
+        .message-info.current-user-info {
+            margin-top: 4px;
+            text-align: right;
+        }
 
-.message-content.current-user-content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  max-width: min(75ch, 100%);
-  gap: 6px;
-}
+        .message-info.current-user-info .timestamp {
+            color: var(--light-gray);
+            font-size: 11px;
+        }
 
-/* Bubble: square, thin border, subtle grid texture */
-.message-bubble.current-user-bubble {
-  position: relative;
-  background: var(--elev-1);
-  color: var(--ink);
-  padding: 12px 14px;
-  border-radius: var(--radius-sq);
-  border: 1px solid var(--stroke);
-  max-width: 100%;
-  word-wrap: break-word;
-  font-size: 14px;
-  line-height: 1.45;
-  box-shadow: var(--shadow-0);
-  letter-spacing: 0.01em;
-}
+        /* Other User Messages */
+        .message-wrapper.other-user-wrapper {
+            display: flex;
+            justify-content: flex-start;
+            margin-right: 20%;
+        }
 
-/* “Square tail” nub */
-.message-bubble.current-user-bubble::after {
-  content: "";
-  position: absolute;
-  right: 4px;
-  bottom: -4px;
-  width: 10px;
-  height: 10px;
-  background: var(--elev-1);
-  border-right: 1px solid var(--stroke);
-  border-bottom: 1px solid var(--stroke);
-  transform: rotate(45deg);
-}
+        .message-content.other-user-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            max-width: 100%;
+        }
 
-/* Dot-grid overlay (Nothing vibe) */
-.message-bubble.current-user-bubble::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: .12;
-  background-image:
-    radial-gradient(currentColor 0.6px, transparent 0.6px);
-  background-size: 6px 6px;
-  mix-blend-mode: soft-light;
-}
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
 
-/* Timestamp / meta */
-.message-info.current-user-info {
-  margin-top: 0;
-  text-align: right;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-  user-select: none;
-}
-
-/* Tighter timestamp tone */
-.message-info.current-user-info .timestamp {
-  color: var(--muted);
-  opacity: .9;
-}
-
-/* Motion: subtle press on hover/focus (desktop) */
-@media (hover: hover) {
-  .message-bubble.current-user-bubble:hover {
-    transform: translateY(-1px);
-  }
-}
-
-/* Compact variant for very small screens */
-@container (max-width: 360px) {
-  .message-bubble.current-user-bubble {
-    font-size: 13px;
-    padding: 10px 12px;
-  }
-}
-
-/* If you don't have container queries enabled, you can remove the block above. */
-
-/* Page background suggestion (optional) */
-.chat-surface {
-  background: var(--surface);
-}
-
-/* If your theme uses CSS variables already, you can map like so: */
-/*
-:root {
-  --current-user-bg: var(--elev-1);
-  --light-gray: var(--muted);
-  --shadow-sm: var(--shadow-0);
-}
-*/
-
-        /* ===== Other User Messages (Left Side) - Nothing OS style ===== */
-
-.message-wrapper.other-user-wrapper {
-  display: flex;
-  justify-content: flex-start;
-  margin-right: min(22%, 220px);
-  padding-inline: 8px;
-}
-
-.message-content.other-user-content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  max-width: min(75ch, 100%);
-  gap: 6px;
-}
-
-/* Username tag: thin border, square edges */
-.username {
-  background: var(--surface);
-  color: var(--muted);
-  padding: 2px 6px;
-  border: 1px solid var(--stroke);
-  border-radius: var(--radius-sq);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-/* Bubble: square, thin border, subtle grid texture */
-.message-bubble.other-user-bubble {
-  position: relative;
-  background: var(--elev-1);
-  color: var(--ink);
-  padding: 12px 14px;
-  border-radius: var(--radius-sq);
-  border: 1px solid var(--stroke);
-  max-width: 100%;
-  word-wrap: break-word;
-  font-size: 14px;
-  line-height: 1.45;
-  box-shadow: var(--shadow-0);
-  letter-spacing: 0.01em;
-}
-
-/* Square tail (left side) */
-.message-bubble.other-user-bubble::after {
-  content: "";
-  position: absolute;
-  left: 4px;
-  bottom: -4px;
-  width: 10px;
-  height: 10px;
-  background: var(--elev-1);
-  border-left: 1px solid var(--stroke);
-  border-bottom: 1px solid var(--stroke);
-  transform: rotate(-45deg);
-}
-
-/* Dot-grid overlay for the bubble */
-.message-bubble.other-user-bubble::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: .12;
-  background-image:
-    radial-gradient(currentColor 0.6px, transparent 0.6px);
-  background-size: 6px 6px;
-  mix-blend-mode: soft-light;
-}
-
-/* Timestamp / meta */
-.message-info.other-user-info {
-  margin-top: 0;
-  text-align: left;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-  user-select: none;
-}
-
-.message-info.other-user-info .timestamp {
-  color: var(--muted);
-  opacity: .9;
-}
-
-/* Hover lift for desktop */
-@media (hover: hover) {
-  .message-bubble.other-user-bubble:hover {
-    transform: translateY(-1px);
-  }
-}
-
-/* Compact variant for small screens */
-@container (max-width: 360px) {
-  .message-bubble.other-user-bubble {
-    font-size: 13px;
-    padding: 10px 12px;
-  }
-}
+        .username {
+            background: var(--dark-gray);
+            color: white;
+            padding: 3px 8px;
+            border-radius: var(--border-radius-sm);
+            font-size: 11px;
+            font-weight: 500;
+        }
 
         .user-age {
             background: rgba(0, 123, 255, 0.1);
@@ -780,7 +591,7 @@
             margin-top: 4px;
         }
 
-        /* Fixed Chat Input */
+        /* Chat Input */
         .chat-input {
             background: var(--white);
             border-top: 1px solid var(--very-light-gray);
@@ -855,157 +666,62 @@
             transform: none;
         }
 
-        /* Desktop-specific fixes */
-@media (min-width: 481px) {
-    body {
-        background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--secondary-yellow) 100%);
-        margin: 0;
-        padding: 0;
-    }
-    
-    .app-container {
-        padding: 20px;
-        align-items: flex-start;
-        min-height: 100vh;
-    }
-    
-    .main-container {
-        max-width: 400px;
-        width: 100%;
-        min-height: auto;
-        border-radius: var(--border-radius-xl);
-        display: flex;
-        flex-direction: column;
-        position: relative;
-    }
-    
-    /* Fix chat view for desktop */
-    #chatsView:not(.hidden) {
-        position: relative !important;
-        top: auto !important;
-        left: auto !important;
-        width: 100% !important;
-        height: auto !important;
-        min-height: 500px !important;
-        max-height: 600px !important;
-        z-index: auto !important;
-        border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
-    }
-    
-    /* Desktop chat header */
-    .chat-header {
-        padding: 16px;
-        border-radius: 0;
-    }
-    
-    /* Desktop message list */
-    #messageList {
-        max-height: 400px;
-        min-height: 300px;
-        padding: 16px;
-    }
-    
-    /* Desktop input */
-    .chat-input {
-        padding: 16px;
-        position: relative;
-        border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
-    }
-    
-    /* Ensure proper layout flow */
-    body:has(#chatsView:not(.hidden)) {
-        overflow: auto;
-    }
-}
+        /* Desktop Responsive */
+        @media (min-width: 481px) {
+            #chatsView:not(.hidden) {
+                position: relative !important;
+                top: auto !important;
+                left: auto !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: 500px !important;
+                max-height: 600px !important;
+                z-index: auto !important;
+                border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
+            }
+            
+            #messageList {
+                max-height: 400px;
+                min-height: 300px;
+            }
+        }
 
-/* Base responsive styles - works for both mobile and desktop */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--secondary-yellow) 100%);
-    min-height: 100vh;
-    color: var(--dark-gray);
-    line-height: 1.6;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-}
-
-.app-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding: 20px;
-}
-
-.main-container {
-    width: 100%;
-    max-width: 400px;
-    background: var(--white);
-    border-radius: var(--border-radius-xl);
-    box-shadow: var(--shadow-lg);
-    overflow: hidden;
-    position: relative;
-}
-
-/* Chat Interface - Fixed for both mobile and desktop */
-#chatsView {
-    display: none;
-    flex-direction: column;
-    background: var(--white);
-    position: relative;
-    min-height: 500px;
-}
-
-#chatsView:not(.hidden) {
-    display: flex !important;
-}
-
-/* Remove mobile-specific overrides for desktop */
-@media (max-width: 480px) {
-    body {
-        margin: 0;
-        padding: 0;
-        background: var(--white);
-    }
-    
-    .app-container {
-        padding: 0;
-        align-items: stretch;
-        min-height: 100vh;
-    }
-    
-    .main-container {
-        max-width: 100%;
-        width: 100%;
-        min-height: 100vh;
-        border-radius: 0;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    #chatsView:not(.hidden) {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        z-index: 9999 !important;
-        border-radius: 0;
-    }
-    
-    body:has(#chatsView:not(.hidden)) {
-        overflow: hidden;
-    }
-}
-
-
-            /* Mobile message layout */
+        /* Mobile Responsive */
+        @media (max-width: 480px) {
+            body {
+                margin: 0;
+                padding: 0;
+                background: var(--white);
+            }
+            
+            .app-container {
+                padding: 0;
+                align-items: stretch;
+            }
+            
+            .main-container {
+                max-width: 100%;
+                width: 100%;
+                min-height: 100vh;
+                border-radius: 0;
+                display: flex;
+                flex-direction: column;
+            }
+            
+            #chatsView:not(.hidden) {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                z-index: 9999 !important;
+                border-radius: 0;
+            }
+            
+            body:has(#chatsView:not(.hidden)) {
+                overflow: hidden;
+            }
+            
             .message-wrapper.current-user-wrapper {
                 margin-left: 15%;
             }
@@ -1013,18 +729,17 @@ body {
             .message-wrapper.other-user-wrapper {
                 margin-right: 15%;
             }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            
+            .chat-input {
+                padding-bottom: env(safe-area-inset-bottom, 16px);
+            }
         }
     </style>
 </head>
 <body>
     <div class="app-container">
         <div class="main-container" id="mainContainer">
-            <!-- App Header - Only shown in join view -->
+            <!-- App Header -->
             <div class="app-header">
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
                     <span id="themeIcon">🌙</span>
@@ -1060,16 +775,7 @@ body {
                         required
                     >
                 </div>
- <div class="form-group">
-                    <label class="form-label" for="dobInput">Age</label>
-                    <input 
-                        type="text" 
-                        id="dobInput" 
-                        class="form-input" 
-                        placeholder="Enter your Age"
-                        maxlength="2"
-                        required
-                    >
+
                 <div class="form-group">
                     <label class="form-label" for="dobInput">Date of Birth</label>
                     <input 
@@ -1104,10 +810,9 @@ body {
                 <div id="locationStatus"></div>
             </div>
 
-            <!-- Fixed Chat Interface -->
+            <!-- Chat Interface -->
             <div id="chatsView" class="hidden">
                 <div class="chat-header">
-                    <!-- Top row with branding and user profile -->
                     <div class="chat-header-top">
                         <div class="chat-branding">
                             <div class="chat-logo">
@@ -1128,7 +833,6 @@ body {
                         </div>
                     </div>
                     
-                    <!-- Bottom row with stats -->
                     <div class="chat-header-bottom">
                         <div class="chat-stats">
                             <div class="stat-item">
@@ -1152,7 +856,7 @@ body {
                     <!-- Messages will appear here -->
                 </div>
 
-                <!-- Fixed input -->
+                <!-- Input -->
                 <div class="chat-input" id="chatInput">
                     <div class="input-container">
                         <input 
