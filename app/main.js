@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebas
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
 import { getFirestore, addDoc, collection, onSnapshot, orderBy, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-// Your REAL Firebase configuration
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCOmLxxqPesNaBr4Z9fVIU6K2BLW6OsED0",
   authDomain: "gappkar-v1-b3afe.firebaseapp.com",
@@ -28,8 +28,6 @@ let currentUserLocation = "";
 let userLatitude = null;
 let userLongitude = null;
 let isJoined = false;
-let keyboardHeight = 0;
-let isKeyboardOpen = false;
 let messageCount = 0;
 
 // Calculate age from date of birth
@@ -65,7 +63,6 @@ function getUserLocation() {
         userLatitude = position.coords.latitude;
         userLongitude = position.coords.longitude;
         
-        // Try to get city name from coordinates
         try {
           const locationName = await getCityFromCoordinates(userLatitude, userLongitude);
           currentUserLocation = locationName || `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
@@ -73,9 +70,7 @@ function getUserLocation() {
           statusDiv.textContent = `Location found: ${currentUserLocation}`;
           statusDiv.className = "success";
           
-          // Update location input field
           document.getElementById('locationInput').value = currentUserLocation;
-          
           resolve(currentUserLocation);
         } catch (error) {
           currentUserLocation = `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
@@ -120,97 +115,14 @@ async function getCityFromCoordinates(lat, lon) {
   }
 }
 
-// Keyboard and scroll management
-function setupKeyboardDetection() {
-    const chatContainer = document.getElementById('chatContainer');
-    const chatInput = document.getElementById('chatInput');
-    
-    // Visual Viewport API for better keyboard detection
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', () => {
-            const viewport = window.visualViewport;
-            const isKeyboardVisible = viewport.height < window.innerHeight * 0.75;
-            
-            if (isKeyboardVisible !== isKeyboardOpen) {
-                isKeyboardOpen = isKeyboardVisible;
-                keyboardHeight = window.innerHeight - viewport.height;
-                
-                if (isKeyboardOpen) {
-                    chatContainer.classList.add('keyboard-open');
-                    chatInput.classList.add('keyboard-open');
-                    chatContainer.style.setProperty('--keyboard-height', `${keyboardHeight}px`);
-                    
-                    // Auto-scroll to bottom when keyboard opens
-                    setTimeout(() => {
-                        scrollToBottom(true);
-                    }, 300);
-                } else {
-                    chatContainer.classList.remove('keyboard-open');
-                    chatInput.classList.remove('keyboard-open');
-                }
-            }
-        });
-    } else {
-        // Fallback for browsers without Visual Viewport API
-        let initialViewportHeight = window.innerHeight;
-        
-        window.addEventListener('resize', () => {
-            const currentHeight = window.innerHeight;
-            const heightDifference = initialViewportHeight - currentHeight;
-            
-            if (heightDifference > 150) { // Keyboard likely open
-                if (!isKeyboardOpen) {
-                    isKeyboardOpen = true;
-                    keyboardHeight = heightDifference;
-                    chatContainer.classList.add('keyboard-open');
-                    chatInput.classList.add('keyboard-open');
-                    setTimeout(() => scrollToBottom(true), 300);
-                }
-            } else { // Keyboard likely closed
-                if (isKeyboardOpen) {
-                    isKeyboardOpen = false;
-                    chatContainer.classList.remove('keyboard-open');
-                    chatInput.classList.remove('keyboard-open');
-                }
-            }
-        });
-    }
-}
-
-// Enhanced scroll to bottom function
-function scrollToBottom(smooth = false) {
+// Fixed scroll to bottom function
+function scrollToBottom() {
     const messageList = document.getElementById('messageList');
     if (messageList) {
-        if (smooth) {
-            messageList.scrollTo({
-                top: messageList.scrollHeight,
-                behavior: 'smooth'
-            });
-        } else {
+        setTimeout(() => {
             messageList.scrollTop = messageList.scrollHeight;
-        }
+        }, 100);
     }
-}
-
-// Auto-scroll hook for new messages
-function setupAutoScroll() {
-    const messageList = document.getElementById('messageList');
-    let shouldAutoScroll = true;
-    
-    // Check if user is near bottom
-    messageList.addEventListener('scroll', () => {
-        const { scrollTop, scrollHeight, clientHeight } = messageList;
-        shouldAutoScroll = scrollTop + clientHeight >= scrollHeight - 100;
-    });
-    
-    // Auto-scroll when new messages arrive (if user is near bottom)
-    const observer = new MutationObserver(() => {
-        if (shouldAutoScroll) {
-            setTimeout(() => scrollToBottom(true), 100);
-        }
-    });
-    
-    observer.observe(messageList, { childList: true });
 }
 
 // Auto-login user when page loads
@@ -223,7 +135,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Enhanced join chat function with location and age
+// Join chat function
 async function joinChat(username, dob, location) {
   if (!username.trim()) {
     alert("Please enter your name");
@@ -252,7 +164,6 @@ async function joinChat(username, dob, location) {
   }
   
   try {
-    // Sign in anonymously
     await signInAnonymously(auth);
     currentUsername = username;
     currentUserAge = age;
@@ -266,27 +177,14 @@ async function joinChat(username, dob, location) {
     localStorage.setItem('gappkar_dob', dob);
     localStorage.setItem('gappkar_joined', 'true');
     
-    // Update enhanced header info
+    // Update header info
     document.getElementById("userNameDisplay").textContent = username;
-    document.getElementById("userAgeDisplay").textContent = `${age}`;
-    document.getElementById("userLocationDisplay").textContent = currentUserLocation;
+    document.getElementById("userAgeDisplay").textContent = age;
+    document.getElementById("userLocationDisplay").textContent = location.length > 15 ? location.substring(0, 15) + '...' : location;
     
-    // Hide join form, show chat
-    const joinView = document.getElementById("joinView");
-    const chatsView = document.getElementById("chatsView");
-    
-    joinView.classList.add("hidden");
-    chatsView.classList.remove("hidden");
-    
-    // Setup keyboard and scroll detection
-    setupKeyboardDetection();
-    setupAutoScroll();
-    
-    // Force mobile layout update
-    setTimeout(() => {
-      chatsView.style.display = "flex";
-      window.scrollTo(0, 0);
-    }, 100);
+    // Switch views
+    document.getElementById("joinView").classList.add("hidden");
+    document.getElementById("chatsView").classList.remove("hidden");
     
     // Start listening for messages
     listenForMessages();
@@ -299,7 +197,7 @@ async function joinChat(username, dob, location) {
   }
 }
 
-// Enhanced send message function with auto-scroll
+// Send message function
 async function sendMessage() {
     const messageInput = document.getElementById("messageInput");
     const messageText = messageInput.value.trim();
@@ -321,20 +219,17 @@ async function sendMessage() {
         });
         
         messageInput.value = "";
-        messageCount++;
         
-        // Update message count in header
-        document.getElementById("messageCount").textContent = `${messageCount} messages`;
-        
-        // Force scroll to bottom after sending
-        setTimeout(() => scrollToBottom(true), 200);
+        // Auto scroll after sending
+        scrollToBottom();
         
     } catch (error) {
         console.error("Error sending message:", error);
+        alert("Failed to send message");
     }
 }
 
-// Function to listen for new messages in real-time
+// Listen for messages
 function listenForMessages() {
   const q = query(
     collection(db, "messages"), 
@@ -344,29 +239,30 @@ function listenForMessages() {
   onSnapshot(q, (querySnapshot) => {
     const messageContainer = document.getElementById("messageList");
     messageContainer.innerHTML = "";
+    messageCount = 0;
     
     querySnapshot.forEach((doc) => {
       const messageData = doc.data();
       displayMessage(messageData);
     });
     
-    // Auto-scroll to bottom
-    messageContainer.scrollTop = messageContainer.scrollHeight;
+    // Update message count
+    document.getElementById("messageCount").textContent = `${messageCount} messages`;
+    
+    // Auto scroll to bottom
+    scrollToBottom();
   });
 }
 
-// Enhanced message display with age info and count tracking
+// Display message
 function displayMessage(messageData) {
   const messageContainer = document.getElementById("messageList");
   
-  // Check if this message is from current user
   const isCurrentUser = messageData.user === currentUsername;
   
-  // Create message element
   const messageDiv = document.createElement("div");
   messageDiv.className = `message ${isCurrentUser ? 'current-user' : 'other-user'}`;
   
-  // Format timestamp
   let timeString = "Just now";
   if (messageData.timestamp) {
     timeString = messageData.timestamp.toDate().toLocaleTimeString([], {
@@ -375,7 +271,6 @@ function displayMessage(messageData) {
     });
   }
   
-  // Different layout for current user vs others
   if (isCurrentUser) {
     messageDiv.innerHTML = `
       <div class="message-wrapper current-user-wrapper">
@@ -408,10 +303,7 @@ function displayMessage(messageData) {
   }
   
   messageContainer.appendChild(messageDiv);
-  
-  // Update message count
   messageCount++;
-  document.getElementById("messageCount").textContent = `${messageCount} messages`;
 }
 
 // Check existing session
@@ -427,18 +319,14 @@ function checkExistingSession() {
     currentUserLocation = savedLocation || "";
     
     setTimeout(() => {
-      // Auto-rejoin with saved data
       isJoined = true;
       document.getElementById("userNameDisplay").textContent = savedUsername;
-      document.getElementById("userAgeDisplay").textContent = `${savedAge}`;
-      document.getElementById("userLocationDisplay").textContent = savedLocation;
+      document.getElementById("userAgeDisplay").textContent = savedAge;
+      document.getElementById("userLocationDisplay").textContent = savedLocation.length > 15 ? savedLocation.substring(0, 15) + '...' : savedLocation;
       document.getElementById("joinView").classList.add("hidden");
       document.getElementById("chatsView").classList.remove("hidden");
-      document.getElementById("chatsView").style.display = "flex";
-      setupKeyboardDetection();
-      setupAutoScroll();
       listenForMessages();
-    }, 1000);
+    }, 500);
   }
 }
 
@@ -477,29 +365,21 @@ document.addEventListener("DOMContentLoaded", function() {
     sendButton.addEventListener("click", sendMessage);
   }
   
-  // Add focus handling for input
+  // Message input handling
   const messageInput = document.getElementById("messageInput");
   if (messageInput) {
-    messageInput.addEventListener('focus', () => {
-        // Small delay to ensure keyboard is fully opened
-        setTimeout(() => {
-            if (isKeyboardOpen) {
-                scrollToBottom(true);
-            }
-        }, 400);
-    });
-    
-    // Handle Enter key with keyboard awareness
     messageInput.addEventListener("keypress", function(e) {
         if (e.key === "Enter") {
             e.preventDefault();
             sendMessage();
-            // Keep focus and scroll after sending
-            setTimeout(() => {
-                this.focus();
-                scrollToBottom(true);
-            }, 100);
         }
+    });
+    
+    // Focus handling for mobile
+    messageInput.addEventListener('focus', () => {
+        setTimeout(() => {
+            scrollToBottom();
+        }, 300);
     });
   }
   
@@ -515,9 +395,18 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 
-// Add logout function
+// Logout function
 window.logout = function() {
   localStorage.clear();
   isJoined = false;
   location.reload();
 };
+
+// Handle mobile keyboard issues
+window.addEventListener('resize', () => {
+    if (document.getElementById('chatsView').classList.contains('hidden') === false) {
+        setTimeout(() => {
+            scrollToBottom();
+        }, 100);
+    }
+});
