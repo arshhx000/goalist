@@ -135,7 +135,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Enhanced join chat function with proper header hiding
+// Enhanced join chat function with proper desktop/mobile handling
 async function joinChat(username, dob, location) {
   if (!username.trim()) {
     alert("Please enter your name");
@@ -182,13 +182,13 @@ async function joinChat(username, dob, location) {
     document.getElementById("userAgeDisplay").textContent = age;
     document.getElementById("userLocationDisplay").textContent = location.length > 15 ? location.substring(0, 15) + '...' : location;
     
-    // Hide app header completely
+    // Hide app header
     const appHeader = document.querySelector('.app-header');
     if (appHeader) {
         appHeader.style.display = 'none';
     }
     
-    // Switch views with proper styling
+    // Switch views with proper desktop/mobile handling
     const joinView = document.getElementById("joinView");
     const chatsView = document.getElementById("chatsView");
     const mainContainer = document.querySelector('.main-container');
@@ -196,7 +196,7 @@ async function joinChat(username, dob, location) {
     joinView.classList.add("hidden");
     chatsView.classList.remove("hidden");
     
-    // Ensure full screen chat on mobile
+    // Apply mobile-specific styles only on mobile
     if (window.innerWidth <= 480) {
         chatsView.style.position = 'fixed';
         chatsView.style.top = '0';
@@ -206,6 +206,17 @@ async function joinChat(username, dob, location) {
         chatsView.style.zIndex = '9999';
         mainContainer.style.borderRadius = '0';
         document.body.style.overflow = 'hidden';
+    } else {
+        // Desktop-specific styling
+        chatsView.style.position = 'relative';
+        chatsView.style.top = 'auto';
+        chatsView.style.left = 'auto';
+        chatsView.style.width = '100%';
+        chatsView.style.height = 'auto';
+        chatsView.style.minHeight = '500px';
+        chatsView.style.maxHeight = '600px';
+        chatsView.style.zIndex = 'auto';
+        document.body.style.overflow = 'auto';
     }
     
     // Start listening for messages
@@ -328,7 +339,7 @@ function displayMessage(messageData) {
   messageCount++;
 }
 
-// Updated checkExistingSession function
+// Updated checkExistingSession for desktop compatibility
 function checkExistingSession() {
   const savedUsername = localStorage.getItem('gappkar_username');
   const savedAge = localStorage.getItem('gappkar_age');
@@ -358,11 +369,12 @@ function checkExistingSession() {
       document.getElementById("joinView").classList.add("hidden");
       document.getElementById("chatsView").classList.remove("hidden");
       
-      // Full screen on mobile
+      // Apply appropriate styles based on screen size
       const chatsView = document.getElementById("chatsView");
       const mainContainer = document.querySelector('.main-container');
       
       if (window.innerWidth <= 480) {
+          // Mobile styles
           chatsView.style.position = 'fixed';
           chatsView.style.top = '0';
           chatsView.style.left = '0';
@@ -371,6 +383,17 @@ function checkExistingSession() {
           chatsView.style.zIndex = '9999';
           mainContainer.style.borderRadius = '0';
           document.body.style.overflow = 'hidden';
+      } else {
+          // Desktop styles
+          chatsView.style.position = 'relative';
+          chatsView.style.top = 'auto';
+          chatsView.style.left = 'auto';
+          chatsView.style.width = '100%';
+          chatsView.style.height = 'auto';
+          chatsView.style.minHeight = '500px';
+          chatsView.style.maxHeight = '600px';
+          chatsView.style.zIndex = 'auto';
+          document.body.style.overflow = 'auto';
       }
       
       listenForMessages();
@@ -450,11 +473,35 @@ window.logout = function() {
   location.reload();
 };
 
-// Handle mobile keyboard and resize issues
+// Handle window resize for desktop/mobile switching
 window.addEventListener('resize', () => {
-    if (document.getElementById('chatsView').classList.contains('hidden') === false) {
-        setTimeout(() => {
-            scrollToBottom();
-        }, 100);
+    const chatsView = document.getElementById('chatsView');
+    const mainContainer = document.querySelector('.main-container');
+    
+    if (!chatsView.classList.contains('hidden')) {
+        if (window.innerWidth <= 480) {
+            // Switch to mobile layout
+            chatsView.style.position = 'fixed';
+            chatsView.style.top = '0';
+            chatsView.style.left = '0';
+            chatsView.style.width = '100vw';
+            chatsView.style.height = '100vh';
+            chatsView.style.zIndex = '9999';
+            mainContainer.style.borderRadius = '0';
+            document.body.style.overflow = 'hidden';
+        } else {
+            // Switch to desktop layout
+            chatsView.style.position = 'relative';
+            chatsView.style.top = 'auto';
+            chatsView.style.left = 'auto';
+            chatsView.style.width = '100%';
+            chatsView.style.height = 'auto';
+            chatsView.style.minHeight = '500px';
+            chatsView.style.maxHeight = '600px';
+            chatsView.style.zIndex = 'auto';
+            document.body.style.overflow = 'auto';
+        }
+        
+        setTimeout(() => scrollToBottom(), 100);
     }
 });
