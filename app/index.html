@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Gappkar - Connect Locally</title>
+    <title>Gappkar Online</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f4d03f">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -83,7 +83,8 @@
             border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
         }
 
-        .main-container:has(#chatsView:not(.hidden)) .app-header {
+        /* Hide header when chat is active */
+        .chat-active .app-header {
             display: none !important;
         }
 
@@ -463,7 +464,7 @@
             50% { opacity: 0.5; }
         }
 
-        /* Message List */
+        /* Message List - Fixed for keyboard issues */
         #messageList {
             flex: 1;
             padding: 12px;
@@ -474,6 +475,7 @@
             gap: 8px;
             -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
+            overscroll-behavior: contain;
         }
 
         .message {
@@ -591,7 +593,7 @@
             margin-top: 4px;
         }
 
-        /* Chat Input */
+        /* Chat Input - Fixed for keyboard */
         .chat-input {
             background: var(--white);
             border-top: 1px solid var(--very-light-gray);
@@ -686,7 +688,7 @@
             }
         }
 
-        /* Mobile Responsive */
+        /* Mobile Responsive - Fixed for keyboard */
         @media (max-width: 480px) {
             body {
                 margin: 0;
@@ -708,6 +710,11 @@
                 flex-direction: column;
             }
             
+            .chat-active {
+                height: 100vh;
+                overflow: hidden;
+            }
+            
             #chatsView:not(.hidden) {
                 position: fixed !important;
                 top: 0 !important;
@@ -716,10 +723,6 @@
                 height: 100vh !important;
                 z-index: 9999 !important;
                 border-radius: 0;
-            }
-            
-            body:has(#chatsView:not(.hidden)) {
-                overflow: hidden;
             }
             
             .message-wrapper.current-user-wrapper {
@@ -731,7 +734,7 @@
             }
             
             .chat-input {
-                padding-bottom: env(safe-area-inset-bottom, 16px);
+                padding-bottom: max(16px, env(safe-area-inset-bottom));
             }
         }
     </style>
@@ -777,13 +780,15 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="dobInput">Date of Birth</label>
+                    <label class="form-label" for="ageInput">Age</label>
                     <input 
-                        type="date" 
-                        id="dobInput" 
+                        type="number" 
+                        id="ageInput" 
                         class="form-input" 
+                        placeholder="Enter your age"
+                        min="13"
+                        max="99"
                         required
-                        max="2010-01-01"
                     >
                 </div>
 
