@@ -30,17 +30,77 @@ let userLongitude = null;
 let isJoined = false;
 let messageCount = 0;
 
-// Calculate age from date of birth
-function calculateAge(dobString) {
-  const dob = new Date(dobString);
-  const today = new Date();
-  let age = today.getFullYear() - dob.getFullYear();
-  const monthDiff = today.getMonth() - dob.getMonth();
-  
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-    age--;
-  }
-  return age;
+// Simple and reliable scroll to bottom function
+function scrollToBottom() {
+    const messageList = document.getElementById('messageList');
+    if (messageList) {
+        requestAnimationFrame(() => {
+            messageList.scrollTop = messageList.scrollHeight;
+        });
+    }
+}
+
+// Enhanced mobile keyboard handling
+function setupMobileKeyboardFix() {
+    const messageInput = document.getElementById('messageInput');
+    const chatInput = document.getElementById('chatInput');
+    const messageList = document.getElementById('messageList');
+    
+    if (!messageInput || !chatInput || !messageList) return;
+
+    // Simple keyboard detection using viewport height changes
+    let initialViewportHeight = window.innerHeight;
+    let isKeyboardOpen = false;
+
+    function handleViewportChange() {
+        const currentHeight = window.innerHeight;
+        const heightDifference = initialViewportHeight - currentHeight;
+        
+        // If height decreased by more than 150px, keyboard is likely open
+        if (heightDifference > 150 && !isKeyboardOpen) {
+            isKeyboardOpen = true;
+            // Add padding to prevent content from being hidden
+            chatInput.style.paddingBottom = `${heightDifference + 20}px`;
+            setTimeout(() => scrollToBottom(), 300);
+        } 
+        // If height is back to normal, keyboard is closed
+        else if (heightDifference <= 150 && isKeyboardOpen) {
+            isKeyboardOpen = false;
+            chatInput.style.paddingBottom = 'max(16px, env(safe-area-inset-bottom))';
+        }
+    }
+
+    // Listen for viewport changes
+    window.addEventListener('resize', handleViewportChange);
+    
+    // Visual Viewport API support (better keyboard detection)
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+            const viewport = window.visualViewport;
+            const keyboardHeight = window.innerHeight - viewport.height;
+            
+            if (keyboardHeight > 150 && !isKeyboardOpen) {
+                isKeyboardOpen = true;
+                chatInput.style.paddingBottom = `${keyboardHeight + 20}px`;
+                setTimeout(() => scrollToBottom(), 300);
+            } else if (keyboardHeight <= 150 && isKeyboardOpen) {
+                isKeyboardOpen = false;
+                chatInput.style.paddingBottom = 'max(16px, env(safe-area-inset-bottom))';
+            }
+        });
+    }
+
+    // Scroll when input is focused
+    messageInput.addEventListener('focus', () => {
+        setTimeout(() => scrollToBottom(), 400);
+    });
+
+    // Scroll when typing
+    messageInput.addEventListener('input', () => {
+        if (isKeyboardOpen) {
+            scrollToBottom();
+        }
+    });
 }
 
 // Get user's current location
@@ -115,60 +175,6 @@ async function getCityFromCoordinates(lat, lon) {
   }
 }
 
-// Enhanced keyboard handling for mobile
-function setupKeyboardHandling() {
-    const messageList = document.getElementById('messageList');
-    const messageInput = document.getElementById('messageInput');
-    
-    if (!messageList || !messageInput) return;
-
-    // Scroll to bottom utility
-    function scrollToBottom(smooth = false) {
-        if (smooth) {
-            messageList.scrollTo({ 
-                top: messageList.scrollHeight, 
-                behavior: 'smooth' 
-            });
-        } else {
-            messageList.scrollTop = messageList.scrollHeight;
-        }
-    }
-
-    // Initial scroll
-    scrollToBottom();
-
-    // Visual Viewport API for better keyboard detection
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', () => {
-            const viewport = window.visualViewport;
-            const isKeyboardVisible = viewport.height < window.innerHeight * 0.75;
-            
-            if (isKeyboardVisible) {
-                setTimeout(() => scrollToBottom(true), 300);
-            }
-        });
-    } else {
-        // Fallback for browsers without Visual Viewport API
-        let initialHeight = window.innerHeight;
-        window.addEventListener('resize', () => {
-            const currentHeight = window.innerHeight;
-            if (currentHeight < initialHeight * 0.75) {
-                setTimeout(() => scrollToBottom(true), 300);
-            }
-        });
-    }
-
-    // Input focus handling
-    messageInput.addEventListener('focus', () => {
-        setTimeout(() => scrollToBottom(true), 300);
-    });
-
-    // Input change handling
-    messageInput.addEventListener('input', () => {
-        scrollToBottom();
-    });
-}
-
 // Auto-login user when page loads
 onAuthStateChanged(auth, (user) => {
   if (user) {
@@ -179,21 +185,17 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Enhanced join chat function
-async function joinChat(username, dob, location) {
+// Fixed join chat function
+async function joinChat(username, age, location) {
+  console.log("Join chat called with:", { username, age, location });
+  
   if (!username.trim()) {
     alert("Please enter your name");
     return;
   }
   
-  if (!dob) {
-    alert("Please enter your date of birth");
-    return;
-  }
-  
-  const age = calculateAge(dob);
-  if (age < 13) {
-    alert("You must be at least 13 years old to use this chat");
+  if (!age || age < 13 || age > 99) {
+    alert("Please enter a valid age (13-99)");
     return;
   }
   
@@ -208,17 +210,20 @@ async function joinChat(username, dob, location) {
   }
   
   try {
+    console.log("Attempting to sign in anonymously...");
     await signInAnonymously(auth);
+    
     currentUsername = username;
-    currentUserAge = age;
+    currentUserAge = parseInt(age);
     currentUserLocation = location;
     isJoined = true;
+    
+    console.log("Sign in successful, storing data...");
     
     // Store in localStorage
     localStorage.setItem('gappkar_username', username);
     localStorage.setItem('gappkar_age', age);
     localStorage.setItem('gappkar_location', location);
-    localStorage.setItem('gappkar_dob', dob);
     localStorage.setItem('gappkar_joined', 'true');
     
     // Update header info
@@ -226,45 +231,37 @@ async function joinChat(username, dob, location) {
     document.getElementById("userAgeDisplay").textContent = age;
     document.getElementById("userLocationDisplay").textContent = location.length > 15 ? location.substring(0, 15) + '...' : location;
     
-    // Hide app header
-    const appHeader = document.querySelector('.app-header');
-    if (appHeader) {
-        appHeader.style.display = 'none';
-    }
+    console.log("Switching to chat view...");
     
-    // Switch views
+    // Switch views - Simplified approach
+    const mainContainer = document.getElementById("mainContainer");
     const joinView = document.getElementById("joinView");
     const chatsView = document.getElementById("chatsView");
-    const mainContainer = document.querySelector('.main-container');
     
+    // Add chat-active class to hide header
+    mainContainer.classList.add("chat-active");
+    
+    // Hide join view and show chat view
     joinView.classList.add("hidden");
     chatsView.classList.remove("hidden");
     
-    // Apply mobile-specific styles
+    // Apply mobile-specific styles if needed
     if (window.innerWidth <= 480) {
+        document.body.classList.add('chat-active');
         chatsView.style.position = 'fixed';
         chatsView.style.top = '0';
         chatsView.style.left = '0';
         chatsView.style.width = '100vw';
         chatsView.style.height = '100vh';
         chatsView.style.zIndex = '9999';
-        mainContainer.style.borderRadius = '0';
-        document.body.style.overflow = 'hidden';
-    } else {
-        // Desktop styles
-        chatsView.style.position = 'relative';
-        chatsView.style.top = 'auto';
-        chatsView.style.left = 'auto';
-        chatsView.style.width = '100%';
-        chatsView.style.height = 'auto';
-        chatsView.style.minHeight = '500px';
-        chatsView.style.maxHeight = '600px';
-        chatsView.style.zIndex = 'auto';
-        document.body.style.overflow = 'auto';
     }
     
-    // Setup keyboard handling
-    setupKeyboardHandling();
+    console.log("Setting up mobile keyboard handling...");
+    
+    // Setup mobile keyboard handling
+    setupMobileKeyboardFix();
+    
+    console.log("Starting to listen for messages...");
     
     // Start listening for messages
     listenForMessages();
@@ -273,7 +270,7 @@ async function joinChat(username, dob, location) {
   } catch (error) {
     console.error("Error joining chat:", error);
     isJoined = false;
-    alert("Failed to join chat. Please try again.");
+    alert("Failed to join chat: " + error.message);
   }
 }
 
@@ -299,14 +296,7 @@ async function sendMessage() {
         });
         
         messageInput.value = "";
-        
-        // Auto scroll after sending
-        const messageList = document.getElementById('messageList');
-        if (messageList) {
-            setTimeout(() => {
-                messageList.scrollTop = messageList.scrollHeight;
-            }, 100);
-        }
+        scrollToBottom();
         
     } catch (error) {
         console.error("Error sending message:", error);
@@ -335,9 +325,7 @@ function listenForMessages() {
     document.getElementById("messageCount").textContent = `${messageCount} messages`;
     
     // Auto scroll to bottom
-    setTimeout(() => {
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-    }, 100);
+    scrollToBottom();
   });
 }
 
@@ -401,63 +389,21 @@ function checkExistingSession() {
   const savedJoined = localStorage.getItem('gappkar_joined');
   
   if (savedUsername && savedJoined === 'true') {
+    console.log("Found existing session, auto-joining...");
+    
     currentUsername = savedUsername;
     currentUserAge = parseInt(savedAge) || 0;
     currentUserLocation = savedLocation || "";
     
     setTimeout(() => {
-      isJoined = true;
-      
-      // Hide app header
-      const appHeader = document.querySelector('.app-header');
-      if (appHeader) {
-          appHeader.style.display = 'none';
-      }
-      
-      // Update user info
-      document.getElementById("userNameDisplay").textContent = savedUsername;
-      document.getElementById("userAgeDisplay").textContent = savedAge;
-      document.getElementById("userLocationDisplay").textContent = savedLocation.length > 15 ? savedLocation.substring(0, 15) + '...' : savedLocation;
-      
-      // Switch views
-      document.getElementById("joinView").classList.add("hidden");
-      document.getElementById("chatsView").classList.remove("hidden");
-      
-      // Apply styles based on screen size
-      const chatsView = document.getElementById("chatsView");
-      const mainContainer = document.querySelector('.main-container');
-      
-      if (window.innerWidth <= 480) {
-          chatsView.style.position = 'fixed';
-          chatsView.style.top = '0';
-          chatsView.style.left = '0';
-          chatsView.style.width = '100vw';
-          chatsView.style.height = '100vh';
-          chatsView.style.zIndex = '9999';
-          mainContainer.style.borderRadius = '0';
-          document.body.style.overflow = 'hidden';
-      } else {
-          chatsView.style.position = 'relative';
-          chatsView.style.top = 'auto';
-          chatsView.style.left = 'auto';
-          chatsView.style.width = '100%';
-          chatsView.style.height = 'auto';
-          chatsView.style.minHeight = '500px';
-          chatsView.style.maxHeight = '600px';
-          chatsView.style.zIndex = 'auto';
-          document.body.style.overflow = 'auto';
-      }
-      
-      // Setup keyboard handling
-      setupKeyboardHandling();
-      
-      listenForMessages();
+      joinChat(savedUsername, savedAge, savedLocation);
     }, 500);
   }
 }
 
 // Event listeners
 document.addEventListener("DOMContentLoaded", function() {
+  console.log("DOM loaded, setting up event listeners...");
   
   checkExistingSession();
   
@@ -473,15 +419,17 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
   
-  // Join chat button
+  // Join chat button - Fixed
   const joinButton = document.getElementById("joinButton");
   if (joinButton) {
     joinButton.addEventListener("click", function() {
+      console.log("Join button clicked");
       const username = document.getElementById("usernameInput").value.trim();
-      const dob = document.getElementById("dobInput").value;
+      const age = document.getElementById("ageInput").value;
       const location = document.getElementById("locationInput").value.trim();
       
-      joinChat(username, dob, location);
+      console.log("Form values:", { username, age, location });
+      joinChat(username, age, location);
     });
   }
   
@@ -502,13 +450,33 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
   
-  // Username input Enter key
+  // Form navigation with Enter key
   const usernameInput = document.getElementById("usernameInput");
   if (usernameInput) {
     usernameInput.addEventListener("keypress", function(e) {
       if (e.key === "Enter") {
         e.preventDefault();
-        document.getElementById("dobInput").focus();
+        document.getElementById("ageInput").focus();
+      }
+    });
+  }
+
+  const ageInput = document.getElementById("ageInput");
+  if (ageInput) {
+    ageInput.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        document.getElementById("locationInput").focus();
+      }
+    });
+  }
+
+  const locationInput = document.getElementById("locationInput");
+  if (locationInput) {
+    locationInput.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        document.getElementById("joinButton").click();
       }
     });
   }
@@ -520,35 +488,3 @@ window.logout = function() {
   isJoined = false;
   location.reload();
 };
-
-// Handle window resize for responsive behavior
-window.addEventListener('resize', () => {
-    const chatsView = document.getElementById('chatsView');
-    const mainContainer = document.querySelector('.main-container');
-    
-    if (!chatsView.classList.contains('hidden')) {
-        if (window.innerWidth <= 480) {
-            chatsView.style.position = 'fixed';
-            chatsView.style.top = '0';
-            chatsView.style.left = '0';
-            chatsView.style.width = '100vw';
-            chatsView.style.height = '100vh';
-            chatsView.style.zIndex = '9999';
-            mainContainer.style.borderRadius = '0';
-            document.body.style.overflow = 'hidden';
-        } else {
-            chatsView.style.position = 'relative';
-            chatsView.style.top = 'auto';
-            chatsView.style.left = 'auto';
-            chatsView.style.width = '100%';
-            chatsView.style.height = 'auto';
-            chatsView.style.minHeight = '500px';
-            chatsView.style.maxHeight = '600px';
-            chatsView.style.zIndex = 'auto';
-            document.body.style.overflow = 'auto';
-        }
-        
-        // Re-setup keyboard handling after resize
-        setupKeyboardHandling();
-    }
-});
