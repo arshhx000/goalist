@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gappkar Chat </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Gappkar - Connect Locally</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f4d03f">
     <!-- Modern Font -->
@@ -53,6 +53,7 @@
             color: var(--dark-gray);
             line-height: 1.6;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* Modern Container */
@@ -74,7 +75,7 @@
             position: relative;
         }
 
-        /* Modern Header */
+        /* Modern Header - Only shown in join view */
         .app-header {
             background: linear-gradient(135deg, var(--primary-yellow), var(--accent-yellow));
             padding: 24px 20px;
@@ -148,7 +149,7 @@
             font-weight: 400;
         }
 
-        /* Join View - Enhanced with Location & Age */
+        /* Join View */
         #joinView {
             padding: 32px 24px;
             display: block;
@@ -189,7 +190,7 @@
             line-height: 1.5;
         }
 
-        /* Modern Form Elements */
+        /* Form Elements */
         .form-group {
             margin-bottom: 20px;
         }
@@ -266,7 +267,7 @@
             border: 1px solid #f5c6cb;
         }
 
-        /* Modern Buttons */
+        /* Buttons */
         .btn {
             width: 100%;
             padding: 16px 24px;
@@ -302,64 +303,57 @@
             transform: none;
         }
 
-        /* Enhanced Chat Interface */
+        /* Chat Interface - Fixed */
         #chatsView {
             display: none;
-            height: 100vh;
-            max-height: 100vh;
             flex-direction: column;
             background: var(--white);
             position: relative;
+            height: 100vh;
+            overflow: hidden;
         }
 
         #chatsView:not(.hidden) {
             display: flex !important;
         }
 
-        /* Keyboard-aware chat container */
-        .chat-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .chat-container.keyboard-open {
-            height: calc(100vh - var(--keyboard-height, 0px));
-        }
-
-        /* Enhanced Chat Header */
+        /* Fixed Chat Header */
         .chat-header {
             background: linear-gradient(135deg, var(--primary-yellow), var(--accent-yellow));
             padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             box-shadow: var(--shadow-md);
             flex-shrink: 0;
             position: relative;
         }
 
-        /* Top row with logo and user info */
+        /* Top row with branding and user info */
         .chat-header-top {
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: space-between;
+        }
+
+        .chat-branding {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .chat-logo {
-            width: 42px;
-            height: 42px;
+            width: 32px;
+            height: 32px;
             background: var(--white);
-            border-radius: 12px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: var(--shadow-sm);
             overflow: hidden;
             font-weight: 700;
-            font-size: 18px;
+            font-size: 14px;
             color: var(--primary-yellow);
             flex-shrink: 0;
         }
@@ -368,53 +362,64 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 12px;
+            border-radius: 8px;
         }
 
-        /* Enhanced user info section */
-        .user-info-detailed {
-            flex: 1;
+        .brand-info {
             display: flex;
             flex-direction: column;
-            gap: 2px;
-            color: var(--white);
-            min-width: 0;
+            gap: 1px;
         }
 
-        .user-name-main {
-            font-size: 18px;
+        .brand-name {
+            font-size: 16px;
             font-weight: 700;
             color: var(--white);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            line-height: 1;
         }
 
-        .user-age-badge {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .user-location-full {
-            font-size: 13px;
-            color: rgba(255, 255, 255, 0.9);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .user-status-line {
-            font-size: 11px;
+        .brand-tagline {
+            font-size: 10px;
             color: rgba(255, 255, 255, 0.8);
+            line-height: 1;
+        }
+
+        /* User profile section */
+        .user-profile-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .user-name-age {
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        /* Bottom row with stats and online status */
+        .user-name-display {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .user-age-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--white);
+        }
+
+        .user-location-display {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            text-align: right;
+        }
+
+        /* Bottom row with stats */
         .chat-header-bottom {
             display: flex;
             justify-content: space-between;
@@ -425,14 +430,14 @@
 
         .chat-stats {
             display: flex;
-            gap: 16px;
+            gap: 12px;
         }
 
         .stat-item {
             display: flex;
             align-items: center;
             gap: 4px;
-            font-size: 11px;
+            font-size: 10px;
             color: rgba(255, 255, 255, 0.9);
             background: rgba(255, 255, 255, 0.1);
             padding: 4px 8px;
@@ -443,13 +448,13 @@
             display: flex;
             align-items: center;
             gap: 4px;
-            font-size: 11px;
+            font-size: 10px;
             color: rgba(255, 255, 255, 0.9);
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             background: var(--success-green);
             border-radius: 50%;
             animation: pulse 2s infinite;
@@ -460,7 +465,7 @@
             50% { opacity: 0.5; }
         }
 
-        /* Enhanced message list with keyboard awareness */
+        /* Fixed Message List */
         #messageList {
             flex: 1;
             padding: 12px;
@@ -469,10 +474,8 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            min-height: 0;
             -webkit-overflow-scrolling: touch;
             scroll-behavior: smooth;
-            padding-bottom: env(keyboard-inset-height, 0px);
         }
 
         /* Message Styles */
@@ -591,25 +594,17 @@
             margin-top: 4px;
         }
 
-        /* Keyboard-aware input section */
+        /* Fixed Chat Input */
         .chat-input {
             background: var(--white);
             border-top: 1px solid var(--very-light-gray);
             padding: 12px 16px;
             flex-shrink: 0;
-            position: sticky;
-            bottom: 0;
+            position: relative;
             z-index: 1000;
-            transition: all 0.3s ease;
             box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
         }
 
-        .chat-input.keyboard-open {
-            transform: translateY(0);
-            padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
-        }
-
-        /* Enhanced input container */
         .input-container {
             display: flex;
             align-items: center;
@@ -640,7 +635,6 @@
             font-family: inherit;
             resize: none;
             min-height: 24px;
-            max-height: 120px;
         }
 
         .message-input::placeholder {
@@ -711,22 +705,8 @@
             }
             
             #chatsView {
-                min-height: 100vh;
+                height: 100vh;
                 max-height: 100vh;
-                display: flex;
-                flex-direction: column;
-            }
-            
-            #chatsView:not(.hidden) {
-                display: flex !important;
-            }
-            
-            .chat-container {
-                height: 100svh;
-            }
-            
-            .chat-container.keyboard-open {
-                height: calc(100svh - var(--keyboard-height, 0px));
             }
             
             .chat-header {
@@ -734,20 +714,28 @@
             }
             
             .chat-logo {
-                width: 38px;
-                height: 38px;
+                width: 28px;
+                height: 28px;
             }
             
-            .user-name-main {
-                font-size: 16px;
+            .brand-name {
+                font-size: 14px;
             }
             
-            .user-location-full {
+            .brand-tagline {
+                font-size: 9px;
+            }
+            
+            .user-name-display {
                 font-size: 12px;
             }
             
+            .user-location-display {
+                font-size: 9px;
+            }
+            
             #messageList {
-                padding-bottom: 8px;
+                padding: 10px;
             }
             
             .chat-input {
@@ -755,7 +743,6 @@
             }
             
             .message-input {
-                padding: 12px 16px;
                 font-size: 16px;
             }
             
@@ -775,17 +762,10 @@
             }
         }
 
-        /* Keyboard detection styles */
-        @supports (height: 100dvh) {
-            .chat-container {
-                height: 100dvh;
-            }
-        }
-
-        /* iOS specific keyboard handling */
+        /* iOS Safari keyboard fix */
         @supports (-webkit-touch-callout: none) {
-            .chat-container.keyboard-open {
-                height: calc(100vh - env(keyboard-inset-height, 250px));
+            .chat-input {
+                padding-bottom: env(safe-area-inset-bottom, 16px);
             }
         }
 
@@ -798,7 +778,7 @@
 <body>
     <div class="app-container">
         <div class="main-container" id="mainContainer">
-            <!-- Modern Header -->
+            <!-- App Header - Only shown in join view -->
             <div class="app-header">
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
                     <span id="themeIcon">🌙</span>
@@ -813,7 +793,7 @@
                 </div>
             </div>
 
-            <!-- Enhanced Join View with Location & Age -->
+            <!-- Join View -->
             <div id="joinView">
                 <div class="section-header">
                     <div class="section-icon">👋</div>
@@ -869,68 +849,68 @@
                 <div id="locationStatus"></div>
             </div>
 
-            <!-- Enhanced Chat Interface -->
+            <!-- Fixed Chat Interface -->
             <div id="chatsView" class="hidden">
-                <div class="chat-container" id="chatContainer">
-                    <div class="chat-header">
-                        <!-- Top row with user details -->
-                        <div class="chat-header-top">
+                <div class="chat-header">
+                    <!-- Top row with branding and user profile -->
+                    <div class="chat-header-top">
+                        <div class="chat-branding">
                             <div class="chat-logo">
                                 <img src="mylogo.png" alt="Gappkar Logo" onerror="this.style.display='none'; this.parentNode.innerHTML='G';">
                             </div>
-                            <div class="user-info-detailed">
-                                <div class="user-name-main">
-                                    <span id="userNameDisplay">User</span>
-                                    <span class="user-age-badge" id="userAgeDisplay">25</span>
-                                </div>
-                                <div class="user-location-full">
-                                    <span>📍</span>
-                                    <span id="userLocationDisplay">Mangalagiri, Andhra Pradesh</span>
-                                </div>
-                                <div class="user-status-line">
-                                    <span>Last seen recently</span>
-                                </div>
+                            <div class="brand-info">
+                                <div class="brand-name">gappkar</div>
+                                <div class="brand-tagline">Connect Locally</div>
                             </div>
                         </div>
                         
-                        <!-- Bottom row with stats -->
-                        <div class="chat-header-bottom">
-                            <div class="chat-stats">
-                                <div class="stat-item">
-                                    <span>👥</span>
-                                    <span id="peopleCount">12 people nearby</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span>💬</span>
-                                    <span id="messageCount">0 messages</span>
-                                </div>
+                        <div class="user-profile-section">
+                            <div class="user-name-age">
+                                <span class="user-name-display" id="userNameDisplay">User</span>
+                                <span class="user-age-badge" id="userAgeDisplay">25</span>
                             </div>
-                            <div class="online-indicator">
-                                <span class="status-dot"></span>
-                                <span>Online</span>
-                            </div>
+                            <div class="user-location-display" id="userLocationDisplay">Mangalagiri, AP</div>
                         </div>
                     </div>
-
-                    <!-- Messages area -->
-                    <div id="messageList">
-                        <!-- Messages will appear here -->
-                    </div>
-
-                    <!-- Keyboard-aware input -->
-                    <div class="chat-input" id="chatInput">
-                        <div class="input-container">
-                            <input 
-                                type="text" 
-                                class="message-input" 
-                                placeholder="Type your message here..." 
-                                id="messageInput"
-                                maxlength="500"
-                            >
-                            <button class="send-btn" id="sendButton">
-                                ➤
-                            </button>
+                    
+                    <!-- Bottom row with stats -->
+                    <div class="chat-header-bottom">
+                        <div class="chat-stats">
+                            <div class="stat-item">
+                                <span>👥</span>
+                                <span id="peopleCount">12 people nearby</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>💬</span>
+                                <span id="messageCount">0 messages</span>
+                            </div>
                         </div>
+                        <div class="online-indicator">
+                            <span class="status-dot"></span>
+                            <span>Online</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages area -->
+                <div id="messageList">
+                    <!-- Messages will appear here -->
+                </div>
+
+                <!-- Fixed input -->
+                <div class="chat-input" id="chatInput">
+                    <div class="input-container">
+                        <input 
+                            type="text" 
+                            class="message-input" 
+                            placeholder="Type your message here..." 
+                            id="messageInput"
+                            maxlength="500"
+                            autocomplete="off"
+                        >
+                        <button class="send-btn" id="sendButton">
+                            ➤
+                        </button>
                     </div>
                 </div>
             </div>
@@ -942,7 +922,6 @@
     
     <!-- Theme Toggle Function -->
     <script>
-        // Simple theme toggle function
         function toggleTheme() {
             const body = document.body;
             const themeIcon = document.getElementById('themeIcon');
@@ -956,7 +935,6 @@
             }
         }
         
-        // Add event listener for theme toggle
         document.addEventListener('DOMContentLoaded', function() {
             const themeToggle = document.getElementById('themeToggle');
             if (themeToggle) {
