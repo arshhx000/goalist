@@ -115,14 +115,58 @@ async function getCityFromCoordinates(lat, lon) {
   }
 }
 
-// Fixed scroll to bottom function
-function scrollToBottom() {
+// Enhanced keyboard handling for mobile
+function setupKeyboardHandling() {
     const messageList = document.getElementById('messageList');
-    if (messageList) {
-        setTimeout(() => {
+    const messageInput = document.getElementById('messageInput');
+    
+    if (!messageList || !messageInput) return;
+
+    // Scroll to bottom utility
+    function scrollToBottom(smooth = false) {
+        if (smooth) {
+            messageList.scrollTo({ 
+                top: messageList.scrollHeight, 
+                behavior: 'smooth' 
+            });
+        } else {
             messageList.scrollTop = messageList.scrollHeight;
-        }, 100);
+        }
     }
+
+    // Initial scroll
+    scrollToBottom();
+
+    // Visual Viewport API for better keyboard detection
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+            const viewport = window.visualViewport;
+            const isKeyboardVisible = viewport.height < window.innerHeight * 0.75;
+            
+            if (isKeyboardVisible) {
+                setTimeout(() => scrollToBottom(true), 300);
+            }
+        });
+    } else {
+        // Fallback for browsers without Visual Viewport API
+        let initialHeight = window.innerHeight;
+        window.addEventListener('resize', () => {
+            const currentHeight = window.innerHeight;
+            if (currentHeight < initialHeight * 0.75) {
+                setTimeout(() => scrollToBottom(true), 300);
+            }
+        });
+    }
+
+    // Input focus handling
+    messageInput.addEventListener('focus', () => {
+        setTimeout(() => scrollToBottom(true), 300);
+    });
+
+    // Input change handling
+    messageInput.addEventListener('input', () => {
+        scrollToBottom();
+    });
 }
 
 // Auto-login user when page loads
@@ -135,7 +179,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Enhanced join chat function with proper desktop/mobile handling
+// Enhanced join chat function
 async function joinChat(username, dob, location) {
   if (!username.trim()) {
     alert("Please enter your name");
@@ -188,7 +232,7 @@ async function joinChat(username, dob, location) {
         appHeader.style.display = 'none';
     }
     
-    // Switch views with proper desktop/mobile handling
+    // Switch views
     const joinView = document.getElementById("joinView");
     const chatsView = document.getElementById("chatsView");
     const mainContainer = document.querySelector('.main-container');
@@ -196,7 +240,7 @@ async function joinChat(username, dob, location) {
     joinView.classList.add("hidden");
     chatsView.classList.remove("hidden");
     
-    // Apply mobile-specific styles only on mobile
+    // Apply mobile-specific styles
     if (window.innerWidth <= 480) {
         chatsView.style.position = 'fixed';
         chatsView.style.top = '0';
@@ -207,7 +251,7 @@ async function joinChat(username, dob, location) {
         mainContainer.style.borderRadius = '0';
         document.body.style.overflow = 'hidden';
     } else {
-        // Desktop-specific styling
+        // Desktop styles
         chatsView.style.position = 'relative';
         chatsView.style.top = 'auto';
         chatsView.style.left = 'auto';
@@ -218,6 +262,9 @@ async function joinChat(username, dob, location) {
         chatsView.style.zIndex = 'auto';
         document.body.style.overflow = 'auto';
     }
+    
+    // Setup keyboard handling
+    setupKeyboardHandling();
     
     // Start listening for messages
     listenForMessages();
@@ -254,7 +301,12 @@ async function sendMessage() {
         messageInput.value = "";
         
         // Auto scroll after sending
-        scrollToBottom();
+        const messageList = document.getElementById('messageList');
+        if (messageList) {
+            setTimeout(() => {
+                messageList.scrollTop = messageList.scrollHeight;
+            }, 100);
+        }
         
     } catch (error) {
         console.error("Error sending message:", error);
@@ -283,7 +335,9 @@ function listenForMessages() {
     document.getElementById("messageCount").textContent = `${messageCount} messages`;
     
     // Auto scroll to bottom
-    scrollToBottom();
+    setTimeout(() => {
+        messageContainer.scrollTop = messageContainer.scrollHeight;
+    }, 100);
   });
 }
 
@@ -339,7 +393,7 @@ function displayMessage(messageData) {
   messageCount++;
 }
 
-// Updated checkExistingSession for desktop compatibility
+// Check existing session
 function checkExistingSession() {
   const savedUsername = localStorage.getItem('gappkar_username');
   const savedAge = localStorage.getItem('gappkar_age');
@@ -369,12 +423,11 @@ function checkExistingSession() {
       document.getElementById("joinView").classList.add("hidden");
       document.getElementById("chatsView").classList.remove("hidden");
       
-      // Apply appropriate styles based on screen size
+      // Apply styles based on screen size
       const chatsView = document.getElementById("chatsView");
       const mainContainer = document.querySelector('.main-container');
       
       if (window.innerWidth <= 480) {
-          // Mobile styles
           chatsView.style.position = 'fixed';
           chatsView.style.top = '0';
           chatsView.style.left = '0';
@@ -384,7 +437,6 @@ function checkExistingSession() {
           mainContainer.style.borderRadius = '0';
           document.body.style.overflow = 'hidden';
       } else {
-          // Desktop styles
           chatsView.style.position = 'relative';
           chatsView.style.top = 'auto';
           chatsView.style.left = 'auto';
@@ -395,6 +447,9 @@ function checkExistingSession() {
           chatsView.style.zIndex = 'auto';
           document.body.style.overflow = 'auto';
       }
+      
+      // Setup keyboard handling
+      setupKeyboardHandling();
       
       listenForMessages();
     }, 500);
@@ -445,13 +500,6 @@ document.addEventListener("DOMContentLoaded", function() {
             sendMessage();
         }
     });
-    
-    // Focus handling for mobile
-    messageInput.addEventListener('focus', () => {
-        setTimeout(() => {
-            scrollToBottom();
-        }, 300);
-    });
   }
   
   // Username input Enter key
@@ -473,14 +521,13 @@ window.logout = function() {
   location.reload();
 };
 
-// Handle window resize for desktop/mobile switching
+// Handle window resize for responsive behavior
 window.addEventListener('resize', () => {
     const chatsView = document.getElementById('chatsView');
     const mainContainer = document.querySelector('.main-container');
     
     if (!chatsView.classList.contains('hidden')) {
         if (window.innerWidth <= 480) {
-            // Switch to mobile layout
             chatsView.style.position = 'fixed';
             chatsView.style.top = '0';
             chatsView.style.left = '0';
@@ -490,7 +537,6 @@ window.addEventListener('resize', () => {
             mainContainer.style.borderRadius = '0';
             document.body.style.overflow = 'hidden';
         } else {
-            // Switch to desktop layout
             chatsView.style.position = 'relative';
             chatsView.style.top = 'auto';
             chatsView.style.left = 'auto';
@@ -502,6 +548,7 @@ window.addEventListener('resize', () => {
             document.body.style.overflow = 'auto';
         }
         
-        setTimeout(() => scrollToBottom(), 100);
+        // Re-setup keyboard handling after resize
+        setupKeyboardHandling();
     }
 });
