@@ -855,98 +855,155 @@
             transform: none;
         }
 
-        /* Mobile Responsive */
-        @media (max-width: 480px) {
-            body {
-                margin: 0;
-                padding: 0;
-                background: var(--white);
-            }
-            
-            .app-container {
-                padding: 0;
-                align-items: stretch;
-                min-height: 100vh;
-            }
-            
-            .main-container {
-                max-width: 100%;
-                width: 100%;
-                min-height: 100vh;
-                border-radius: 0;
-                display: flex;
-                flex-direction: column;
-            }
-            
-            .app-header {
-                border-radius: 0;
-                flex-shrink: 0;
-                padding: 20px 16px;
-            }
-            
-            #joinView {
-                padding: 24px 20px;
-                flex: 1;
-                overflow-y: auto;
-            }
-            
-            #chatsView:not(.hidden) {
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100vw !important;
-                height: 100vh !important;
-                z-index: 9999 !important;
-                border-radius: 0;
-            }
-            
-            body:has(#chatsView:not(.hidden)) {
-                overflow: hidden;
-            }
-            
-            .chat-header {
-                padding: 12px;
-            }
-            
-            .chat-logo {
-                width: 28px;
-                height: 28px;
-            }
-            
-            .brand-name {
-                font-size: 14px;
-            }
-            
-            .brand-tagline {
-                font-size: 9px;
-            }
-            
-            .user-name-display {
-                font-size: 12px;
-            }
-            
-            .user-location-display {
-                font-size: 9px;
-            }
-            
-            #messageList {
-                padding: 10px;
-            }
-            
-            .chat-input {
-                padding: 10px 12px 16px;
-                padding-bottom: env(safe-area-inset-bottom, 16px);
-            }
-            
-            .message-input {
-                font-size: 16px;
-            }
-            
-            .send-btn {
-                width: 36px;
-                height: 36px;
-                font-size: 14px;
-            }
+        /* Desktop-specific fixes */
+@media (min-width: 481px) {
+    body {
+        background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--secondary-yellow) 100%);
+        margin: 0;
+        padding: 0;
+    }
+    
+    .app-container {
+        padding: 20px;
+        align-items: flex-start;
+        min-height: 100vh;
+    }
+    
+    .main-container {
+        max-width: 400px;
+        width: 100%;
+        min-height: auto;
+        border-radius: var(--border-radius-xl);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+    
+    /* Fix chat view for desktop */
+    #chatsView:not(.hidden) {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 500px !important;
+        max-height: 600px !important;
+        z-index: auto !important;
+        border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
+    }
+    
+    /* Desktop chat header */
+    .chat-header {
+        padding: 16px;
+        border-radius: 0;
+    }
+    
+    /* Desktop message list */
+    #messageList {
+        max-height: 400px;
+        min-height: 300px;
+        padding: 16px;
+    }
+    
+    /* Desktop input */
+    .chat-input {
+        padding: 16px;
+        position: relative;
+        border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
+    }
+    
+    /* Ensure proper layout flow */
+    body:has(#chatsView:not(.hidden)) {
+        overflow: auto;
+    }
+}
+
+/* Base responsive styles - works for both mobile and desktop */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--secondary-yellow) 100%);
+    min-height: 100vh;
+    color: var(--dark-gray);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+.app-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.main-container {
+    width: 100%;
+    max-width: 400px;
+    background: var(--white);
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Chat Interface - Fixed for both mobile and desktop */
+#chatsView {
+    display: none;
+    flex-direction: column;
+    background: var(--white);
+    position: relative;
+    min-height: 500px;
+}
+
+#chatsView:not(.hidden) {
+    display: flex !important;
+}
+
+/* Remove mobile-specific overrides for desktop */
+@media (max-width: 480px) {
+    body {
+        margin: 0;
+        padding: 0;
+        background: var(--white);
+    }
+    
+    .app-container {
+        padding: 0;
+        align-items: stretch;
+        min-height: 100vh;
+    }
+    
+    .main-container {
+        max-width: 100%;
+        width: 100%;
+        min-height: 100vh;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    #chatsView:not(.hidden) {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 9999 !important;
+        border-radius: 0;
+    }
+    
+    body:has(#chatsView:not(.hidden)) {
+        overflow: hidden;
+    }
+}
+
 
             /* Mobile message layout */
             .message-wrapper.current-user-wrapper {
