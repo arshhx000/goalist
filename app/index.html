@@ -65,6 +65,8 @@
       overflow: hidden;
       position: relative;
       transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
     }
     /* Header */
     .app-header {
@@ -115,6 +117,7 @@
       font-size: 24px;
       background: var(--bg-light);
       color: var(--text-dark);
+      overflow: hidden;
     }
     .logo-image {
       width: 100%;
@@ -136,6 +139,9 @@
     /* Join View */
     #joinView {
       padding: 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
     #joinView.hidden {
       display: none !important;
@@ -248,7 +254,7 @@
       display: none;
       flex-direction: column;
       background: var(--bg-light);
-      height: 100vh;
+      height: 100%;
       max-height: 100vh;
       overflow: hidden;
     }
@@ -308,6 +314,7 @@
       background: var(--bg-light);
       color: var(--text-dark);
       flex-shrink: 0;
+      overflow: hidden;
     }
     .header-logo-image {
       width: 100%;
@@ -728,7 +735,7 @@
         </div>
       </div>
       <!-- Join View -->
-      <div id="joinView">
+      <div id="joinView" class="active">
         <div class="section-header">
           <div class="section-icon">👋</div>
           <h2 class="section-title">Join the Chat</h2>
@@ -755,7 +762,7 @@
       <!-- Chat Interface -->
       <div id="chatsView" class="hidden">
         <div class="chat-header">
-          <button class="back-button" id="backButton" onclick="logout()">←</button>
+          <button class="back-button" id="backButton">←</button>
           <div class="chat-header-info">
             <!-- Updated header with logo and app name -->
             <div class="header-logo-section">
@@ -810,6 +817,13 @@
   <script type="module" src="main.js"></script>
   <!-- Enhanced Theme Toggle Script -->
   <script>
+    // Fixed logout function
+    function logout() {
+      document.getElementById('chatsView').classList.add('hidden');
+      document.getElementById('joinView').classList.remove('hidden');
+      document.getElementById('joinView').classList.add('active');
+    }
+
     function toggleTheme() {
       const body = document.body;
       const themeIcon = document.getElementById('themeIcon');
@@ -832,6 +846,7 @@
       const joinRoomBtn = document.getElementById('joinRoomBtn');
       const createRoomBtnModal = document.getElementById('createRoomBtnModal');
       const leaveRoomBtn = document.getElementById('leaveRoomBtn');
+      const backButton = document.getElementById('backButton');
 
       // Theme toggle
       if (themeToggle) {
@@ -898,6 +913,75 @@
           window.dispatchEvent(new CustomEvent('leaveRoom'));
           roomModal.classList.remove('show');
         });
+      }
+
+      // Fixed back button functionality
+      if (backButton) {
+        backButton.addEventListener('click', function(e) {
+          e.preventDefault();
+          logout();
+        });
+      }
+
+      // Join button functionality
+      const joinButton = document.getElementById('joinButton');
+      if (joinButton) {
+        joinButton.addEventListener('click', function() {
+          const username = document.getElementById('usernameInput').value.trim();
+          const age = document.getElementById('ageInput').value.trim();
+          
+          if (!username || !age) {
+            alert('Please enter both your name and age');
+            return;
+          }
+          
+          // Show chat view
+          document.getElementById('joinView').classList.add('hidden');
+          document.getElementById('chatsView').classList.remove('hidden');
+          
+          // Add welcome message
+          const messageList = document.getElementById('messageList');
+          if (messageList) {
+            const welcomeMsg = document.createElement('div');
+            welcomeMsg.className = 'message system';
+            welcomeMsg.innerHTML = '<div class="message-bubble">Welcome, ' + username + '! You\'ve joined the chat.</div>';
+            messageList.appendChild(welcomeMsg);
+            messageList.scrollTop = messageList.scrollHeight;
+          }
+        });
+      }
+
+      // Send message functionality
+      const sendButton = document.getElementById('sendButton');
+      const messageInput = document.getElementById('messageInput');
+      
+      if (sendButton && messageInput) {
+        sendButton.addEventListener('click', function() {
+          const message = messageInput.value.trim();
+          if (message) {
+            sendMessage(message);
+            messageInput.value = '';
+          }
+        });
+        
+        messageInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter' && messageInput.value.trim()) {
+            sendMessage(messageInput.value.trim());
+            messageInput.value = '';
+          }
+        });
+      }
+      
+      // Function to send a message
+      function sendMessage(text) {
+        const messageList = document.getElementById('messageList');
+        if (messageList) {
+          const messageEl = document.createElement('div');
+          messageEl.className = 'message sent';
+          messageEl.innerHTML = '<div class="message-bubble">' + text + '</div>';
+          messageList.appendChild(messageEl);
+          messageList.scrollTop = messageList.scrollHeight;
+        }
       }
     });
   </script>
