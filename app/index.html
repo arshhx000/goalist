@@ -13,7 +13,7 @@
       --bg-light: #ffffff;
       --text-dark: #000000;
       --text-light: #ffffff;
-      --accent: #ff3b30; /* bold red accent */
+      --accent: #ff3b30;
       --gray: #888888;
       --border-radius: 12px;
       --border-thin: 1.5px solid #000;
@@ -67,7 +67,6 @@
       display: flex;
       flex-direction: column;
     }
-    /* Header */
     .app-header {
       background: var(--bg-light);
       padding: 20px;
@@ -134,7 +133,6 @@
       font-size: 13px;
       color: var(--gray);
     }
-    /* Join View */
     #joinView {
       padding: 24px;
       flex: 1;
@@ -163,7 +161,6 @@
       color: var(--gray);
       font-size: 14px;
     }
-    /* Form */
     .form-group {
       margin-bottom: 18px;
     }
@@ -240,12 +237,6 @@
     .btn-success:hover {
       background: var(--accent);
     }
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      background: var(--gray);
-    }
-    /* Chat View */
     #chatsView {
       display: none;
       flex-direction: column;
@@ -357,7 +348,6 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
     }
-    /* Create Room Button */
     .create-room-btn {
       border: var(--border-thin);
       width: 36px;
@@ -375,7 +365,6 @@
       background: var(--accent);
       color: var(--text-light);
     }
-    /* Room Modal */
     .room-modal {
       position: fixed;
       top: 0;
@@ -473,7 +462,6 @@
     .btn-room.primary:hover {
       background: var(--accent);
     }
-    /* Enhanced Message List */
     #messageList {
       flex: 1;
       padding: 16px;
@@ -492,14 +480,8 @@
       animation: messageSlideIn 0.3s ease;
     }
     @keyframes messageSlideIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .message-bubble {
       border: var(--border-thin);
@@ -510,7 +492,6 @@
       max-width: 75%;
       position: relative;
     }
-    /* Sent Messages */
     .message.sent {
       justify-content: flex-end;
     }
@@ -519,7 +500,6 @@
       color: var(--text-light);
       border: none;
     }
-    /* Received Messages */
     .message.received {
       justify-content: flex-start;
     }
@@ -527,7 +507,6 @@
       background: var(--bg-light);
       color: var(--text-dark);
     }
-    /* System Messages */
     .message.system {
       justify-content: center;
     }
@@ -539,7 +518,6 @@
       max-width: 90%;
       text-align: center;
     }
-    /* Message Meta Information */
     .message-time {
       font-size: 10px;
       opacity: 0.7;
@@ -562,7 +540,6 @@
       align-items: flex-start;
       max-width: 75%;
     }
-    /* Input Bar */
     .chat-input {
       border-top: var(--border-thin);
       padding: 10px 16px;
@@ -606,58 +583,47 @@
       background: var(--accent);
       transform: scale(1.05);
     }
-    .send-button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
     
-    /* CORRECTED: Mobile Responsive */
+    /*
+     * ✅ UPDATED & FIXED: Mobile Responsive CSS
+     * This uses a more robust flexbox structure to prevent
+     * the on-screen keyboard from hiding the chat input.
+    */
     @media (max-width: 480px) {
-      body {
-        /* Prevent scrolling on the body when chat is active */
-        height: 100vh;
+      html, body {
+        height: 100%;
         overflow: hidden;
       }
-
       .app-container {
+        height: 100%;
         padding: 0;
-        height: 100%; /* Fill the body */
       }
-
       .main-container {
         width: 100%;
-        height: 100%; /* Fill the app-container */
+        height: 100%;
         border-radius: 0;
         border: none;
         display: flex;
         flex-direction: column;
       }
-
       #chatsView:not(.hidden) {
-        /* Take up all space within the main-container */
-        flex: 1;
+        flex: 1; /* Grow to fill available space */
         display: flex !important;
         flex-direction: column;
-        overflow: hidden; /* Prevent internal overflow */
-
-        /* Remove fixed positioning which causes issues */
+        min-height: 0; /* Important for flex containers */
         position: static !important;
         width: 100% !important;
         height: 100% !important;
       }
-
       #messageList {
-        /* This is the key: it will take up all available space */
-        flex: 1;
-        overflow-y: auto; /* Allow only the message list to scroll */
-        min-height: 0; /* Necessary for flexbox shrinking */
+        flex: 1; /* Takes up all space except the header/input */
+        overflow-y: auto;
+        min-height: 0;
       }
-
       .chat-input {
-        /* No longer needs to be fixed positioned */
+        flex-shrink: 0; /* Prevents the input from shrinking */
         position: static !important;
         width: 100% !important;
-        flex-shrink: 0; /* Prevent the input bar from shrinking */
       }
     }
   </style>
@@ -714,14 +680,12 @@
                 <div class="header-room-info">
                   <span class="room-indicator" id="roomIndicator">Global</span>
                   <span class="online-dot"></span>
-                  <span id="peopleCount">connecting nearby</span>
+                  <span id="peopleCount">connecting...</span>
                 </div>
               </div>
             </div>
           </div>
-          <button class="create-room-btn" id="createRoomBtn" title="Create/Join Room">
-            +
-          </button>
+          <button class="create-room-btn" id="createRoomBtn" title="Create/Join Room">+</button>
         </div>
         <div id="messageList"></div>
         <div class="chat-input" id="chatInput">
@@ -751,456 +715,264 @@
       </div>
     </div>
   </div>
+
   <script type="module">
-    // Import Firebase modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-    import { getFirestore, addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, setDoc, doc, where, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    import { getFirestore, addDoc, collection, doc, setDoc, onSnapshot, orderBy, query, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-    // Firebase configuration
-    // IMPORTANT: Make sure you have set up Firestore Security Rules in your Firebase console!
+    /* ───────────────────────── Firebase config ───────────────────────── */
+    // 🚨 REMINDER: Make sure your Firestore Security Rules in the Firebase Console
+    // have been updated to allow writes to the `rooms/{roomId}/messages` collection!
     const firebaseConfig = {
       apiKey: "AIzaSyCOmLxxqPesNaBr4Z9fVIU6K2BLW6OsED0",
       authDomain: "gappkar-v1-b3afe.firebaseapp.com",
       databaseURL: "https://gappkar-v1-b3afe-default-rtdb.firebaseio.com",
       projectId: "gappkar-v1-b3afe",
-      storageBucket: "gappkar-v1-b3afe.firebasestorage.app",
+      storageBucket: "gappkar-v1-b3afe.appspot.com",
       messagingSenderId: "726018257415",
       appId: "1:726018257415:web:12142708abdf47952af0a2",
       measurementId: "G-EWK4436NRB"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    // Global variables
-    let currentUser = null;
-    let currentUsername = "";
-    let currentUserAge = 0;
-    let currentUserLocation = "";
-    let userLatitude = null;
-    let userLongitude = null;
-    let isJoined = false;
+    /* ───────────────────────── Global state ───────────────────────── */
+    let currentUser = null, currentUsername = "", currentUserAge = 0, currentUserLocation = "";
+    let userLatitude = null, userLongitude = null, isJoined = false, currentRoom = "global";
+    let messagesListener = null, presenceTimer = null, onlineListener = null;
 
-    // Room variables
-    let currentRoom = "global";
-    let messagesListener = null;
+    /* ───────────────────────── DOM helpers ───────────────────────── */
+    const $ = id => document.getElementById(id);
+    const joinView = $("joinView"), chatsView = $("chatsView"), messageList = $("messageList");
+    const messageInput = $("messageInput"), sendButton = $("sendButton"), backButton = $("backButton");
+    const usernameInput = $("usernameInput"), ageInput = $("ageInput"), locationInput = $("locationInput");
+    const joinButton = $("joinButton"), getLocationBtn = $("getLocationBtn"), peopleCount = $("peopleCount");
+    const createRoomBtnH = $("createRoomBtn"), roomModal = $("roomModal"), roomModalClose = $("roomModalClose");
+    const roomKeyInput = $("roomKeyInput"), joinRoomBtn = $("joinRoomBtn"), createRoomBtnM = $("createRoomBtnModal");
+    const leaveRoomBtn = $("leaveRoomBtn"), roomIndicator = $("roomIndicator");
 
-    // Online user tracking variables
-    let onlineUsers = new Set();
-    let presenceUpdateInterval = null;
-    let onlineUsersListener = null;
+    const roomMessagesRef = room => collection(db, "rooms", room, "messages");
 
-    // DOM Elements
-    const joinView = document.getElementById("joinView");
-    const chatsView = document.getElementById("chatsView");
-    const messageList = document.getElementById("messageList");
-    const messageInput = document.getElementById("messageInput");
-    const sendButton = document.getElementById("sendButton");
-    const backButton = document.getElementById("backButton");
-    const usernameInput = document.getElementById("usernameInput");
-    const ageInput = document.getElementById("ageInput");
-    const locationInput = document.getElementById("locationInput");
-    const joinButton = document.getElementById("joinButton");
-    const getLocationBtn = document.getElementById("getLocationBtn");
-    const peopleCount = document.getElementById("peopleCount");
-    const createRoomBtnHeader = document.getElementById("createRoomBtn");
-    const roomModal = document.getElementById("roomModal");
-    const roomModalClose = document.getElementById("roomModalClose");
-    const roomKeyInput = document.getElementById("roomKeyInput");
-    const joinRoomBtn = document.getElementById("joinRoomBtn");
-    const createRoomBtnModal = document.getElementById("createRoomBtnModal");
-    const leaveRoomBtn = document.getElementById("leaveRoomBtn");
-    const roomIndicator = document.getElementById("roomIndicator");
+    /* ───────────────────────── UI utilities ───────────────────────── */
+    const timeStr = ts => {
+      const d = ts?.toDate ? ts.toDate() : (ts || new Date());
+      let h = d.getHours();
+      const m = d.getMinutes().toString().padStart(2, "0");
+      const a = h >= 12 ? "PM" : "AM";
+      h = h % 12 || 12;
+      return `${h}:${m} ${a}`;
+    };
+    const scrollBottom = () => messageList && (messageList.scrollTop = messageList.scrollHeight);
+    const updateRoomUI = () => {
+      if (!roomIndicator) return;
+      roomIndicator.textContent = currentRoom === "global" ? "Global" : currentRoom;
+      roomIndicator.style.background = currentRoom === "global" ? "var(--accent)" : "#28a745";
+    };
+    const addSystemMsg = txt => {
+      const div = document.createElement("div");
+      div.className = "message system";
+      div.innerHTML = `<div class="message-bubble">${txt}</div>`;
+      messageList.appendChild(div);
+      scrollBottom();
+    };
 
-    function getTimeString(timestamp = null) {
-      const date = timestamp ? (timestamp.toDate ? timestamp.toDate() : timestamp) : new Date();
-      let hours = date.getHours();
-      const minutes = date.getMinutes().toString().padStart(2, "0");
-      const ampm = hours >= 12 ? "PM" : "AM";
-      hours = hours % 12 || 12;
-      return `${hours}:${minutes} ${ampm}`;
-    }
-
-    function smoothScrollToBottom() {
-      if (messageList) {
-        messageList.scrollTop = messageList.scrollHeight;
-      }
-    }
-
-    // Room Management
-    function showRoomModal() {
-      if (roomModal) roomModal.classList.add('show');
-    }
-
-    function hideRoomModal() {
-      if (roomModal) {
-        roomModal.classList.remove('show');
-        if (roomKeyInput) roomKeyInput.value = '';
-      }
-    }
-
-    function updateRoomUI() {
-      if (roomIndicator) {
-        if (currentRoom === "global") {
-          roomIndicator.textContent = "Global";
-          roomIndicator.style.background = "var(--accent)";
-        } else {
-          roomIndicator.textContent = currentRoom;
-          roomIndicator.style.background = "#28a745"; // Green for private rooms
-        }
-      }
-    }
-
-    async function createOrJoinRoom(roomKey) {
-      if (!roomKey || !roomKey.trim()) {
-        alert("Please enter a room key");
-        return;
-      }
-      const sanitizedRoomKey = roomKey.trim().toLowerCase();
-      if (sanitizedRoomKey === currentRoom) {
-        hideRoomModal();
-        return;
-      }
-      if (messagesListener) messagesListener();
-      
-      currentRoom = sanitizedRoomKey;
-      updateRoomUI();
-      
-      if (messageList) {
-        messageList.innerHTML = "";
-        addSystemMessage(`Joined room: ${currentRoom}`);
-      }
-      
-      listenForMessages();
-      if (currentUser && isJoined) trackUserPresence();
-      
-      hideRoomModal();
-      localStorage.setItem('gappkar_current_room', currentRoom);
-    }
-
-    function leaveRoom() {
-      if (currentRoom === "global") {
-        hideRoomModal();
-        return;
-      }
-      if (messagesListener) messagesListener();
-      
-      currentRoom = "global";
-      updateRoomUI();
-      
-      if (messageList) {
-        messageList.innerHTML = "";
-        addSystemMessage("Left room, back to global chat");
-      }
-      
-      listenForMessages();
-      if (currentUser && isJoined) trackUserPresence();
-
-      hideRoomModal();
-      localStorage.removeItem('gappkar_current_room');
-    }
-
-    function addSystemMessage(text) {
-      if (!messageList) return;
-      displayMessage({ user: "System", message: text, timestamp: new Date(), isSystem: true });
-      smoothScrollToBottom();
-    }
-
-    // Presence Tracking
-    function trackUserPresence() {
+    /* ───────────────── Presence & Location ────────────────── */
+    function trackPresence() {
       if (!currentUser || !currentUsername) return;
-
-      const userPresenceDoc = doc(db, "presence", currentUser.uid);
-      const userPresenceData = {
-        userId: currentUser.uid,
-        username: currentUsername,
-        location: currentUserLocation,
-        age: currentUserAge,
-        room: currentRoom,
-        lastSeen: serverTimestamp(),
-        isOnline: true
+      const ref = doc(db, "presence", currentUser.uid);
+      const data = {
+        userId: currentUser.uid, username: currentUsername, location: currentUserLocation,
+        age: currentUserAge, room: currentRoom, lastSeen: serverTimestamp(), isOnline: true
       };
-
-      setDoc(userPresenceDoc, userPresenceData, { merge: true });
-
-      if (presenceUpdateInterval) clearInterval(presenceUpdateInterval);
-
-      presenceUpdateInterval = setInterval(() => {
-        if (isJoined && currentUser) {
-          setDoc(userPresenceDoc, { room: currentRoom, lastSeen: serverTimestamp() }, { merge: true });
-        }
-      }, 30000);
+      setDoc(ref, data, { merge: true });
+      clearInterval(presenceTimer);
+      presenceTimer = setInterval(() => setDoc(ref, { room: currentRoom, lastSeen: serverTimestamp() }, { merge: true }), 30000);
     }
-
-    function listenForOnlineUsers() {
-      const presenceRef = collection(db, "presence");
-      if (onlineUsersListener) onlineUsersListener();
-      
-      onlineUsersListener = onSnapshot(presenceRef, (querySnapshot) => {
-        onlineUsers.clear();
-        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-        let roomUsers = 0;
-        
-        querySnapshot.forEach((doc) => {
-          const userData = doc.data();
-          if (userData.lastSeen && userData.lastSeen.toDate() > fiveMinutesAgo) {
-            onlineUsers.add(userData.userId);
-            if (userData.room === currentRoom) roomUsers++;
-          }
+    function listenOnlineUsers() {
+      onlineListener && onlineListener();
+      onlineListener = onSnapshot(collection(db, "presence"), snap => {
+        const fiveAgo = Date.now() - 5 * 60 * 1000;
+        let roomCnt = 0;
+        snap.forEach(doc => {
+          const d = doc.data();
+          if (d.lastSeen?.toDate && d.lastSeen.toDate().getTime() > fiveAgo && d.room === currentRoom) roomCnt++;
         });
-        updateOnlineCount(roomUsers);
+        peopleCount.textContent = `${roomCnt} people ${currentRoom === "global" ? "nearby" : "in " + currentRoom}`;
       });
     }
-
-    function updateOnlineCount(roomUserCount = null) {
-      if (peopleCount) {
-        const count = roomUserCount !== null ? roomUserCount : onlineUsers.size;
-        const roomText = currentRoom === "global" ? "nearby" : `in ${currentRoom}`;
-        peopleCount.textContent = `${count} people ${roomText}`;
-      }
-    }
-
-    // Location
     async function getUserLocation() {
-        const statusDiv = document.getElementById('locationStatus');
+        const statusDiv = $("locationStatus");
         if (!navigator.geolocation) {
-            statusDiv.textContent = "Geolocation is not supported.";
-            statusDiv.className = "error";
-            return;
+            statusDiv.textContent = "Geolocation is not supported."; statusDiv.className = "error"; return;
         }
-        statusDiv.textContent = "Getting your location...";
-        statusDiv.className = "";
+        statusDiv.textContent = "Getting your location..."; statusDiv.className = "";
         try {
-            const position = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
-            });
-            userLatitude = position.coords.latitude;
-            userLongitude = position.coords.longitude;
-            const locationName = await getCityFromCoordinates(userLatitude, userLongitude);
+            const position = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 }));
+            userLatitude = position.coords.latitude; userLongitude = position.coords.longitude;
+            const locationName = await (async (lat, lon) => { try { const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`); return (await r.json()).city; } catch (e) { return null; } })(userLatitude, userLongitude);
             currentUserLocation = locationName || `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
-            statusDiv.textContent = `Location found: ${currentUserLocation}`;
-            statusDiv.className = "success";
+            statusDiv.textContent = `Location found: ${currentUserLocation}`; statusDiv.className = "success";
             locationInput.value = currentUserLocation;
         } catch (error) {
-            statusDiv.textContent = "Could not get location. Please enter manually.";
-            statusDiv.className = "error";
+            statusDiv.textContent = "Could not get location. Enter manually."; statusDiv.className = "error";
         }
     }
 
-    async function getCityFromCoordinates(lat, lon) {
+    /* ───────────────────── Room helpers ────────────────────── */
+    function showModal() { roomModal.classList.add("show"); }
+    function hideModal() { roomModal.classList.remove("show"); roomKeyInput.value = ""; }
+    async function joinRoom(key) {
+      const k = key.trim().toLowerCase();
+      if (!k) return alert("Enter a room key");
+      if (k === currentRoom) return hideModal();
+      messagesListener && messagesListener();
+      currentRoom = k;
+      localStorage.setItem("gappkar_current_room", currentRoom);
+      updateRoomUI(); messageList.innerHTML = "";
+      addSystemMsg(`Joined room: ${currentRoom}`);
+      listenMessages(); trackPresence(); hideModal();
+    }
+    function leaveRoom() {
+      if (currentRoom === "global") return hideModal();
+      messagesListener && messagesListener();
+      currentRoom = "global";
+      localStorage.removeItem("gappkar_current_room");
+      updateRoomUI(); messageList.innerHTML = "";
+      addSystemMsg("Left room, back to global chat");
+      listenMessages(); trackPresence(); hideModal();
+    }
+
+    /* ───────────────────── Messaging ───────────────────────── */
+    function displayMsg(d) {
+      const mine = d.user === currentUsername;
+      const div = document.createElement("div");
+      div.className = `message ${mine ? "sent" : "received"}`;
+      const time = timeStr(d.timestamp);
+      div.innerHTML = mine
+        ? `<div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>`
+        : `<div class="message-info"><div class="sender-name">${d.user}${d.age ? ` (${d.age})` : ""}</div><div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>${d.location ? `<div class="message-location">📍 ${d.location}</div>` : ""}</div>`;
+      messageList.appendChild(div);
+    }
+    function listenMessages() {
+      messagesListener && messagesListener();
+      const q = query(roomMessagesRef(currentRoom), orderBy("timestamp", "asc"));
+      messagesListener = onSnapshot(q, (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === "added") {
+            const temp = messageList.querySelector('[data-temp="true"]');
+            if (temp) temp.remove();
+            displayMsg(change.doc.data());
+          }
+        });
+        scrollBottom();
+      });
+    }
+    
+    // ✅ UPDATED & FIXED: sendMessage function with better error feedback
+    async function sendMessage() {
+      const txt = messageInput.value.trim();
+      if (!txt || !isJoined) return;
+      messageInput.value = "";
+
+      const tempId = `temp_${Date.now()}`;
+      const div = document.createElement("div");
+      div.className = "message sent";
+      div.id = tempId;
+      div.dataset.temp = "true"; // Mark as temporary
+      div.innerHTML = `<div class="message-bubble">${txt}<div class="message-time" style="opacity: 0.5;">sending...</div></div>`;
+      messageList.appendChild(div);
+      scrollBottom();
+      
       try {
-        const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
-        const data = await response.json();
-        return data.city || data.locality || data.principalSubdivision;
-      } catch (error) {
-        return null;
+        await addDoc(roomMessagesRef(currentRoom), {
+          user: currentUsername, message: txt, timestamp: serverTimestamp(),
+          location: currentUserLocation, age: currentUserAge, userId: currentUser.uid
+        });
+      } catch (e) {
+        console.error("Send failed:", e);
+        const failedNode = document.getElementById(tempId);
+        if (failedNode) {
+          failedNode.querySelector('.message-bubble').style.backgroundColor = '#d32f2f';
+          failedNode.querySelector('.message-time').innerText = 'Failed to send!';
+        }
       }
     }
 
-    // Authentication and Session
-    onAuthStateChanged(auth, (user) => {
-      currentUser = user;
-    });
-
-    async function joinChat(username, age, location) {
-      if (!username?.trim() || !age || age < 13 || age > 99 || !location?.trim()) {
-        alert("Please fill in all fields correctly (Age 13-99).");
-        return;
-      }
+    /* ─────────────────── Join/Logout Flow ──────────────────── */
+    async function joinChat(name, age, loc) {
+      if (!name.trim()) return alert("Enter name");
+      if (age < 13 || age > 99) return alert("Age 13-99 only");
+      if (!loc.trim()) return alert("Enter location");
       if (isJoined) return;
 
-      try {
-        await signInAnonymously(auth);
-        
-        currentUsername = username.trim();
-        currentUserAge = parseInt(age);
-        currentUserLocation = location.trim();
-        isJoined = true;
-        
-        localStorage.setItem('gappkar_username', username);
-        localStorage.setItem('gappkar_age', age);
-        localStorage.setItem('gappkar_location', location);
-        localStorage.setItem('gappkar_joined', 'true');
-        
-        const savedRoom = localStorage.getItem('gappkar_current_room');
-        if (savedRoom) currentRoom = savedRoom;
-        
-        document.getElementById("mainContainer").classList.add("chat-active");
-        joinView.classList.add("hidden");
-        chatsView.classList.remove("hidden");
-        document.body.classList.add("chat-active");
-        
-        updateRoomUI();
-        
-        messageList.innerHTML = "";
-        addSystemMessage(`Welcome ${currentUsername}! You're in ${currentRoom === "global" ? "global chat" : `room: ${currentRoom}`}`);
-        
-        listenForMessages();
-        trackUserPresence();
-        listenForOnlineUsers();
-        
-      } catch (error) {
-        isJoined = false;
-        alert("Failed to join chat: " + error.message);
-      }
+      await signInAnonymously(auth);
+      currentUsername = name.trim();
+      currentUserAge = parseInt(age, 10);
+      currentUserLocation = loc.trim();
+      isJoined = true;
+
+      const savedRoom = localStorage.getItem("gappkar_current_room");
+      if (savedRoom) currentRoom = savedRoom;
+
+      joinView.classList.add("hidden");
+      chatsView.classList.remove("hidden");
+      document.body.classList.add("chat-active");
+      updateRoomUI();
+
+      messageList.innerHTML = "";
+      addSystemMsg(`Welcome ${currentUsername}!`);
+      listenMessages(); trackPresence(); listenOnlineUsers();
+
+      localStorage.setItem("gappkar_username", currentUsername);
+      localStorage.setItem("gappkar_age", currentUserAge);
+      localStorage.setItem("gappkar_location", currentUserLocation);
+      localStorage.setItem("gappkar_joined", "true");
     }
-
+    onAuthStateChanged(auth, u => currentUser = u || null);
     async function logout() {
-      console.log("🚪 User logging out...");
-      
-      if (presenceUpdateInterval) clearInterval(presenceUpdateInterval);
-      if (onlineUsersListener) onlineUsersListener();
-      if (messagesListener) messagesListener();
+      presenceTimer && clearInterval(presenceTimer);
+      onlineListener && onlineListener();
+      messagesListener && messagesListener();
 
-      // CORRECTED: Remove user from presence collection
       if (currentUser) {
-          const userPresenceDoc = doc(db, "presence", currentUser.uid);
-          try {
-              await deleteDoc(userPresenceDoc);
-              console.log("✅ Presence document deleted.");
-          } catch (error) {
-              console.error("❌ Error deleting presence doc:", error);
-          }
+        try { await deleteDoc(doc(db, "presence", currentUser.uid)); } catch(e) { console.error("Presence cleanup failed:", e) }
       }
-      
-      if (auth.currentUser) await signOut(auth);
-      
+      try { await signOut(auth); } catch {}
+
+      isJoined = false; currentRoom = "global";
+      localStorage.clear();
       chatsView.classList.add("hidden");
       joinView.classList.remove("hidden");
       document.body.classList.remove("chat-active");
-      document.getElementById("mainContainer").classList.remove("chat-active");
-      
-      localStorage.clear();
-      isJoined = false;
-      currentUsername = "";
-      currentRoom = "global";
-      
-      usernameInput.value = "";
-      ageInput.value = "";
-      locationInput.value = "";
     }
 
-    // Messaging
-    async function sendMessage() {
-      const messageText = messageInput.value.trim();
-      if (!messageText || !currentUser || !isJoined) return;
-      messageInput.value = "";
-      
-      try {
-        await addDoc(collection(db, "messages"), {
-          user: currentUsername,
-          message: messageText,
-          timestamp: serverTimestamp(),
-          location: currentUserLocation,
-          age: currentUserAge,
-          userId: currentUser.uid,
-          room: currentRoom,
-        });
-      } catch (error) {
-        console.error("Error sending message:", error);
-        alert("Failed to send message");
+    /* ─────────────────── Event wiring ──────────────────────── */
+    document.addEventListener("DOMContentLoaded", () => {
+      if (localStorage.getItem("gappkar_joined") === "true") {
+        joinChat(localStorage.getItem("gappkar_username") || "", localStorage.getItem("gappkar_age") || 0, localStorage.getItem("gappkar_location") || "");
       }
-    }
-
-    function listenForMessages() {
-      if (messagesListener) messagesListener();
-
-      const messagesRef = collection(db, "messages");
-      const q = query(messagesRef, where("room", "==", currentRoom), orderBy("timestamp", "asc"));
-      
-      messagesListener = onSnapshot(q, (snapshot) => {
-        // CORRECTED: Efficiently render only new messages
-        snapshot.docChanges().forEach((change) => {
-            if (change.type === "added") {
-                const messageData = change.doc.data();
-                if (!messageData.isTemp && !messageData.isSystem) {
-                    displayMessage(messageData);
-                }
-            }
-        });
-        setTimeout(() => smoothScrollToBottom(), 100);
-      }, (error) => {
-        console.error("Error listening for messages:", error);
-      });
-    }
-
-    function displayMessage(messageData) {
-      if (!messageList) return;
-      
-      const isCurrentUser = messageData.user === currentUsername;
-      const isSystem = messageData.isSystem || messageData.user === "System";
-      
-      const messageDiv = document.createElement("div");
-      
-      if (isSystem) {
-        messageDiv.className = "message system";
-        messageDiv.innerHTML = `<div class="message-bubble">${messageData.message}</div>`;
-      } else {
-        messageDiv.className = `message ${isCurrentUser ? 'sent' : 'received'}`;
-        const timeString = getTimeString(messageData.timestamp);
-        
-        if (isCurrentUser) {
-          messageDiv.innerHTML = `
-            <div class="message-bubble">
-              ${messageData.message}
-              <div class="message-time">${timeString}</div>
-            </div>`;
-        } else {
-          messageDiv.innerHTML = `
-            <div class="message-info">
-              <div class="sender-name">${messageData.user}${messageData.age ? ` (${messageData.age})` : ''}</div>
-              <div class="message-bubble">
-                ${messageData.message}
-                <div class="message-time">${timeString}</div>
-              </div>
-              ${messageData.location ? `<div class="message-location">📍 ${messageData.location}</div>` : ''}
-            </div>`;
-        }
-      }
-      messageList.appendChild(messageDiv);
-      smoothScrollToBottom();
-    }
-
-    function checkExistingSession() {
-      const savedUsername = localStorage.getItem('gappkar_username');
-      const savedAge = localStorage.getItem('gappkar_age');
-      const savedLocation = localStorage.getItem('gappkar_location');
-      const savedJoined = localStorage.getItem('gappkar_joined');
-      
-      if (savedUsername && savedJoined === 'true') {
-        console.log("Found existing session, auto-joining...");
-        // CORRECTED: No timeout needed
-        joinChat(savedUsername, savedAge, savedLocation);
-      }
-    }
-
-    // Event Listeners
-    document.addEventListener("DOMContentLoaded", function() {
-      checkExistingSession();
       
       getLocationBtn.addEventListener("click", getUserLocation);
       joinButton.addEventListener("click", () => joinChat(usernameInput.value, ageInput.value, locationInput.value));
       sendButton.addEventListener("click", sendMessage);
-      messageInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); sendMessage(); } });
+      messageInput.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
       backButton.addEventListener("click", logout);
-      createRoomBtnHeader.addEventListener("click", showRoomModal);
-      roomModalClose.addEventListener("click", hideRoomModal);
-      roomModal.addEventListener("click", (e) => { if (e.target === roomModal) hideRoomModal(); });
-      joinRoomBtn.addEventListener("click", () => createOrJoinRoom(roomKeyInput.value));
-      createRoomBtnModal.addEventListener("click", () => createOrJoinRoom(roomKeyInput.value));
-      leaveRoomBtn.addEventListener("click", leaveRoom);
-      roomKeyInput.addEventListener("keypress", (e) => { if (e.key === "Enter") { e.preventDefault(); createOrJoinRoom(roomKeyInput.value); } });
-    });
 
+      createRoomBtnH.addEventListener("click", showModal);
+      roomModalClose.addEventListener("click", hideModal);
+      joinRoomBtn.addEventListener("click", () => joinRoom(roomKeyInput.value));
+      createRoomBtnM.addEventListener("click", () => joinRoom(roomKeyInput.value));
+      leaveRoomBtn.addEventListener("click", leaveRoom);
+      roomModal.addEventListener("click", e => { if (e.target === roomModal) hideModal(); });
+    });
   </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const themeToggle = document.getElementById('themeToggle');
       const themeIcon = document.getElementById('themeIcon');
-      
       function toggleTheme() {
         const body = document.body;
         if (body.getAttribute('data-theme') === 'dark') {
@@ -1211,10 +983,7 @@
           if (themeIcon) themeIcon.textContent = '☀️';
         }
       }
-      
-      if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-      }
+      if (themeToggle) { themeToggle.addEventListener('click', toggleTheme); }
     });
   </script>
 </body>
