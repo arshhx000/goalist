@@ -20,6 +20,27 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+// DOM Elements
+const joinView = document.getElementById("joinView");
+const chatsView = document.getElementById("chatsView");
+const messageList = document.getElementById("messageList");
+const messageInput = document.getElementById("messageInput");
+const sendButton = document.getElementById("sendButton");
+const backButton = document.getElementById("backButton");
+const themeToggle = document.getElementById("themeToggle");
+const themeIcon = document.getElementById("themeIcon");
+
+// Join form elements
+const usernameInput = document.getElementById("usernameInput");
+const ageInput = document.getElementById("ageInput");
+const locationInput = document.getElementById("locationInput");
+const joinButton = document.getElementById("joinButton");
+const getLocationBtn = document.getElementById("getLocationBtn");
+
+// Chat header elements
+const chatContactName = document.getElementById("contactName");
+const peopleCount = document.getElementById("peopleCount");
+
 // Global variables
 let currentUser = null;
 let currentUsername = "";
@@ -34,6 +55,16 @@ let messageCount = 0;
 let onlineUsers = new Set();
 let presenceUpdateInterval = null;
 let onlineUsersListener = null;
+
+// Enhanced time formatting
+function getTimeString(timestamp = null) {
+  const date = timestamp ? (timestamp.toDate ? timestamp.toDate() : timestamp) : new Date();
+  let hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12 || 12;
+  return `${hours}:${minutes} ${ampm}`;
+}
 
 // Enhanced smooth scroll to bottom function
 function smoothScrollToBottom() {
@@ -68,7 +99,6 @@ function setupEnhancedMobileKeyboardFix() {
             isKeyboardOpen = true;
             document.body.classList.add('keyboard-active');
             
-            // Adjust layout for mobile
             if (window.innerWidth <= 480) {
                 messageList.style.height = `calc(100vh - 140px - ${heightDifference}px)`;
                 messageList.style.paddingBottom = '20px';
@@ -156,7 +186,6 @@ function trackUserPresence() {
         joinedAt: serverTimestamp()
     };
     
-    // Set/update user presence document
     setDoc(userPresenceDoc, userPresenceData).then(() => {
         console.log("✅ User presence tracked successfully");
     }).catch(error => {
@@ -212,15 +241,13 @@ function listenForOnlineUsers() {
     });
 }
 
-// FIXED: Enhanced online count update
+// Enhanced online count update
 function updateOnlineCount() {
     const peopleCountElement = document.getElementById("peopleCount");
     if (peopleCountElement) {
         const count = onlineUsers.size;
         peopleCountElement.textContent = `${count} people nearby`;
         console.log(`📊 Updated UI: ${count} people nearby`);
-    } else {
-        console.error("❌ Could not find peopleCount element");
     }
 }
 
@@ -327,7 +354,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// FIXED: Enhanced join chat function
+// Enhanced join chat function
 async function joinChat(username, age, location) {
   console.log("Join chat called with:", { username, age, location });
   
@@ -368,29 +395,21 @@ async function joinChat(username, age, location) {
     localStorage.setItem('gappkar_location', location);
     localStorage.setItem('gappkar_joined', 'true');
     
-    console.log("Switching to enhanced chat view...");
-    
-    // Switch views
+    // Switch views with enhanced animation
     const mainContainer = document.getElementById("mainContainer");
-    const joinView = document.getElementById("joinView");
-    const chatsView = document.getElementById("chatsView");
     
-    // Add chat-active class to hide header
     mainContainer.classList.add("chat-active");
-    
-    // Hide join view and show chat view
     joinView.classList.add("hidden");
     chatsView.classList.remove("hidden");
+    document.body.classList.add("chat-active");
     
-    // FIXED: Update contact name with user info
-    const contactNameElement = document.getElementById("contactName");
-    if (contactNameElement) {
-        contactNameElement.textContent = `${username}'s Chat`;
+    // Update contact name with user info
+    if (chatContactName) {
+        chatContactName.textContent = `${username}'s Local Chat`;
     }
     
-    // Apply mobile-specific styles if needed
+    // Apply mobile-specific styles
     if (window.innerWidth <= 480) {
-        document.body.classList.add('chat-active');
         chatsView.style.position = 'fixed';
         chatsView.style.top = '0';
         chatsView.style.left = '0';
@@ -399,18 +418,17 @@ async function joinChat(username, age, location) {
         chatsView.style.zIndex = '9999';
     }
     
-    console.log("Setting up enhanced mobile keyboard handling...");
+    // Clear old messages and add welcome message
+    messageList.innerHTML = "";
+    addWelcomeMessage();
     
-    // Setup enhanced mobile keyboard handling
+    console.log("Setting up enhanced mobile keyboard handling...");
     setupEnhancedMobileKeyboardFix();
     
     console.log("Starting to listen for messages...");
-    
-    // Start listening for messages
     listenForMessages();
     
-    // Start online user tracking with delay
-    console.log("⏳ Starting online user tracking in 2 seconds...");
+    // Start online user tracking
     setTimeout(() => {
         trackUserPresence();
         listenForOnlineUsers();
@@ -425,9 +443,19 @@ async function joinChat(username, age, location) {
   }
 }
 
-// Enhanced send message function with instant UI update
+// Add welcome message
+function addWelcomeMessage() {
+    const welcomeMsg = {
+        user: "System",
+        message: `Welcome ${currentUsername}! You're now connected to the local chat.`,
+        timestamp: new Date(),
+        isSystem: true
+    };
+    displayMessage(welcomeMsg);
+}
+
+// Enhanced send message function
 async function sendMessage() {
-    const messageInput = document.getElementById("messageInput");
     const messageText = messageInput.value.trim();
     
     if (!messageText || !currentUser || !isJoined) {
@@ -437,7 +465,7 @@ async function sendMessage() {
     // Clear input immediately for better UX
     messageInput.value = "";
     
-    // Create temporary message object for instant display
+    // Create temporary message for instant display
     const tempMessage = {
         user: currentUsername,
         message: messageText,
@@ -448,7 +476,6 @@ async function sendMessage() {
         isTemp: true
     };
     
-    // Display message instantly
     displayMessage(tempMessage);
     smoothScrollToBottom();
     
@@ -487,74 +514,73 @@ function listenForMessages() {
   onSnapshot(q, (querySnapshot) => {
     const messageContainer = document.getElementById("messageList");
     
-    // Clear only non-temporary messages
-    const tempMessages = messageContainer.querySelectorAll('[data-temp="true"]');
+    // Clear messages but keep welcome message
+    const welcomeMsg = messageContainer.querySelector('[data-welcome="true"]');
     messageContainer.innerHTML = "";
-    
-    // Re-add temporary messages
-    tempMessages.forEach(tempMsg => {
-        messageContainer.appendChild(tempMsg);
-    });
+    if (welcomeMsg) {
+        messageContainer.appendChild(welcomeMsg);
+    }
     
     messageCount = 0;
     
     querySnapshot.forEach((doc) => {
       const messageData = doc.data();
-      
-      // Skip if this is a temporary message we already displayed
       if (!messageData.isTemp) {
         displayMessage(messageData);
       }
     });
     
-    // Auto scroll to bottom
     setTimeout(() => smoothScrollToBottom(), 200);
   });
 }
 
-// FIXED: Enhanced display message with bubble styling
+// Enhanced display message with improved styling
 function displayMessage(messageData) {
   const messageContainer = document.getElementById("messageList");
   
   const isCurrentUser = messageData.user === currentUsername;
+  const isSystem = messageData.isSystem || messageData.user === "System";
   
   const messageDiv = document.createElement("div");
-  messageDiv.className = `message ${isCurrentUser ? 'sent' : 'received'}`;
   
-  // Add temporary message attribute if needed
-  if (messageData.isTemp) {
-    messageDiv.setAttribute('data-temp', 'true');
-  }
-  
-  let timeString = "Just now";
-  if (messageData.timestamp) {
-    const timestamp = messageData.timestamp.toDate ? messageData.timestamp.toDate() : messageData.timestamp;
-    timeString = timestamp.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
-  
-  if (isCurrentUser) {
-    // Sent message (green bubble)
+  if (isSystem) {
+    messageDiv.className = "message system";
+    messageDiv.setAttribute('data-welcome', 'true');
     messageDiv.innerHTML = `
-      <div class="message-bubble">
+      <div class="message-bubble system-message">
         ${messageData.message}
-        <div class="message-time">${timeString}</div>
       </div>
     `;
   } else {
-    // Received message (white bubble)
-    messageDiv.innerHTML = `
-      <div class="message-info">
-        <div class="sender-name">${messageData.user}${messageData.age ? ` (${messageData.age})` : ''}</div>
+    messageDiv.className = `message ${isCurrentUser ? 'sent' : 'received'}`;
+    
+    if (messageData.isTemp) {
+      messageDiv.setAttribute('data-temp', 'true');
+    }
+    
+    const timeString = getTimeString(messageData.timestamp);
+    
+    if (isCurrentUser) {
+      // Sent message (green bubble)
+      messageDiv.innerHTML = `
         <div class="message-bubble">
           ${messageData.message}
           <div class="message-time">${timeString}</div>
         </div>
-        ${messageData.location ? `<div class="message-location">📍 ${messageData.location}</div>` : ''}
-      </div>
-    `;
+      `;
+    } else {
+      // Received message (white bubble)
+      messageDiv.innerHTML = `
+        <div class="message-info">
+          <div class="sender-name">${messageData.user}${messageData.age ? ` (${messageData.age})` : ''}</div>
+          <div class="message-bubble">
+            ${messageData.message}
+            <div class="message-time">${timeString}</div>
+          </div>
+          ${messageData.location ? `<div class="message-location">📍 ${messageData.location}</div>` : ''}
+        </div>
+      `;
+    }
   }
   
   messageContainer.appendChild(messageDiv);
@@ -581,14 +607,66 @@ function checkExistingSession() {
   }
 }
 
-// Enhanced event listeners
+// Enhanced logout function
+function logout() {
+  console.log("🚪 User logging out...");
+  
+  // Clean up presence tracking
+  if (presenceUpdateInterval) {
+    clearInterval(presenceUpdateInterval);
+  }
+  
+  if (onlineUsersListener) {
+    onlineUsersListener();
+  }
+  
+  // Mark user as offline
+  if (currentUser && isJoined) {
+    markUserOffline();
+  }
+  
+  // Reset UI
+  chatsView.classList.add("hidden");
+  joinView.classList.remove("hidden");
+  document.body.classList.remove("chat-active");
+  
+  // Clear data
+  localStorage.clear();
+  isJoined = false;
+  currentUsername = "";
+  
+  // Reset form
+  if (usernameInput) usernameInput.value = "";
+  if (ageInput) ageInput.value = "";
+  if (locationInput) locationInput.value = "";
+  
+  console.log("✅ Logout completed");
+}
+
+// Enhanced theme toggle
+function toggleTheme() {
+    const body = document.body;
+    const themeIcon = document.getElementById('themeIcon');
+    
+    if (body.getAttribute('data-theme') === 'dark') {
+        body.removeAttribute('data-theme');
+        if (themeIcon) themeIcon.textContent = '🌙';
+    } else {
+        body.setAttribute('data-theme', 'dark');
+        if (themeIcon) themeIcon.textContent = '☀️';
+    }
+}
+
+// Enhanced event listeners setup
 document.addEventListener("DOMContentLoaded", function() {
   console.log("DOM loaded, setting up enhanced event listeners...");
+  
+  // Initialize theme
+  if (themeIcon) themeIcon.textContent = '🌙';
   
   checkExistingSession();
   
   // Get location button
-  const getLocationBtn = document.getElementById("getLocationBtn");
   if (getLocationBtn) {
     getLocationBtn.addEventListener("click", async function() {
       try {
@@ -600,21 +678,18 @@ document.addEventListener("DOMContentLoaded", function() {
   }
   
   // Join chat button
-  const joinButton = document.getElementById("joinButton");
   if (joinButton) {
-    joinButton.addEventListener("click", function() {
-      console.log("Join button clicked");
-      const username = document.getElementById("usernameInput").value.trim();
-      const age = document.getElementById("ageInput").value;
-      const location = document.getElementById("locationInput").value.trim();
+    joinButton.addEventListener("click", function(e) {
+      e.preventDefault();
+      const username = usernameInput?.value.trim();
+      const age = ageInput?.value;
+      const location = locationInput?.value.trim();
       
-      console.log("Form values:", { username, age, location });
       joinChat(username, age, location);
     });
   }
   
-  // Enhanced send message button
-  const sendButton = document.getElementById("sendButton");
+  // Send message handlers
   if (sendButton) {
     sendButton.addEventListener("click", function(e) {
       e.preventDefault();
@@ -622,8 +697,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
   
-  // Enhanced message input handling
-  const messageInput = document.getElementById("messageInput");
   if (messageInput) {
     messageInput.addEventListener("keypress", function(e) {
         if (e.key === "Enter" && !e.shiftKey) {
@@ -631,75 +704,49 @@ document.addEventListener("DOMContentLoaded", function() {
             sendMessage();
         }
     });
-    
-    // Auto-resize textarea (if needed)
-    messageInput.addEventListener("input", function() {
-        this.style.height = "auto";
-        this.style.height = Math.min(this.scrollHeight, 120) + "px";
-    });
+  }
+  
+  // Back button handler
+  if (backButton) {
+    backButton.addEventListener("click", logout);
+  }
+  
+  // Theme toggle handler
+  if (themeToggle) {
+    themeToggle.addEventListener("click", toggleTheme);
   }
   
   // Form navigation with Enter key
-  const usernameInput = document.getElementById("usernameInput");
   if (usernameInput) {
     usernameInput.addEventListener("keypress", function(e) {
       if (e.key === "Enter") {
         e.preventDefault();
-        document.getElementById("ageInput").focus();
+        ageInput?.focus();
       }
     });
   }
 
-  const ageInput = document.getElementById("ageInput");
   if (ageInput) {
     ageInput.addEventListener("keypress", function(e) {
       if (e.key === "Enter") {
         e.preventDefault();
-        document.getElementById("locationInput").focus();
+        locationInput?.focus();
       }
     });
   }
 
-  const locationInput = document.getElementById("locationInput");
   if (locationInput) {
     locationInput.addEventListener("keypress", function(e) {
       if (e.key === "Enter") {
         e.preventDefault();
-        document.getElementById("joinButton").click();
+        joinButton?.click();
       }
     });
   }
 });
 
-// Enhanced logout function
-window.logout = function() {
-  console.log("🚪 User logging out...");
-  
-  // Clean up presence tracking
-  if (presenceUpdateInterval) {
-    clearInterval(presenceUpdateInterval);
-    console.log("✅ Cleared presence update interval");
-  }
-  
-  if (onlineUsersListener) {
-    onlineUsersListener();
-    console.log("✅ Removed online users listener");
-  }
-  
-  // Mark user as offline before leaving
-  if (currentUser && isJoined) {
-    markUserOffline();
-    setTimeout(() => {
-      localStorage.clear();
-      isJoined = false;
-      location.reload();
-    }, 1000);
-  } else {
-    localStorage.clear();
-    isJoined = false;
-    location.reload();
-  }
-};
+// Make logout available globally
+window.logout = logout;
 
 // Enhanced cleanup on page unload
 window.addEventListener('beforeunload', () => {
@@ -709,7 +756,6 @@ window.addEventListener('beforeunload', () => {
         markUserOffline();
     }
     
-    // Cleanup listeners
     if (onlineUsersListener) {
         onlineUsersListener();
     }
