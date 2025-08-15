@@ -1,7 +1,7 @@
 // Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, setDoc, doc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { getFirestore, addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, setDoc, doc, where } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -20,27 +20,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// DOM Elements
-const joinView = document.getElementById("joinView");
-const chatsView = document.getElementById("chatsView");
-const messageList = document.getElementById("messageList");
-const messageInput = document.getElementById("messageInput");
-const sendButton = document.getElementById("sendButton");
-const backButton = document.getElementById("backButton");
-const themeToggle = document.getElementById("themeToggle");
-const themeIcon = document.getElementById("themeIcon");
-
-// Join form elements
-const usernameInput = document.getElementById("usernameInput");
-const ageInput = document.getElementById("ageInput");
-const locationInput = document.getElementById("locationInput");
-const joinButton = document.getElementById("joinButton");
-const getLocationBtn = document.getElementById("getLocationBtn");
-
-// Chat header elements
-const chatContactName = document.getElementById("contactName");
-const peopleCount = document.getElementById("peopleCount");
-
 // Global variables
 let currentUser = null;
 let currentUsername = "";
@@ -51,10 +30,40 @@ let userLongitude = null;
 let isJoined = false;
 let messageCount = 0;
 
+// NEW: Room variables
+let currentRoom = "global"; // Default to global chat
+let messagesListener = null;
+
 // Online user tracking variables
 let onlineUsers = new Set();
 let presenceUpdateInterval = null;
 let onlineUsersListener = null;
+
+// DOM Elements
+const joinView = document.getElementById("joinView");
+const chatsView = document.getElementById("chatsView");
+const messageList = document.getElementById("messageList");
+const messageInput = document.getElementById("messageInput");
+const sendButton = document.getElementById("sendButton");
+const backButton = document.getElementById("backButton");
+const themeToggle = document.getElementById("themeToggle");
+const usernameInput = document.getElementById("usernameInput");
+const ageInput = document.getElementById("ageInput");
+const locationInput = document.getElementById("locationInput");
+const joinButton = document.getElementById("joinButton");
+const getLocationBtn = document.getElementById("getLocationBtn");
+const chatContactName = document.getElementById("contactName");
+const peopleCount = document.getElementById("peopleCount");
+
+// NEW: Room DOM elements
+const createRoomBtnHeader = document.getElementById("createRoomBtn");
+const roomModal = document.getElementById("roomModal");
+const roomModalClose = document.getElementById("roomModalClose");
+const roomKeyInput = document.getElementById("roomKeyInput");
+const joinRoomBtn = document.getElementById("joinRoomBtn");
+const createRoomBtn = document.getElementById("createRoomBtn");
+const leaveRoomBtn = document.getElementById("leaveRoomBtn");
+const roomIndicator = document.getElementById("roomIndicator");
 
 // Enhanced time formatting
 function getTimeString(timestamp = null) {
@@ -68,7 +77,6 @@ function getTimeString(timestamp = null) {
 
 // Enhanced smooth scroll to bottom function
 function smoothScrollToBottom() {
-    const messageList = document.getElementById('messageList');
     if (messageList) {
         requestAnimationFrame(() => {
             messageList.scrollTo({
@@ -79,91 +87,98 @@ function smoothScrollToBottom() {
     }
 }
 
-// Enhanced mobile keyboard handling
-function setupEnhancedMobileKeyboardFix() {
-    const messageInput = document.getElementById('messageInput');
-    const chatInput = document.getElementById('chatInput');
-    const messageList = document.getElementById('messageList');
-    
-    if (!messageInput || !chatInput || !messageList) return;
+// NEW: Room Management Functions
+function showRoomModal() {
+    roomModal.classList.add('show');
+}
 
-    let initialViewportHeight = window.innerHeight;
-    let isKeyboardOpen = false;
+function hideRoomModal() {
+    roomModal.classList.remove('show');
+    roomKeyInput.value = '';
+}
 
-    function handleViewportChange() {
-        const currentHeight = window.innerHeight;
-        const heightDifference = initialViewportHeight - currentHeight;
-        
-        if (heightDifference > 150 && !isKeyboardOpen) {
-            // Keyboard opened
-            isKeyboardOpen = true;
-            document.body.classList.add('keyboard-active');
-            
-            if (window.innerWidth <= 480) {
-                messageList.style.height = `calc(100vh - 140px - ${heightDifference}px)`;
-                messageList.style.paddingBottom = '20px';
-                setTimeout(() => smoothScrollToBottom(), 300);
-            }
-            
-        } else if (heightDifference <= 150 && isKeyboardOpen) {
-            // Keyboard closed
-            isKeyboardOpen = false;
-            document.body.classList.remove('keyboard-active');
-            
-            if (window.innerWidth <= 480) {
-                messageList.style.height = 'calc(100vh - 140px)';
-                messageList.style.paddingBottom = '16px';
-            }
-        }
-    }
-
-    // Visual Viewport API for better keyboard detection
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', () => {
-            const viewport = window.visualViewport;
-            const keyboardHeight = window.innerHeight - viewport.height;
-            
-            if (keyboardHeight > 150 && !isKeyboardOpen) {
-                isKeyboardOpen = true;
-                document.body.classList.add('keyboard-active');
-                
-                if (window.innerWidth <= 480) {
-                    messageList.style.height = `calc(100vh - 140px - ${keyboardHeight}px)`;
-                    messageList.style.paddingBottom = '20px';
-                    setTimeout(() => smoothScrollToBottom(), 300);
-                }
-                
-            } else if (keyboardHeight <= 150 && isKeyboardOpen) {
-                isKeyboardOpen = false;
-                document.body.classList.remove('keyboard-active');
-                
-                if (window.innerWidth <= 480) {
-                    messageList.style.height = 'calc(100vh - 140px)';
-                    messageList.style.paddingBottom = '16px';
-                }
-            }
-        });
+function updateRoomUI() {
+    if (currentRoom === "global") {
+        chatContactName.textContent = "Global Chat";
+        roomIndicator.textContent = "🌐";
     } else {
-        // Fallback for older browsers
-        window.addEventListener('resize', handleViewportChange);
+        chatContactName.textContent = `Room: ${currentRoom}`;
+        roomIndicator.textContent = "🔒";
+    }
+}
+
+async function createOrJoinRoom(roomKey) {
+    if (!roomKey || !roomKey.trim()) {
+        alert("Please enter a room key");
+        return;
     }
 
-    // Enhanced input focus handling
-    messageInput.addEventListener('focus', () => {
-        setTimeout(() => {
-            smoothScrollToBottom();
-            if (window.innerWidth <= 480) {
-                messageInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }, 400);
-    });
+    const sanitizedRoomKey = roomKey.trim().toLowerCase();
+    
+    // Stop current message listener
+    if (messagesListener) {
+        messagesListener();
+    }
 
-    // Scroll when typing
-    messageInput.addEventListener('input', () => {
-        if (isKeyboardOpen) {
-            smoothScrollToBottom();
-        }
-    });
+    // Update current room
+    currentRoom = sanitizedRoomKey;
+    
+    // Update UI
+    updateRoomUI();
+    
+    // Clear messages and show room join message
+    messageList.innerHTML = "";
+    addSystemMessage(`Joined room: ${currentRoom}`);
+    
+    // Start listening to room messages
+    listenForMessages();
+    
+    // Hide modal
+    hideRoomModal();
+    
+    // Store room in localStorage
+    localStorage.setItem('gappkar_current_room', currentRoom);
+    
+    console.log(`✅ Joined room: ${currentRoom}`);
+}
+
+function leaveRoom() {
+    // Stop current message listener
+    if (messagesListener) {
+        messagesListener();
+    }
+
+    // Reset to global
+    currentRoom = "global";
+    
+    // Update UI
+    updateRoomUI();
+    
+    // Clear messages and show leave message
+    messageList.innerHTML = "";
+    addSystemMessage("Left room, back to global chat");
+    
+    // Start listening to global messages
+    listenForMessages();
+    
+    // Hide modal
+    hideRoomModal();
+    
+    // Remove room from localStorage
+    localStorage.removeItem('gappkar_current_room');
+    
+    console.log("✅ Left room, back to global chat");
+}
+
+// NEW: Add system message
+function addSystemMessage(text) {
+    const systemMsg = {
+        user: "System",
+        message: text,
+        timestamp: new Date(),
+        isSystem: true
+    };
+    displayMessage(systemMsg);
 }
 
 // Enhanced user presence tracking
@@ -181,6 +196,7 @@ function trackUserPresence() {
         username: currentUsername,
         location: currentUserLocation,
         age: currentUserAge,
+        room: currentRoom, // NEW: Track current room
         lastSeen: serverTimestamp(),
         isOnline: true,
         joinedAt: serverTimestamp()
@@ -197,6 +213,7 @@ function trackUserPresence() {
         if (isJoined && currentUser) {
             const updateData = {
                 ...userPresenceData,
+                room: currentRoom, // Update current room
                 lastSeen: serverTimestamp()
             };
             
@@ -209,7 +226,7 @@ function trackUserPresence() {
     }, 30000);
 }
 
-// Enhanced online users listener
+// Enhanced online users listener with room filtering
 function listenForOnlineUsers() {
     console.log("🔍 Starting to listen for online users...");
     
@@ -223,6 +240,7 @@ function listenForOnlineUsers() {
         const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
         
         let activeUsers = 0;
+        let roomUsers = 0;
         
         querySnapshot.forEach((doc) => {
             const userData = doc.data();
@@ -230,11 +248,16 @@ function listenForOnlineUsers() {
             if (userData.lastSeen && userData.lastSeen.toDate() > fiveMinutesAgo) {
                 onlineUsers.add(userData.userId);
                 activeUsers++;
+                
+                // Count users in current room
+                if (userData.room === currentRoom) {
+                    roomUsers++;
+                }
             }
         });
         
-        console.log("🎯 Total active users found:", activeUsers);
-        updateOnlineCount();
+        console.log(`🎯 Total active users: ${activeUsers}, In current room: ${roomUsers}`);
+        updateOnlineCount(roomUsers);
         
     }, (error) => {
         console.error("❌ Error listening for online users:", error);
@@ -242,34 +265,14 @@ function listenForOnlineUsers() {
 }
 
 // Enhanced online count update
-function updateOnlineCount() {
+function updateOnlineCount(roomUserCount = null) {
     const peopleCountElement = document.getElementById("peopleCount");
     if (peopleCountElement) {
-        const count = onlineUsers.size;
-        peopleCountElement.textContent = `${count} people nearby`;
-        console.log(`📊 Updated UI: ${count} people nearby`);
+        const count = roomUserCount !== null ? roomUserCount : onlineUsers.size;
+        const roomText = currentRoom === "global" ? "nearby" : `in ${currentRoom}`;
+        peopleCountElement.textContent = `${count} people ${roomText}`;
+        console.log(`📊 Updated UI: ${count} people ${roomText}`);
     }
-}
-
-// Mark user as offline
-function markUserOffline() {
-    if (!currentUser) return;
-    
-    console.log("📴 Marking user offline:", currentUsername);
-    
-    const userPresenceDoc = doc(db, "presence", currentUser.uid);
-    setDoc(userPresenceDoc, {
-        userId: currentUser.uid,
-        username: currentUsername,
-        location: currentUserLocation,
-        age: currentUserAge,
-        lastSeen: serverTimestamp(),
-        isOnline: false
-    }).then(() => {
-        console.log("✅ User marked offline successfully");
-    }).catch(error => {
-        console.error("❌ Error marking user offline:", error);
-    });
 }
 
 // Get user's current location
@@ -395,7 +398,13 @@ async function joinChat(username, age, location) {
     localStorage.setItem('gappkar_location', location);
     localStorage.setItem('gappkar_joined', 'true');
     
-    // Switch views with enhanced animation
+    // Check for saved room
+    const savedRoom = localStorage.getItem('gappkar_current_room');
+    if (savedRoom) {
+        currentRoom = savedRoom;
+    }
+    
+    // Switch views
     const mainContainer = document.getElementById("mainContainer");
     
     mainContainer.classList.add("chat-active");
@@ -403,10 +412,8 @@ async function joinChat(username, age, location) {
     chatsView.classList.remove("hidden");
     document.body.classList.add("chat-active");
     
-    // Update contact name with user info
-    if (chatContactName) {
-        chatContactName.textContent = `${username}'s Local Chat`;
-    }
+    // Update UI
+    updateRoomUI();
     
     // Apply mobile-specific styles
     if (window.innerWidth <= 480) {
@@ -418,12 +425,9 @@ async function joinChat(username, age, location) {
         chatsView.style.zIndex = '9999';
     }
     
-    // Clear old messages and add welcome message
+    // Clear messages and add welcome
     messageList.innerHTML = "";
-    addWelcomeMessage();
-    
-    console.log("Setting up enhanced mobile keyboard handling...");
-    setupEnhancedMobileKeyboardFix();
+    addSystemMessage(`Welcome ${currentUsername}! You're in ${currentRoom === "global" ? "global chat" : `room: ${currentRoom}`}`);
     
     console.log("Starting to listen for messages...");
     listenForMessages();
@@ -435,7 +439,7 @@ async function joinChat(username, age, location) {
         console.log("🚀 Online user tracking started!");
     }, 2000);
     
-    console.log(`Successfully joined enhanced chat - Name: ${username}, Age: ${age}, Location: ${location}`);
+    console.log(`Successfully joined enhanced chat - Name: ${username}, Age: ${age}, Location: ${location}, Room: ${currentRoom}`);
   } catch (error) {
     console.error("Error joining chat:", error);
     isJoined = false;
@@ -443,18 +447,7 @@ async function joinChat(username, age, location) {
   }
 }
 
-// Add welcome message
-function addWelcomeMessage() {
-    const welcomeMsg = {
-        user: "System",
-        message: `Welcome ${currentUsername}! You're now connected to the local chat.`,
-        timestamp: new Date(),
-        isSystem: true
-    };
-    displayMessage(welcomeMsg);
-}
-
-// Enhanced send message function
+// Enhanced send message function with room support
 async function sendMessage() {
     const messageText = messageInput.value.trim();
     
@@ -462,7 +455,7 @@ async function sendMessage() {
         return;
     }
     
-    // Clear input immediately for better UX
+    // Clear input immediately
     messageInput.value = "";
     
     // Create temporary message for instant display
@@ -473,6 +466,7 @@ async function sendMessage() {
         location: currentUserLocation,
         age: currentUserAge,
         userId: currentUser.uid,
+        room: currentRoom, // NEW: Include room
         isTemp: true
     };
     
@@ -480,7 +474,7 @@ async function sendMessage() {
     smoothScrollToBottom();
     
     try {
-        // Send to Firebase
+        // Send to Firebase with room
         await addDoc(collection(db, "messages"), {
             user: currentUsername,
             message: messageText,
@@ -488,11 +482,12 @@ async function sendMessage() {
             location: currentUserLocation,
             age: currentUserAge,
             userId: currentUser.uid,
+            room: currentRoom, // NEW: Include room
             latitude: userLatitude,
             longitude: userLongitude
         });
         
-        console.log("✅ Message sent successfully");
+        console.log("✅ Message sent successfully to room:", currentRoom);
         
     } catch (error) {
         console.error("Error sending message:", error);
@@ -504,28 +499,33 @@ async function sendMessage() {
     }
 }
 
-// Enhanced listen for messages
+// Enhanced listen for messages with room filtering
 function listenForMessages() {
+  // Stop existing listener
+  if (messagesListener) {
+    messagesListener();
+  }
+
+  const messagesRef = collection(db, "messages");
   const q = query(
-    collection(db, "messages"), 
+    messagesRef,
+    where("room", "==", currentRoom),
     orderBy("timestamp", "asc")
   );
   
-  onSnapshot(q, (querySnapshot) => {
+  messagesListener = onSnapshot(q, (querySnapshot) => {
     const messageContainer = document.getElementById("messageList");
     
-    // Clear messages but keep welcome message
-    const welcomeMsg = messageContainer.querySelector('[data-welcome="true"]');
+    // Clear messages but keep system messages
+    const systemMessages = messageContainer.querySelectorAll('[data-system="true"]');
     messageContainer.innerHTML = "";
-    if (welcomeMsg) {
-        messageContainer.appendChild(welcomeMsg);
-    }
+    systemMessages.forEach(msg => messageContainer.appendChild(msg));
     
     messageCount = 0;
     
     querySnapshot.forEach((doc) => {
       const messageData = doc.data();
-      if (!messageData.isTemp) {
+      if (!messageData.isTemp && !messageData.isSystem) {
         displayMessage(messageData);
       }
     });
@@ -534,7 +534,7 @@ function listenForMessages() {
   });
 }
 
-// Enhanced display message with improved styling
+// Enhanced display message
 function displayMessage(messageData) {
   const messageContainer = document.getElementById("messageList");
   
@@ -545,7 +545,7 @@ function displayMessage(messageData) {
   
   if (isSystem) {
     messageDiv.className = "message system";
-    messageDiv.setAttribute('data-welcome', 'true');
+    messageDiv.setAttribute('data-system', 'true');
     messageDiv.innerHTML = `
       <div class="message-bubble system-message">
         ${messageData.message}
@@ -561,7 +561,7 @@ function displayMessage(messageData) {
     const timeString = getTimeString(messageData.timestamp);
     
     if (isCurrentUser) {
-      // Sent message (green bubble)
+      // Sent message
       messageDiv.innerHTML = `
         <div class="message-bubble">
           ${messageData.message}
@@ -569,7 +569,7 @@ function displayMessage(messageData) {
         </div>
       `;
     } else {
-      // Received message (white bubble)
+      // Received message
       messageDiv.innerHTML = `
         <div class="message-info">
           <div class="sender-name">${messageData.user}${messageData.age ? ` (${messageData.age})` : ''}</div>
@@ -593,6 +593,7 @@ function checkExistingSession() {
   const savedAge = localStorage.getItem('gappkar_age');
   const savedLocation = localStorage.getItem('gappkar_location');
   const savedJoined = localStorage.getItem('gappkar_joined');
+  const savedRoom = localStorage.getItem('gappkar_current_room');
   
   if (savedUsername && savedJoined === 'true') {
     console.log("Found existing session, auto-joining...");
@@ -600,6 +601,10 @@ function checkExistingSession() {
     currentUsername = savedUsername;
     currentUserAge = parseInt(savedAge) || 0;
     currentUserLocation = savedLocation || "";
+    
+    if (savedRoom) {
+        currentRoom = savedRoom;
+    }
     
     setTimeout(() => {
       joinChat(savedUsername, savedAge, savedLocation);
@@ -611,7 +616,7 @@ function checkExistingSession() {
 function logout() {
   console.log("🚪 User logging out...");
   
-  // Clean up presence tracking
+  // Clean up listeners
   if (presenceUpdateInterval) {
     clearInterval(presenceUpdateInterval);
   }
@@ -620,9 +625,8 @@ function logout() {
     onlineUsersListener();
   }
   
-  // Mark user as offline
-  if (currentUser && isJoined) {
-    markUserOffline();
+  if (messagesListener) {
+    messagesListener();
   }
   
   // Reset UI
@@ -634,6 +638,7 @@ function logout() {
   localStorage.clear();
   isJoined = false;
   currentUsername = "";
+  currentRoom = "global";
   
   // Reset form
   if (usernameInput) usernameInput.value = "";
@@ -643,26 +648,9 @@ function logout() {
   console.log("✅ Logout completed");
 }
 
-// Enhanced theme toggle
-function toggleTheme() {
-    const body = document.body;
-    const themeIcon = document.getElementById('themeIcon');
-    
-    if (body.getAttribute('data-theme') === 'dark') {
-        body.removeAttribute('data-theme');
-        if (themeIcon) themeIcon.textContent = '🌙';
-    } else {
-        body.setAttribute('data-theme', 'dark');
-        if (themeIcon) themeIcon.textContent = '☀️';
-    }
-}
-
 // Enhanced event listeners setup
 document.addEventListener("DOMContentLoaded", function() {
   console.log("DOM loaded, setting up enhanced event listeners...");
-  
-  // Initialize theme
-  if (themeIcon) themeIcon.textContent = '🌙';
   
   checkExistingSession();
   
@@ -711,9 +699,57 @@ document.addEventListener("DOMContentLoaded", function() {
     backButton.addEventListener("click", logout);
   }
   
-  // Theme toggle handler
-  if (themeToggle) {
-    themeToggle.addEventListener("click", toggleTheme);
+  // NEW: Room management event listeners
+  if (createRoomBtnHeader) {
+    createRoomBtnHeader.addEventListener("click", showRoomModal);
+  }
+  
+  if (roomModalClose) {
+    roomModalClose.addEventListener("click", hideRoomModal);
+  }
+  
+  if (joinRoomBtn) {
+    joinRoomBtn.addEventListener("click", () => {
+      const roomKey = roomKeyInput?.value.trim();
+      if (roomKey) {
+        createOrJoinRoom(roomKey);
+      }
+    });
+  }
+  
+  if (createRoomBtn) {
+    createRoomBtn.addEventListener("click", () => {
+      const roomKey = roomKeyInput?.value.trim();
+      if (roomKey) {
+        createOrJoinRoom(roomKey);
+      }
+    });
+  }
+  
+  if (leaveRoomBtn) {
+    leaveRoomBtn.addEventListener("click", leaveRoom);
+  }
+  
+  // Close modal when clicking outside
+  if (roomModal) {
+    roomModal.addEventListener("click", (e) => {
+      if (e.target === roomModal) {
+        hideRoomModal();
+      }
+    });
+  }
+  
+  // Room key input enter handler
+  if (roomKeyInput) {
+    roomKeyInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const roomKey = roomKeyInput.value.trim();
+        if (roomKey) {
+          createOrJoinRoom(roomKey);
+        }
+      }
+    });
   }
   
   // Form navigation with Enter key
@@ -750,24 +786,17 @@ window.logout = logout;
 
 // Enhanced cleanup on page unload
 window.addEventListener('beforeunload', () => {
-    console.log("🔄 Page unloading, cleaning up presence...");
-    
-    if (currentUser && isJoined) {
-        markUserOffline();
-    }
+    console.log("🔄 Page unloading, cleaning up...");
     
     if (onlineUsersListener) {
         onlineUsersListener();
+    }
+    
+    if (messagesListener) {
+        messagesListener();
     }
     
     if (presenceUpdateInterval) {
         clearInterval(presenceUpdateInterval);
     }
 });
-
-// Prevent body scroll when keyboard opens on mobile
-document.addEventListener('touchmove', function(e) {
-    if (document.body.classList.contains('keyboard-active')) {
-        e.preventDefault();
-    }
-}, { passive: false });
