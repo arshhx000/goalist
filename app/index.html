@@ -8,7 +8,6 @@
   <meta name="theme-color" content="#000000">
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
   <style>
-
         /* --- Chat Container Styles --- */
         #chat-container {
             width: 100%;
@@ -22,7 +21,6 @@
             flex-direction: column;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-
         #message-list {
             flex-grow: 1;
             padding: 16px;
@@ -31,7 +29,6 @@
             flex-direction: column;
             gap: 12px;
         }
-
         .system-message {
             text-align: center;
             font-size: 12px;
@@ -40,21 +37,17 @@
             background-color: #f0f2f5;
             border-radius: 12px;
         }
-
         .chat-message {
             display: flex;
             max-width: 75%;
         }
-
         .chat-message.sent {
             align-self: flex-end;
         }
-
         .chat-message img {
             max-width: 100%;
             border-radius: 16px;
         }
-
         #chat-input-bar {
             padding: 10px;
             border-top: 1px solid #dbdbdb;
@@ -62,7 +55,6 @@
             gap: 10px;
             align-items: center;
         }
-
         #chat-input-bar input {
             flex-grow: 1;
             border: 1.5px solid #dbdbdb;
@@ -71,7 +63,6 @@
             font-size: 14px;
             background-color: #f5f5f5;
         }
-
         #gif-tab-button {
             background-color: #ffffff;
             color: #262626;
@@ -94,7 +85,6 @@
             background-color: #f5f5f5;
             border-color: #c7c7c7;
         }
-
         /* --- GIF Picker Panel Styles --- */
         #gif-picker {
             position: fixed;
@@ -115,7 +105,6 @@
         #gif-picker.visible {
             transform: translateY(0);
         }
-
         .gif-picker-header {
             padding: 12px 16px;
             border-bottom: 1px solid #dbdbdb;
@@ -140,7 +129,6 @@
             color: #8e8e8e;
             cursor: pointer;
         }
-
         #gif-results-grid {
             flex-grow: 1;
             overflow-y: auto;
@@ -149,7 +137,6 @@
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 8px;
         }
-
         #gif-results-grid img {
             width: 100%;
             height: 120px;
@@ -696,11 +683,6 @@
       margin-bottom: 2px;
       color: var(--accent);
     }
-    .message-location {
-      font-size: 10px;
-      opacity: 0.7;
-      margin-top: 2px;
-    }
     .message-info {
       display: flex;
       flex-direction: column;
@@ -750,14 +732,12 @@
       background: var(--accent);
       transform: scale(1.05);
     }
-    
     /* ✅ FIXED: Mobile Responsive CSS with keyboard handling */
     @media (max-width: 480px) {
       html {
         height: 100%;
         height: -webkit-fill-available;
       }
-      
       body {
         height: 100%;
         height: -webkit-fill-available;
@@ -765,14 +745,12 @@
         position: fixed;
         width: 100%;
       }
-      
       .app-container {
         height: 100%;
         height: -webkit-fill-available;
         padding: 0;
         align-items: stretch;
       }
-      
       .main-container {
         width: 100%;
         height: 100%;
@@ -781,7 +759,6 @@
         border: none;
         max-width: none;
       }
-      
       #chatsView:not(.hidden) {
         display: flex !important;
         flex-direction: column;
@@ -789,21 +766,18 @@
         height: -webkit-fill-available;
         position: relative;
       }
-      
       .chat-header {
         flex-shrink: 0;
         position: sticky;
         top: 0;
         z-index: 100;
       }
-      
       #messageList {
         flex: 1;
         overflow-y: auto;
         min-height: 0;
         padding-bottom: 20px;
       }
-      
       .chat-input {
         flex-shrink: 0;
         position: sticky;
@@ -811,24 +785,20 @@
         z-index: 100;
         transition: transform 0.3s ease;
       }
-      
       /* Keyboard focused state */
       body.keyboard-visible .chat-input {
         transform: translateY(0);
       }
-      
       body.keyboard-visible #messageList {
         padding-bottom: 80px;
       }
     }
-    
     /* iOS Safari specific fixes */
     @supports (-webkit-touch-callout: none) {
       @media (max-width: 480px) {
         body {
           height: -webkit-fill-available;
         }
-        
         .app-container,
         .main-container,
         #chatsView:not(.hidden) {
@@ -900,6 +870,7 @@
         <div id="messageList"></div>
         <div class="chat-input" id="chatInput">
           <input type="text" class="message-input" placeholder="Type a message..." id="messageInput" maxlength="500" autocomplete="off">
+          <button id="gif-tab-button">GIF</button>
           <button class="send-button" id="sendButton">➤</button>
         </div>
       </div>
@@ -925,18 +896,25 @@
       </div>
     </div>
   </div>
-
+  <!-- This is the hidden GIF picker panel -->
+  <div id="gif-picker">
+    <header class="gif-picker-header">
+      <input type="text" id="gif-search-input" placeholder="Search for GIFs...">
+      <button id="gif-picker-close">&times;</button>
+    </header>
+    <div id="gif-results-grid">
+      <!-- GIFs will be loaded here by JavaScript -->
+    </div>
+  </div>
   <!-- ✅ ADDED: Mobile Keyboard Handling Script -->
   <script>
     // Mobile keyboard handling
     function setupMobileKeyboardHandling() {
       if (!('ontouchstart' in window)) return; // Not a mobile device
-      
       const messageInput = document.getElementById('messageInput');
       const messageList = document.getElementById('messageList');
       const chatInput = document.getElementById('chatInput');
       let initialViewportHeight = window.innerHeight;
-      
       function handleKeyboardShow() {
         document.body.classList.add('keyboard-visible');
         setTimeout(() => {
@@ -945,21 +923,17 @@
           }
         }, 300);
       }
-      
       function handleKeyboardHide() {
         document.body.classList.remove('keyboard-visible');
       }
-      
       // iOS handling
       if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
         messageInput.addEventListener('focus', () => {
           setTimeout(handleKeyboardShow, 300);
         });
-        
         messageInput.addEventListener('blur', () => {
           setTimeout(handleKeyboardHide, 100);
         });
-        
         // Viewport height change detection for iOS
         window.addEventListener('resize', () => {
           const currentHeight = window.innerHeight;
@@ -971,27 +945,21 @@
           }
         });
       }
-      
       // Android handling
       else {
         let lastHeight = window.innerHeight;
-        
         const resizeObserver = new ResizeObserver(() => {
           const currentHeight = window.innerHeight;
           const heightDiff = lastHeight - currentHeight;
-          
           if (heightDiff > 150) { // Keyboard likely opened
             handleKeyboardShow();
           } else if (heightDiff < -150) { // Keyboard likely closed
             handleKeyboardHide();
           }
-          
           lastHeight = currentHeight;
         });
-        
         resizeObserver.observe(document.body);
       }
-      
       // Enhanced scroll behavior for new messages
       const originalScrollBottom = window.scrollBottom;
       window.scrollBottom = () => {
@@ -1006,7 +974,6 @@
         }
       };
     }
-    
     // Initialize when DOM is loaded
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', setupMobileKeyboardHandling);
@@ -1014,13 +981,11 @@
       setupMobileKeyboardHandling();
     }
   </script>
-
   <!-- Your existing Firebase script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
     import { getFirestore, addDoc, collection, doc, setDoc, onSnapshot, orderBy, query, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-    
     const firebaseConfig = {
       apiKey: "AIzaSyCOmLxxqPesNaBr4Z9fVIU6K2BLW6OsED0",
       authDomain: "gappkar-v1-b3afe.firebaseapp.com",
@@ -1034,11 +999,9 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-
     let currentUser = null, currentUsername = "", currentUserAge = 0, currentUserLocation = "";
     let userLatitude = null, userLongitude = null, isJoined = false, currentRoom = "global";
     let messagesListener = null, presenceTimer = null, onlineListener = null;
-
     const $ = id => document.getElementById(id);
     const joinView = $("joinView"), chatsView = $("chatsView"), messageList = $("messageList");
     const messageInput = $("messageInput"), sendButton = $("sendButton"), backButton = $("backButton");
@@ -1048,7 +1011,6 @@
     const roomKeyInput = $("roomKeyInput"), joinRoomBtn = $("joinRoomBtn"), createRoomBtnM = $("createRoomBtnModal");
     const leaveRoomBtn = $("leaveRoomBtn"), roomIndicator = $("roomIndicator");
     const roomMessagesRef = room => collection(db, "rooms", room, "messages");
-
     const timeStr = ts => {
       const d = ts?.toDate ? ts.toDate() : (ts || new Date());
       let h = d.getHours();
@@ -1057,7 +1019,6 @@
       h = h % 12 || 12;
       return `${h}:${m} ${a}`;
     };
-    
     const scrollBottom = () => {
       if (messageList) {
         messageList.scrollTop = messageList.scrollHeight;
@@ -1069,13 +1030,11 @@
         }
       }
     };
-    
     const updateRoomUI = () => {
       if (!roomIndicator) return;
       roomIndicator.textContent = currentRoom === "global" ? "Global" : currentRoom;
       roomIndicator.style.background = currentRoom === "global" ? "var(--accent)" : "#28a745";
     };
-    
     const addSystemMsg = txt => {
       const div = document.createElement("div");
       div.className = "message system";
@@ -1083,7 +1042,6 @@
       messageList.appendChild(div);
       scrollBottom();
     };
-
     function trackPresence() {
       if (!currentUser || !currentUsername) return;
       const ref = doc(db, "presence", currentUser.uid);
@@ -1095,7 +1053,6 @@
       clearInterval(presenceTimer);
       presenceTimer = setInterval(() => setDoc(ref, { room: currentRoom, lastSeen: serverTimestamp() }, { merge: true }), 30000);
     }
-    
     function listenOnlineUsers() {
       onlineListener && onlineListener();
       onlineListener = onSnapshot(collection(db, "presence"), snap => {
@@ -1108,7 +1065,6 @@
         peopleCount.textContent = `${roomCnt} people ${currentRoom === "global" ? "nearby" : "in " + currentRoom}`;
       });
     }
-    
     async function getUserLocation() {
         const statusDiv = $("locationStatus");
         if (!navigator.geolocation) {
@@ -1126,10 +1082,8 @@
             statusDiv.textContent = "Could not get location. Enter manually."; statusDiv.className = "error";
         }
     }
-
     function showModal() { roomModal.classList.add("show"); }
     function hideModal() { roomModal.classList.remove("show"); roomKeyInput.value = ""; }
-    
     async function joinRoom(key) {
       const k = key.trim().toLowerCase();
       if (!k) return alert("Enter a room key");
@@ -1141,7 +1095,6 @@
       addSystemMsg(`Joined room: ${currentRoom}`);
       listenMessages(); trackPresence(); hideModal();
     }
-    
     function leaveRoom() {
       if (currentRoom === "global") return hideModal();
       messagesListener && messagesListener();
@@ -1151,7 +1104,6 @@
       addSystemMsg("Left room, back to global chat");
       listenMessages(); trackPresence(); hideModal();
     }
-
     function displayMsg(d) {
       const mine = d.user === currentUsername;
       const div = document.createElement("div");
@@ -1162,7 +1114,6 @@
         : `<div class="message-info"><div class="sender-name">${d.user}${d.age ? ` (${d.age})` : ""}</div><div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>${d.location ? `<div class="message-location">📍 ${d.location}</div>` : ""}</div>`;
       messageList.appendChild(div);
     }
-    
     function listenMessages() {
       messagesListener && messagesListener();
       const q = query(roomMessagesRef(currentRoom), orderBy("timestamp", "asc"));
@@ -1177,7 +1128,6 @@
         scrollBottom();
       });
     }
-
     async function sendMessage() {
       const txt = messageInput.value.trim();
       if (!txt || !isJoined) return;
@@ -1190,7 +1140,6 @@
       div.innerHTML = `<div class="message-bubble">${txt}<div class="message-time" style="opacity: 0.5;">sending...</div></div>`;
       messageList.appendChild(div);
       scrollBottom();
-      
       try {
         await addDoc(roomMessagesRef(currentRoom), {
           user: currentUsername, message: txt, timestamp: serverTimestamp(),
@@ -1205,7 +1154,6 @@
         }
       }
     }
-
     async function joinChat(name, age, loc) {
       if (!name.trim()) return alert("Enter name");
       if (age < 13 || age > 99) return alert("Age 13-99 only");
@@ -1230,9 +1178,7 @@
       localStorage.setItem("gappkar_location", currentUserLocation);
       localStorage.setItem("gappkar_joined", "true");
     }
-    
     onAuthStateChanged(auth, u => currentUser = u || null);
-    
     async function logout() {
       presenceTimer && clearInterval(presenceTimer);
       onlineListener && onlineListener();
@@ -1247,12 +1193,10 @@
       joinView.classList.remove("hidden");
       document.body.classList.remove("chat-active");
     }
-
     document.addEventListener("DOMContentLoaded", () => {
       if (localStorage.getItem("gappkar_joined") === "true") {
         joinChat(localStorage.getItem("gappkar_username") || "", localStorage.getItem("gappkar_age") || 0, localStorage.getItem("gappkar_location") || "");
       }
-      
       getLocationBtn.addEventListener("click", getUserLocation);
       joinButton.addEventListener("click", () => joinChat(usernameInput.value, ageInput.value, locationInput.value));
       sendButton.addEventListener("click", sendMessage);
@@ -1266,102 +1210,146 @@
       roomModal.addEventListener("click", e => { if (e.target === roomModal) hideModal(); });
     });
   </script>
-
-   <script>
-        document.addEventListener('DOMContentLoaded', () => {
-
-            // --- 1. SETUP ---
-            const GIPHY_API_KEY = 'GLutXRXDEL19PuG3ztekK0JNDr5oySTh';
-
-            // DOM Elements
-            const gifTabButton = document.getElementById('gif-tab-button');
-            const gifPicker = document.getElementById('gif-picker');
-            const gifPickerClose = document.getElementById('gif-picker-close');
-            const gifSearchInput = document.getElementById('gif-search-input');
-            const gifResultsGrid = document.getElementById('gif-results-grid');
-            const messageList = document.getElementById('message-list');
-            
-            let debounceTimer;
-
-            // --- 2. EVENT LISTENERS ---
-            gifTabButton.addEventListener('click', openGifPicker);
-            gifPickerClose.addEventListener('click', closeGifPicker);
-            gifSearchInput.addEventListener('input', (event) => {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(() => {
-                    fetchGifs(event.target.value);
-                }, 500);
-            });
-
-            // --- 3. FUNCTIONS ---
-            function openGifPicker() {
-                gifPicker.classList.add('visible');
-                if (gifResultsGrid.innerHTML.trim() === '') {
-                    fetchGifs();
-                }
-            }
-            
-            function closeGifPicker() {
-                gifPicker.classList.remove('visible');
-            }
-            
-            async function fetchGifs(searchTerm = '') {
-                gifResultsGrid.innerHTML = '<div class="loader"></div>';
-                let apiUrl = searchTerm 
-                    ? `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(searchTerm)}&limit=30&rating=g`
-                    : `https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_API_KEY}&limit=30&rating=g`;
-                
-                try {
-                    const response = await fetch(apiUrl);
-                    if (!response.ok) throw new Error(`Giphy API error: ${response.statusText}`);
-                    const data = await response.json();
-                    renderGifs(data.data);
-                } catch (error) {
-                    console.error('Failed to fetch GIFs:', error);
-                    gifResultsGrid.innerHTML = '<p style="text-align: center;">Could not load GIFs.</p>';
-                }
-            }
-            
-            function renderGifs(gifs) {
-                gifResultsGrid.innerHTML = '';
-                if (!gifs || gifs.length === 0) {
-                    gifResultsGrid.innerHTML = '<p style="text-align: center;">No GIFs found.</p>';
-                    return;
-                }
-                gifs.forEach(gif => {
-                    const img = document.createElement('img');
-                    img.src = gif.images.fixed_width.url;
-                    img.alt = gif.title;
-                    img.addEventListener('click', () => selectGif(gif));
-                    gifResultsGrid.appendChild(img);
-                });
-            }
-            
-            function selectGif(gif) {
-                // Create the message bubble element
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('chat-message', 'sent');
-
-                // Create the image element for the GIF
-                const gifImage = document.createElement('img');
-                gifImage.src = gif.images.original.url;
-                gifImage.alt = gif.title;
-
-                // Append the image to the message bubble
-                messageElement.appendChild(gifImage);
-
-                // Append the message to the message list
-                messageList.appendChild(messageElement);
-
-                // Scroll to the bottom of the chat
-                messageList.scrollTop = messageList.scrollHeight;
-                
-                // Close the picker after selection
-                closeGifPicker();
-            }
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // --- 1. SETUP ---
+      const GIPHY_API_KEY = 'GLutXRXDEL19PuG3ztekK0JNDr5oySTh';
+      // DOM Elements - Fixed to use the correct elements from the main chat
+      const gifTabButton = document.getElementById('gif-tab-button');
+      const gifPicker = document.getElementById('gif-picker');
+      const gifPickerClose = document.getElementById('gif-picker-close');
+      const gifSearchInput = document.getElementById('gif-search-input');
+      const gifResultsGrid = document.getElementById('gif-results-grid');
+      const messageList = document.getElementById('messageList'); // Fixed: Use the correct message list
+      let debounceTimer;
+      
+      // --- 2. EVENT LISTENERS ---
+      gifTabButton.addEventListener('click', openGifPicker);
+      gifPickerClose.addEventListener('click', closeGifPicker);
+      gifSearchInput.addEventListener('input', (event) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          fetchGifs(event.target.value);
+        }, 500);
+      });
+      
+      // --- 3. FUNCTIONS ---
+      function openGifPicker() {
+        gifPicker.classList.add('visible');
+        if (gifResultsGrid.innerHTML.trim() === '') {
+          fetchGifs();
+        }
+      }
+      
+      function closeGifPicker() {
+        gifPicker.classList.remove('visible');
+      }
+      
+      async function fetchGifs(searchTerm = '') {
+        gifResultsGrid.innerHTML = '<div class="loader"></div>';
+        let apiUrl = searchTerm 
+          ? `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(searchTerm)}&limit=30&rating=g`
+          : `https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_API_KEY}&limit=30&rating=g`;
+        try {
+          const response = await fetch(apiUrl);
+          if (!response.ok) throw new Error(`Giphy API error: ${response.statusText}`);
+          const data = await response.json();
+          renderGifs(data.data);
+        } catch (error) {
+          console.error('Failed to fetch GIFs:', error);
+          gifResultsGrid.innerHTML = '<p style="text-align: center;">Could not load GIFs.</p>';
+        }
+      }
+      
+      function renderGifs(gifs) {
+        gifResultsGrid.innerHTML = '';
+        if (!gifs || gifs.length === 0) {
+          gifResultsGrid.innerHTML = '<p style="text-align: center;">No GIFs found.</p>';
+          return;
+        }
+        gifs.forEach(gif => {
+          const img = document.createElement('img');
+          img.src = gif.images.fixed_width.url;
+          img.alt = gif.title;
+          img.addEventListener('click', () => selectGif(gif));
+          gifResultsGrid.appendChild(img);
         });
-    </script>
-  
+      }
+      
+      async function selectGif(gif) {
+        // Only proceed if user is joined
+        if (!isJoined) {
+          addSystemMsg('Please join the chat first!');
+          closeGifPicker();
+          return;
+        }
+        
+        // Create the message bubble element
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', 'sent');
+        
+        // Create the image element for the GIF
+        const gifImage = document.createElement('img');
+        gifImage.src = gif.images.original.url;
+        gifImage.alt = gif.title;
+        gifImage.style.maxWidth = '250px';
+        gifImage.style.borderRadius = '16px';
+        
+        // Create container for the image
+        const messageBubble = document.createElement('div');
+        messageBubble.classList.add('message-bubble');
+        messageBubble.style.background = 'var(--bg-dark)';
+        messageBubble.style.color = 'var(--text-light)';
+        messageBubble.style.border = 'none';
+        
+        // Add the image to the bubble
+        messageBubble.appendChild(gifImage);
+        
+        // Add timestamp
+        const timeDiv = document.createElement('div');
+        timeDiv.classList.add('message-time');
+        timeDiv.textContent = timeStr();
+        messageBubble.appendChild(timeDiv);
+        
+        // Append the bubble to the message
+        messageElement.appendChild(messageBubble);
+        
+        // Append the message to the message list
+        messageList.appendChild(messageElement);
+        
+        // Scroll to the bottom of the chat
+        scrollBottom();
+        
+        // Send the GIF to Firebase
+        try {
+          await addDoc(roomMessagesRef(currentRoom), {
+            user: currentUsername, 
+            message: `[GIF] ${gif.title || 'Animated GIF'}`, 
+            timestamp: serverTimestamp(),
+            location: currentUserLocation, 
+            age: currentUserAge, 
+            userId: currentUser.uid,
+            gifUrl: gif.images.original.url,
+            isGif: true
+          });
+        } catch (e) {
+          console.error("Failed to send GIF:", e);
+          // Optionally show error to user
+          const errorDiv = document.createElement('div');
+          errorDiv.textContent = 'Failed to send GIF';
+          errorDiv.style.color = 'red';
+          errorDiv.style.fontSize = '12px';
+          messageBubble.appendChild(errorDiv);
+        }
+        
+        // Close the picker after selection
+        closeGifPicker();
+      }
+      
+      // Initial fetch of trending GIFs
+      fetchGifs();
+    });
+  </script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const themeToggle = document.getElementById('themeToggle');
@@ -1379,28 +1367,5 @@
       if (themeToggle) { themeToggle.addEventListener('click', toggleTheme); }
     });
   </script>
-
-  <body>
-
-    <div id="chat-container">
-        <div id="message-list">
-            <div class="system-message">Click the GIF button to send a GIF!</div>
-        </div>
-        <div id="chat-input-bar">
-            <input type="text" placeholder="Message..." disabled>
-            <button id="gif-tab-button">GIF</button>
-        </div>
-    </div>
-
-    <!-- This is the hidden GIF picker panel -->
-    <div id="gif-picker">
-        <header class="gif-picker-header">
-            <input type="text" id="gif-search-input" placeholder="Search for GIFs...">
-            <button id="gif-picker-close">&times;</button>
-        </header>
-        <div id="gif-results-grid">
-            <!-- GIFs will be loaded here by JavaScript -->
-        </div>
-    </div>
 </body>
 </html>
