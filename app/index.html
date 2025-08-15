@@ -22,7 +22,6 @@
       --system-text: #666666;
       --modal-bg: rgba(0, 0, 0, 0.8);
     }
-
     [data-theme="dark"] {
       --bg-dark: #ffffff;
       --bg-light: #000000;
@@ -35,13 +34,11 @@
       --system-text: #cccccc;
       --modal-bg: rgba(255, 255, 255, 0.8);
     }
-
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-
     body {
       font-family: 'DotGothic16', monospace;
       background: var(--bg-light);
@@ -51,7 +48,6 @@
       -webkit-font-smoothing: antialiased;
       transition: all 0.3s ease;
     }
-
     .app-container {
       display: flex;
       justify-content: center;
@@ -60,7 +56,6 @@
       padding: 20px;
       transition: all 0.3s ease;
     }
-
     .main-container {
       width: 100%;
       max-width: 400px;
@@ -71,7 +66,6 @@
       position: relative;
       transition: all 0.3s ease;
     }
-
     /* Header */
     .app-header {
       background: var(--bg-light);
@@ -79,11 +73,9 @@
       text-align: center;
       border-bottom: var(--border-thin);
     }
-
     .chat-active .app-header {
       display: none !important;
     }
-
     .theme-toggle {
       position: absolute;
       top: 16px;
@@ -101,19 +93,16 @@
       transition: background 0.2s ease;
       color: var(--text-dark);
     }
-
     .theme-toggle:hover {
       background: var(--accent);
       color: var(--text-light);
     }
-
     .logo-section {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
     }
-
     .logo-icon {
       width: 64px;
       height: 64px;
@@ -127,14 +116,12 @@
       background: var(--bg-light);
       color: var(--text-dark);
     }
-
     .logo-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
       border-radius: var(--border-radius);
     }
-
     .app-title {
       font-size: 26px;
       font-weight: 700;
@@ -142,31 +129,25 @@
       text-transform: uppercase;
       color: var(--text-dark);
     }
-
     .app-subtitle {
       font-size: 13px;
       color: var(--gray);
     }
-
     /* Join View */
     #joinView {
       padding: 24px;
     }
-
     #joinView.hidden {
       display: none !important;
     }
-
     .section-header {
       text-align: center;
       margin-bottom: 24px;
     }
-
     .section-icon {
       font-size: 28px;
       margin-bottom: 12px;
     }
-
     .section-title {
       font-size: 18px;
       font-weight: 600;
@@ -174,17 +155,14 @@
       text-transform: uppercase;
       color: var(--text-dark);
     }
-
     .section-description {
       color: var(--gray);
       font-size: 14px;
     }
-
     /* Form */
     .form-group {
       margin-bottom: 18px;
     }
-
     .form-label {
       display: block;
       font-weight: 500;
@@ -192,7 +170,6 @@
       font-size: 14px;
       color: var(--text-dark);
     }
-
     .form-input {
       width: 100%;
       padding: 12px;
@@ -205,21 +182,17 @@
       outline: none;
       transition: border-color 0.2s ease;
     }
-
     .form-input:focus {
       border-color: var(--accent);
     }
-
     .form-input::placeholder {
       color: var(--gray);
     }
-
     .location-options {
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
-
     #locationStatus {
       padding: 8px;
       border-radius: var(--border-radius);
@@ -228,19 +201,16 @@
       font-size: 12px;
       border: var(--border-thin);
     }
-
     #locationStatus.success {
       background: #d4edda;
       color: #155724;
       border-color: #c3e6cb;
     }
-
     #locationStatus.error {
       background: #f8d7da;
       color: #721c24;
       border-color: #f5c6cb;
     }
-
     .btn {
       width: 100%;
       padding: 14px;
@@ -253,32 +223,26 @@
       transition: background 0.2s ease;
       font-family: inherit;
     }
-
     .btn-location {
       background: var(--bg-dark);
       color: var(--text-light);
       margin-bottom: 0;
     }
-
     .btn-location:hover {
       background: var(--accent);
     }
-
     .btn-success {
       background: var(--bg-dark);
       color: var(--text-light);
     }
-
     .btn-success:hover {
       background: var(--accent);
     }
-
     .btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
       background: var(--gray);
     }
-
     /* Chat View */
     #chatsView {
       display: none;
@@ -288,11 +252,9 @@
       max-height: 100vh;
       overflow: hidden;
     }
-
     #chatsView:not(.hidden) {
       display: flex !important;
     }
-
     .chat-header {
       background: var(--bg-light);
       padding: 12px 16px;
@@ -302,7 +264,6 @@
       border-bottom: var(--border-thin);
       flex-shrink: 0;
     }
-
     .back-button {
       border: var(--border-thin);
       width: 36px;
@@ -317,19 +278,74 @@
       color: var(--text-dark);
       transition: background 0.2s ease;
     }
-
     .back-button:hover {
       background: var(--accent);
       color: var(--text-light);
     }
-
     .chat-header-info {
       flex: 1;
       display: flex;
       align-items: center;
       gap: 10px;
     }
-
+    /* Enhanced Chat Header with Logo */
+    .header-logo-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+    .header-logo-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: var(--border-thin);
+      font-weight: 600;
+      font-size: 14px;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      flex-shrink: 0;
+    }
+    .header-logo-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    .header-app-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .header-app-name {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-dark);
+      letter-spacing: 1px;
+      line-height: 1.2;
+    }
+    .header-room-info {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--gray);
+      margin-top: 2px;
+    }
+    .room-indicator {
+      background: var(--accent);
+      color: var(--text-light);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    /* Legacy styles for backward compatibility */
     .contact-avatar {
       width: 40px;
       height: 40px;
@@ -342,18 +358,15 @@
       background: var(--bg-light);
       color: var(--text-dark);
     }
-
     .contact-info {
       flex: 1;
     }
-
     .contact-name {
       font-size: 14px;
       font-weight: 600;
       text-transform: uppercase;
       color: var(--text-dark);
     }
-
     .contact-status {
       font-size: 12px;
       color: var(--gray);
@@ -361,7 +374,6 @@
       align-items: center;
       gap: 4px;
     }
-
     .online-dot {
       width: 6px;
       height: 6px;
@@ -369,13 +381,11 @@
       border-radius: 50%;
       animation: pulse 2s infinite;
     }
-
     @keyframes pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
     }
-
-    /* NEW: Create Room Button */
+    /* Create Room Button */
     .create-room-btn {
       border: var(--border-thin);
       width: 36px;
@@ -390,13 +400,11 @@
       color: var(--text-dark);
       transition: background 0.2s ease;
     }
-
     .create-room-btn:hover {
       background: var(--accent);
       color: var(--text-light);
     }
-
-    /* NEW: Room Modal */
+    /* Room Modal */
     .room-modal {
       position: fixed;
       top: 0;
@@ -412,12 +420,10 @@
       visibility: hidden;
       transition: all 0.3s ease;
     }
-
     .room-modal.show {
       opacity: 1;
       visibility: visible;
     }
-
     .room-modal-content {
       background: var(--bg-light);
       border: var(--border-thin);
@@ -429,16 +435,13 @@
       transform: scale(0.9);
       transition: transform 0.3s ease;
     }
-
     .room-modal.show .room-modal-content {
       transform: scale(1);
     }
-
     .room-modal-header {
       text-align: center;
       margin-bottom: 20px;
     }
-
     .room-modal-title {
       font-size: 18px;
       font-weight: 600;
@@ -446,12 +449,10 @@
       color: var(--text-dark);
       margin-bottom: 8px;
     }
-
     .room-modal-description {
       font-size: 14px;
       color: var(--gray);
     }
-
     .room-modal-close {
       position: absolute;
       top: 12px;
@@ -468,18 +469,15 @@
       font-size: 14px;
       color: var(--text-dark);
     }
-
     .room-modal-close:hover {
       background: var(--accent);
       color: var(--text-light);
     }
-
     .room-buttons {
       display: flex;
       gap: 10px;
       margin-top: 16px;
     }
-
     .btn-room {
       flex: 1;
       padding: 12px;
@@ -494,32 +492,17 @@
       background: transparent;
       color: var(--text-dark);
     }
-
     .btn-room:hover {
       background: var(--accent);
       color: var(--text-light);
     }
-
     .btn-room.primary {
       background: var(--bg-dark);
       color: var(--text-light);
     }
-
     .btn-room.primary:hover {
       background: var(--accent);
     }
-
-    .room-indicator {
-      background: var(--accent);
-      color: var(--text-light);
-      padding: 4px 8px;
-      border-radius: 8px;
-      font-size: 10px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
     /* Enhanced Message List */
     #messageList {
       flex: 1;
@@ -533,13 +516,11 @@
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
     }
-
     .message {
       display: flex;
       width: 100%;
       animation: messageSlideIn 0.3s ease;
     }
-
     @keyframes messageSlideIn {
       from {
         opacity: 0;
@@ -550,7 +531,6 @@
         transform: translateY(0);
       }
     }
-
     .message-bubble {
       border: var(--border-thin);
       border-radius: var(--border-radius);
@@ -560,33 +540,27 @@
       max-width: 75%;
       position: relative;
     }
-
     /* Sent Messages */
     .message.sent {
       justify-content: flex-end;
     }
-
     .message.sent .message-bubble {
       background: var(--bg-dark);
       color: var(--text-light);
       border: none;
     }
-
     /* Received Messages */
     .message.received {
       justify-content: flex-start;
     }
-
     .message.received .message-bubble {
       background: var(--bg-light);
       color: var(--text-dark);
     }
-
     /* System Messages */
     .message.system {
       justify-content: center;
     }
-
     .message.system .message-bubble {
       background: var(--system-bg);
       color: var(--system-text);
@@ -595,34 +569,29 @@
       max-width: 90%;
       text-align: center;
     }
-
     /* Message Meta Information */
     .message-time {
       font-size: 10px;
       opacity: 0.7;
       margin-top: 4px;
     }
-
     .sender-name {
       font-size: 11px;
       font-weight: 600;
       margin-bottom: 2px;
       color: var(--accent);
     }
-
     .message-location {
       font-size: 10px;
       opacity: 0.7;
       margin-top: 2px;
     }
-
     .message-info {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       max-width: 75%;
     }
-
     /* Input Bar */
     .chat-input {
       border-top: var(--border-thin);
@@ -635,7 +604,6 @@
       bottom: 0;
       z-index: 1000;
     }
-
     .message-input {
       flex: 1;
       padding: 10px;
@@ -648,15 +616,12 @@
       color: var(--text-dark);
       transition: border-color 0.2s ease;
     }
-
     .message-input:focus {
       border-color: var(--accent);
     }
-
     .message-input::placeholder {
       color: var(--gray);
     }
-
     .send-button {
       width: 40px;
       height: 40px;
@@ -672,17 +637,14 @@
       transition: background 0.2s ease;
       flex-shrink: 0;
     }
-
     .send-button:hover:not(:disabled) {
       background: var(--accent);
       transform: scale(1.05);
     }
-
     .send-button:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
-
     /* Mobile Responsive */
     @media (max-width: 480px) {
       body {
@@ -741,7 +703,6 @@
         padding: 10px 16px !important;
       }
     }
-
     /* Smooth transitions for all elements */
     * {
       transition: background-color 0.3s ease,
@@ -766,7 +727,6 @@
           <p class="app-subtitle">Connect with people around you</p>
         </div>
       </div>
-
       <!-- Join View -->
       <div id="joinView">
         <div class="section-header">
@@ -774,17 +734,14 @@
           <h2 class="section-title">Join the Chat</h2>
           <p class="section-description">Enter your info to start gapping</p>
         </div>
-
         <div class="form-group">
           <label class="form-label" for="usernameInput">Name</label>
           <input type="text" id="usernameInput" class="form-input" placeholder="Enter your display name" maxlength="30" required>
         </div>
-
         <div class="form-group">
           <label class="form-label" for="ageInput">Age</label>
           <input type="number" id="ageInput" class="form-input" placeholder="Enter your age" min="13" max="99" required>
         </div>
-
         <div class="form-group">
           <label class="form-label">Location</label>
           <div class="location-options">
@@ -792,33 +749,35 @@
             <input type="text" id="locationInput" class="form-input" placeholder="Or enter your city manually" style="margin-top: 10px;">
           </div>
         </div>
-
         <button type="button" class="btn btn-success" id="joinButton">🚀 Start Chatting</button>
         <div id="locationStatus"></div>
       </div>
-
       <!-- Chat Interface -->
       <div id="chatsView" class="hidden">
         <div class="chat-header">
           <button class="back-button" id="backButton" onclick="logout()">←</button>
           <div class="chat-header-info">
-            <div class="contact-avatar" id="roomIndicator">🌐</div>
-            <div class="contact-info">
-              <div class="contact-name" id="contactName">Global Chat</div>
-              <div class="contact-status">
-                <span class="online-dot"></span>
-                <span id="peopleCount">0 people nearby</span>
+            <!-- Updated header with logo and app name -->
+            <div class="header-logo-section">
+              <div class="header-logo-icon">
+                <img src="mylogo.png" alt="Gappkar Logo" class="header-logo-image" onerror="this.style.display='none'; this.parentNode.innerHTML='G';">
+              </div>
+              <div class="header-app-info">
+                <div class="header-app-name">gappkar</div>
+                <div class="header-room-info">
+                  <span class="room-indicator" id="roomIndicator">Global</span>
+                  <span class="online-dot"></span>
+                  <span id="peopleCount">0 people nearby</span>
+                </div>
               </div>
             </div>
           </div>
-          <!-- NEW: Create Room Button -->
+          <!-- Create Room Button -->
           <button class="create-room-btn" id="createRoomBtn" title="Create/Join Room">
             +
           </button>
         </div>
-
         <div id="messageList"></div>
-
         <div class="chat-input" id="chatInput">
           <input type="text" class="message-input" placeholder="Type a message..." id="messageInput" maxlength="500" autocomplete="off">
           <button class="send-button" id="sendButton">➤</button>
@@ -826,8 +785,7 @@
       </div>
     </div>
   </div>
-
-  <!-- NEW: Room Modal -->
+  <!-- Room Modal -->
   <div class="room-modal" id="roomModal">
     <div class="room-modal-content">
       <button class="room-modal-close" id="roomModalClose">×</button>
@@ -835,26 +793,21 @@
         <h3 class="room-modal-title">Room Manager</h3>
         <p class="room-modal-description">Create or join a private room</p>
       </div>
-
       <div class="form-group">
         <label class="form-label" for="roomKeyInput">Room Key</label>
         <input type="text" id="roomKeyInput" class="form-input" placeholder="Enter room key (e.g., myroom123)" maxlength="50">
       </div>
-
       <div class="room-buttons">
         <button class="btn-room" id="joinRoomBtn">Join Room</button>
-        <button class="btn-room primary" id="createRoomBtn">Create Room</button>
+        <button class="btn-room primary" id="createRoomBtnModal">Create Room</button>
       </div>
-
       <div class="room-buttons" style="margin-top: 10px;">
         <button class="btn-room" id="leaveRoomBtn" style="width: 100%;">Leave Current Room</button>
       </div>
     </div>
   </div>
-
   <!-- Firebase / Main Script -->
   <script type="module" src="main.js"></script>
-  
   <!-- Enhanced Theme Toggle Script -->
   <script>
     function toggleTheme() {
@@ -870,10 +823,81 @@
       }
     }
 
+    // Room Modal Functionality
     document.addEventListener('DOMContentLoaded', function() {
       const themeToggle = document.getElementById('themeToggle');
+      const createRoomBtn = document.getElementById('createRoomBtn');
+      const roomModal = document.getElementById('roomModal');
+      const roomModalClose = document.getElementById('roomModalClose');
+      const joinRoomBtn = document.getElementById('joinRoomBtn');
+      const createRoomBtnModal = document.getElementById('createRoomBtnModal');
+      const leaveRoomBtn = document.getElementById('leaveRoomBtn');
+
+      // Theme toggle
       if (themeToggle) {
         themeToggle.addEventListener('click', toggleTheme);
+      }
+
+      // Show room modal
+      if (createRoomBtn) {
+        createRoomBtn.addEventListener('click', function() {
+          roomModal.classList.add('show');
+        });
+      }
+
+      // Close room modal
+      if (roomModalClose) {
+        roomModalClose.addEventListener('click', function() {
+          roomModal.classList.remove('show');
+        });
+      }
+
+      // Close modal when clicking outside
+      if (roomModal) {
+        roomModal.addEventListener('click', function(e) {
+          if (e.target === roomModal) {
+            roomModal.classList.remove('show');
+          }
+        });
+      }
+
+      // Handle room actions
+      if (joinRoomBtn) {
+        joinRoomBtn.addEventListener('click', function() {
+          const roomKey = document.getElementById('roomKeyInput').value.trim();
+          if (roomKey) {
+            // Dispatch custom event for main.js to handle
+            window.dispatchEvent(new CustomEvent('joinRoom', {
+              detail: { roomKey: roomKey }
+            }));
+            roomModal.classList.remove('show');
+          } else {
+            alert('Please enter a room key');
+          }
+        });
+      }
+
+      if (createRoomBtnModal) {
+        createRoomBtnModal.addEventListener('click', function() {
+          const roomKey = document.getElementById('roomKeyInput').value.trim();
+          if (roomKey) {
+            // Dispatch custom event for main.js to handle
+            window.dispatchEvent(new CustomEvent('createRoom', {
+              detail: { roomKey: roomKey }
+            }));
+            roomModal.classList.remove('show');
+          } else {
+            alert('Please enter a room key');
+          }
+        });
+      }
+
+      if (leaveRoomBtn) {
+        leaveRoomBtn.addEventListener('click', function() {
+          // Dispatch custom event for main.js to handle
+          window.dispatchEvent(new CustomEvent('leaveRoom'));
+          roomModal.classList.remove('show');
+        });
       }
     });
   </script>
