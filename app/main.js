@@ -30,6 +30,12 @@ let userLongitude = null;
 let isJoined = false;
 let messageCount = 0;
 
+// Online user tracking variables
+let onlineUsers = new Set();
+let userPresenceRef = null;
+let onlineUsersListener = null;
+let presenceUpdateInterval = null;
+
 // Simple and reliable scroll to bottom function
 function scrollToBottom() {
     const messageList = document.getElementById('messageList');
@@ -101,6 +107,76 @@ function setupMobileKeyboardFix() {
             scrollToBottom();
         }
     });
+}
+
+// Track user presence and online status
+function trackUserPresence() {
+    if (!currentUser || !currentUsername) return;
+    
+    const presenceRef = collection(db, "presence");
+    const userPresenceData = {
+        userId: currentUser.uid,
+        username: currentUsername,
+        location: currentUserLocation,
+        age: currentUserAge,
+        lastSeen: serverTimestamp(),
+        isOnline: true
+    };
+    
+    // Add/update user presence
+    addDoc(presenceRef, userPresenceData).then(() => {
+        console.log("User presence tracked");
+    }).catch(error => {
+        console.error("Error tracking presence:", error);
+    });
+    
+    // Update presence every 30 seconds
+    presenceUpdateInterval = setInterval(() => {
+        if (isJoined && currentUser) {
+            addDoc(presenceRef, {
+                ...userPresenceData,
+                lastSeen: serverTimestamp()
+            }).catch(error => {
+                console.error("Error updating presence:", error);
+            });
+        }
+    }, 30000); // 30 seconds
+}
+
+// Listen for online users and update count
+function listenForOnlineUsers() {
+    const presenceRef = collection(db, "presence");
+    
+    // Listen for users who were active in the last 5 minutes
+    const q = query(
+        presenceRef,
+        orderBy("lastSeen", "desc")
+    );
+    
+    onlineUsersListener = onSnapshot(q, (querySnapshot) => {
+        onlineUsers.clear();
+        const now = new Date();
+        const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+        
+        querySnapshot.forEach((doc) => {
+            const userData = doc.data();
+            if (userData.lastSeen && userData.lastSeen.toDate() > fiveMinutesAgo) {
+                onlineUsers.add(userData.userId);
+            }
+        });
+        
+        updateOnlineCount();
+    });
+}
+
+// Update the online count display
+function updateOnlineCount() {
+    const peopleCountElement = document.getElementById("peopleCount");
+    if (peopleCountElement) {
+        const count = onlineUsers.size;
+        peopleCountElement.textContent = `${count} people nearby`;
+        console.log(`Updated online count: ${count} users`);
+    }
 }
 
 // Get user's current location
@@ -185,7 +261,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Fixed join chat function
+// Fixed join chat function with online tracking
 async function joinChat(username, age, location) {
   console.log("Join chat called with:", { username, age, location });
   
@@ -220,7 +296,7 @@ async function joinChat(username, age, location) {
     
     console.log("Sign in successful, storing data...");
     
-    // Store in localStorage
+    // Store in localStorage (fixed escaped underscores)
     localStorage.setItem('gappkar_username', username);
     localStorage.setItem('gappkar_age', age);
     localStorage.setItem('gappkar_location', location);
@@ -265,6 +341,11 @@ async function joinChat(username, age, location) {
     
     // Start listening for messages
     listenForMessages();
+    
+    // NEW: Start tracking user presence and online users
+    console.log("Starting online user tracking...");
+    trackUserPresence();
+    listenForOnlineUsers();
     
     console.log(`Successfully joined chat - Name: ${username}, Age: ${age}, Location: ${location}`);
   } catch (error) {
@@ -381,7 +462,7 @@ function displayMessage(messageData) {
   messageCount++;
 }
 
-// Check existing session
+// Check existing session with online tracking
 function checkExistingSession() {
   const savedUsername = localStorage.getItem('gappkar_username');
   const savedAge = localStorage.getItem('gappkar_age');
@@ -484,7 +565,60 @@ document.addEventListener("DOMContentLoaded", function() {
 
 // Logout function
 window.logout = function() {
-  localStorage.clear();
-  isJoined = false;
-  location.reload();
+  // Clean up presence tracking
+  if (presenceUpdateInterval) {
+    clearInterval(presenceUpdateInterval);
+  }
+  
+  if (onlineUsersListener) {
+    onlineUsersListener();
+  }
+  
+  // Mark user as offline before leaving
+  if (currentUser && isJoined) {
+    addDoc(collection(db, "presence"), {
+      userId: currentUser.uid,
+      username: currentUsername,
+      location: currentUserLocation,
+      age: currentUserAge,
+      lastSeen: serverTimestamp(),
+      isOnline: false
+    }).finally(() => {
+      localStorage.clear();
+      isJoined = false;
+      location.reload();
+    });
+  } else {
+    localStorage.clear();
+    isJoined = false;
+    location.reload();
+  }
 };
+
+// Clean up presence when user leaves
+window.addEventListener('beforeunload', async () => {
+    if (currentUser && isJoined) {
+        try {
+            // Mark user as offline
+            await addDoc(collection(db, "presence"), {
+                userId: currentUser.uid,
+                username: currentUsername,
+                location: currentUserLocation,
+                age: currentUserAge,
+                lastSeen: serverTimestamp(),
+                isOnline: false
+            });
+        } catch (error) {
+            console.error("Error updating offline status:", error);
+        }
+    }
+    
+    // Cleanup listeners
+    if (onlineUsersListener) {
+        onlineUsersListener();
+    }
+    
+    if (presenceUpdateInterval) {
+        clearInterval(presenceUpdateInterval);
+    }
+});
