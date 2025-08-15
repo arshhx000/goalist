@@ -8,6 +8,172 @@
   <meta name="theme-color" content="#000000">
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
   <style>
+
+        /* --- Chat Container Styles --- */
+        #chat-container {
+            width: 100%;
+            max-width: 400px;
+            height: 90vh;
+            max-height: 700px;
+            background-color: #ffffff;
+            border: 1px solid #dbdbdb;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        #message-list {
+            flex-grow: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .system-message {
+            text-align: center;
+            font-size: 12px;
+            color: #8e8e8e;
+            padding: 8px;
+            background-color: #f0f2f5;
+            border-radius: 12px;
+        }
+
+        .chat-message {
+            display: flex;
+            max-width: 75%;
+        }
+
+        .chat-message.sent {
+            align-self: flex-end;
+        }
+
+        .chat-message img {
+            max-width: 100%;
+            border-radius: 16px;
+        }
+
+        #chat-input-bar {
+            padding: 10px;
+            border-top: 1px solid #dbdbdb;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #chat-input-bar input {
+            flex-grow: 1;
+            border: 1.5px solid #dbdbdb;
+            border-radius: 18px;
+            padding: 8px 12px;
+            font-size: 14px;
+            background-color: #f5f5f5;
+        }
+
+        #gif-tab-button {
+            background-color: #ffffff;
+            color: #262626;
+            border: 1.5px solid #dbdbdb;
+            padding: 0;
+            width: 50px;
+            height: 36px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+        #gif-tab-button:hover {
+            background-color: #f5f5f5;
+            border-color: #c7c7c7;
+        }
+
+        /* --- GIF Picker Panel Styles --- */
+        #gif-picker {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60%;
+            background-color: #ffffff;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+        }
+        #gif-picker.visible {
+            transform: translateY(0);
+        }
+
+        .gif-picker-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid #dbdbdb;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #gif-search-input {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: none;
+            background-color: #efefef;
+            border-radius: 20px;
+            font-size: 16px;
+            outline: none;
+        }
+        #gif-picker-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            font-weight: 300;
+            color: #8e8e8e;
+            cursor: pointer;
+        }
+
+        #gif-results-grid {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 8px;
+        }
+
+        #gif-results-grid img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        #gif-results-grid img:hover {
+            transform: scale(1.05);
+        }
+        .loader {
+            margin: 40px auto;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #0095f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     :root {
       --bg-dark: #000000;
       --bg-light: #ffffff;
@@ -1100,6 +1266,101 @@
       roomModal.addEventListener("click", e => { if (e.target === roomModal) hideModal(); });
     });
   </script>
+
+   <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 1. SETUP ---
+            const GIPHY_API_KEY = 'GLutXRXDEL19PuG3ztekK0JNDr5oySTh';
+
+            // DOM Elements
+            const gifTabButton = document.getElementById('gif-tab-button');
+            const gifPicker = document.getElementById('gif-picker');
+            const gifPickerClose = document.getElementById('gif-picker-close');
+            const gifSearchInput = document.getElementById('gif-search-input');
+            const gifResultsGrid = document.getElementById('gif-results-grid');
+            const messageList = document.getElementById('message-list');
+            
+            let debounceTimer;
+
+            // --- 2. EVENT LISTENERS ---
+            gifTabButton.addEventListener('click', openGifPicker);
+            gifPickerClose.addEventListener('click', closeGifPicker);
+            gifSearchInput.addEventListener('input', (event) => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    fetchGifs(event.target.value);
+                }, 500);
+            });
+
+            // --- 3. FUNCTIONS ---
+            function openGifPicker() {
+                gifPicker.classList.add('visible');
+                if (gifResultsGrid.innerHTML.trim() === '') {
+                    fetchGifs();
+                }
+            }
+            
+            function closeGifPicker() {
+                gifPicker.classList.remove('visible');
+            }
+            
+            async function fetchGifs(searchTerm = '') {
+                gifResultsGrid.innerHTML = '<div class="loader"></div>';
+                let apiUrl = searchTerm 
+                    ? `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(searchTerm)}&limit=30&rating=g`
+                    : `https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_API_KEY}&limit=30&rating=g`;
+                
+                try {
+                    const response = await fetch(apiUrl);
+                    if (!response.ok) throw new Error(`Giphy API error: ${response.statusText}`);
+                    const data = await response.json();
+                    renderGifs(data.data);
+                } catch (error) {
+                    console.error('Failed to fetch GIFs:', error);
+                    gifResultsGrid.innerHTML = '<p style="text-align: center;">Could not load GIFs.</p>';
+                }
+            }
+            
+            function renderGifs(gifs) {
+                gifResultsGrid.innerHTML = '';
+                if (!gifs || gifs.length === 0) {
+                    gifResultsGrid.innerHTML = '<p style="text-align: center;">No GIFs found.</p>';
+                    return;
+                }
+                gifs.forEach(gif => {
+                    const img = document.createElement('img');
+                    img.src = gif.images.fixed_width.url;
+                    img.alt = gif.title;
+                    img.addEventListener('click', () => selectGif(gif));
+                    gifResultsGrid.appendChild(img);
+                });
+            }
+            
+            function selectGif(gif) {
+                // Create the message bubble element
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('chat-message', 'sent');
+
+                // Create the image element for the GIF
+                const gifImage = document.createElement('img');
+                gifImage.src = gif.images.original.url;
+                gifImage.alt = gif.title;
+
+                // Append the image to the message bubble
+                messageElement.appendChild(gifImage);
+
+                // Append the message to the message list
+                messageList.appendChild(messageElement);
+
+                // Scroll to the bottom of the chat
+                messageList.scrollTop = messageList.scrollHeight;
+                
+                // Close the picker after selection
+                closeGifPicker();
+            }
+        });
+    </script>
   
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -1118,5 +1379,28 @@
       if (themeToggle) { themeToggle.addEventListener('click', toggleTheme); }
     });
   </script>
+
+  <body>
+
+    <div id="chat-container">
+        <div id="message-list">
+            <div class="system-message">Click the GIF button to send a GIF!</div>
+        </div>
+        <div id="chat-input-bar">
+            <input type="text" placeholder="Message..." disabled>
+            <button id="gif-tab-button">GIF</button>
+        </div>
+    </div>
+
+    <!-- This is the hidden GIF picker panel -->
+    <div id="gif-picker">
+        <header class="gif-picker-header">
+            <input type="text" id="gif-search-input" placeholder="Search for GIFs...">
+            <button id="gif-picker-close">&times;</button>
+        </header>
+        <div id="gif-results-grid">
+            <!-- GIFs will be loaded here by JavaScript -->
+        </div>
+    </div>
 </body>
 </html>
