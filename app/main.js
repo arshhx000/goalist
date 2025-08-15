@@ -1,7 +1,7 @@
-// Import Firebase modules
+// Import Firebase modules with proper URLs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, setDoc, doc, where } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { getFirestore, addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, setDoc, doc, where, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -39,7 +39,7 @@ let onlineUsers = new Set();
 let presenceUpdateInterval = null;
 let onlineUsersListener = null;
 
-// DOM Elements
+// DOM Elements - Use querySelector to avoid null errors
 const joinView = document.getElementById("joinView");
 const chatsView = document.getElementById("chatsView");
 const messageList = document.getElementById("messageList");
@@ -54,13 +54,13 @@ const joinButton = document.getElementById("joinButton");
 const getLocationBtn = document.getElementById("getLocationBtn");
 const peopleCount = document.getElementById("peopleCount");
 
-// Updated Room DOM elements
+// Room DOM elements
 const createRoomBtnHeader = document.getElementById("createRoomBtn");
 const roomModal = document.getElementById("roomModal");
 const roomModalClose = document.getElementById("roomModalClose");
 const roomKeyInput = document.getElementById("roomKeyInput");
 const joinRoomBtn = document.getElementById("joinRoomBtn");
-const createRoomBtnModal = document.getElementById("createRoomBtnModal"); // Updated ID
+const createRoomBtnModal = document.getElementById("createRoomBtnModal");
 const leaveRoomBtn = document.getElementById("leaveRoomBtn");
 const roomIndicator = document.getElementById("roomIndicator");
 
@@ -74,246 +74,248 @@ function getTimeString(timestamp = null) {
   return `${hours}:${minutes} ${ampm}`;
 }
 
-// Enhanced smooth scroll to bottom function
+// Smooth scroll to bottom function
 function smoothScrollToBottom() {
-    if (messageList) {
-        requestAnimationFrame(() => {
-            messageList.scrollTo({
-                top: messageList.scrollHeight,
-                behavior: 'smooth'
-            });
-        });
-    }
+  if (messageList) {
+    messageList.scrollTop = messageList.scrollHeight;
+  }
 }
 
 // Room Management Functions
 function showRoomModal() {
-    if (roomModal) {
-        roomModal.classList.add('show');
-    }
+  if (roomModal) {
+    roomModal.classList.add('show');
+  }
 }
 
 function hideRoomModal() {
-    if (roomModal) {
-        roomModal.classList.remove('show');
-        if (roomKeyInput) {
-            roomKeyInput.value = '';
-        }
+  if (roomModal) {
+    roomModal.classList.remove('show');
+    if (roomKeyInput) {
+      roomKeyInput.value = '';
     }
+  }
 }
 
 function updateRoomUI() {
-    // Update room indicator in header
-    if (roomIndicator) {
-        if (currentRoom === "global") {
-            roomIndicator.textContent = "Global";
-            roomIndicator.style.background = "var(--accent)";
-        } else {
-            roomIndicator.textContent = currentRoom;
-            roomIndicator.style.background = "#28a745"; // Green for private rooms
-        }
+  // Update room indicator in header
+  if (roomIndicator) {
+    if (currentRoom === "global") {
+      roomIndicator.textContent = "Global";
+      roomIndicator.style.background = "var(--accent)";
+    } else {
+      roomIndicator.textContent = currentRoom;
+      roomIndicator.style.background = "#28a745"; // Green for private rooms
     }
-    
-    console.log(`🎯 UI updated for room: ${currentRoom}`);
+  }
+  
+  console.log(`🎯 UI updated for room: ${currentRoom}`);
 }
 
 async function createOrJoinRoom(roomKey) {
-    if (!roomKey || !roomKey.trim()) {
-        alert("Please enter a room key");
-        return;
-    }
-    
-    const sanitizedRoomKey = roomKey.trim().toLowerCase();
-    
-    // Don't rejoin the same room
-    if (sanitizedRoomKey === currentRoom) {
-        hideRoomModal();
-        return;
-    }
-    
-    // Stop current message listener
-    if (messagesListener) {
-        messagesListener();
-    }
-    
-    // Update current room
-    currentRoom = sanitizedRoomKey;
-    
-    // Update UI
-    updateRoomUI();
-    
-    // Clear messages and show room join message
+  if (!roomKey || !roomKey.trim()) {
+    alert("Please enter a room key");
+    return;
+  }
+  
+  const sanitizedRoomKey = roomKey.trim().toLowerCase();
+  
+  // Don't rejoin the same room
+  if (sanitizedRoomKey === currentRoom) {
+    hideRoomModal();
+    return;
+  }
+  
+  // Stop current message listener
+  if (messagesListener) {
+    messagesListener();
+  }
+  
+  // Update current room
+  currentRoom = sanitizedRoomKey;
+  
+  // Update UI
+  updateRoomUI();
+  
+  // Clear messages and show room join message
+  if (messageList) {
     messageList.innerHTML = "";
     addSystemMessage(`Joined room: ${currentRoom}`);
-    
-    // Start listening to room messages
-    listenForMessages();
-    
-    // Update presence with new room
-    if (currentUser && isJoined) {
-        trackUserPresence();
-    }
-    
-    // Hide modal
-    hideRoomModal();
-    
-    // Store room in localStorage
-    localStorage.setItem('gappkar_current_room', currentRoom);
-    
-    console.log(`✅ Joined room: ${currentRoom}`);
+  }
+  
+  // Start listening to room messages
+  listenForMessages();
+  
+  // Update presence with new room
+  if (currentUser && isJoined) {
+    trackUserPresence();
+  }
+  
+  // Hide modal
+  hideRoomModal();
+  
+  // Store room in localStorage
+  localStorage.setItem('gappkar_current_room', currentRoom);
+  
+  console.log(`✅ Joined room: ${currentRoom}`);
 }
 
 function leaveRoom() {
-    // Don't leave if already in global
-    if (currentRoom === "global") {
-        hideRoomModal();
-        return;
-    }
-    
-    // Stop current message listener
-    if (messagesListener) {
-        messagesListener();
-    }
-    
-    // Reset to global
-    currentRoom = "global";
-    
-    // Update UI
-    updateRoomUI();
-    
-    // Clear messages and show leave message
+  // Don't leave if already in global
+  if (currentRoom === "global") {
+    hideRoomModal();
+    return;
+  }
+  
+  // Stop current message listener
+  if (messagesListener) {
+    messagesListener();
+  }
+  
+  // Reset to global
+  currentRoom = "global";
+  
+  // Update UI
+  updateRoomUI();
+  
+  // Clear messages and show leave message
+  if (messageList) {
     messageList.innerHTML = "";
     addSystemMessage("Left room, back to global chat");
-    
-    // Start listening to global messages
-    listenForMessages();
-    
-    // Update presence with new room
-    if (currentUser && isJoined) {
-        trackUserPresence();
-    }
-    
-    // Hide modal
-    hideRoomModal();
-    
-    // Remove room from localStorage
-    localStorage.removeItem('gappkar_current_room');
-    
-    console.log("✅ Left room, back to global chat");
+  }
+  
+  // Start listening to global messages
+  listenForMessages();
+  
+  // Update presence with new room
+  if (currentUser && isJoined) {
+    trackUserPresence();
+  }
+  
+  // Hide modal
+  hideRoomModal();
+  
+  // Remove room from localStorage
+  localStorage.removeItem('gappkar_current_room');
+  
+  console.log("✅ Left room, back to global chat");
 }
 
 // Add system message
 function addSystemMessage(text) {
-    const systemMsg = {
-        user: "System",
-        message: text,
-        timestamp: new Date(),
-        isSystem: true
-    };
-    displayMessage(systemMsg);
+  if (!messageList) return;
+  
+  const systemMsg = {
+    user: "System",
+    message: text,
+    timestamp: new Date(),
+    isSystem: true
+  };
+  displayMessage(systemMsg);
+  smoothScrollToBottom();
 }
 
 // Enhanced user presence tracking
 function trackUserPresence() {
-    if (!currentUser || !currentUsername) {
-        console.log("Cannot track presence: No user or username");
-        return;
-    }
-    
-    console.log("🔄 Starting presence tracking for user:", currentUsername);
-    
-    const userPresenceDoc = doc(db, "presence", currentUser.uid);
-    const userPresenceData = {
-        userId: currentUser.uid,
-        username: currentUsername,
-        location: currentUserLocation,
-        age: currentUserAge,
+  if (!currentUser || !currentUsername) {
+    console.log("Cannot track presence: No user or username");
+    return;
+  }
+  
+  console.log("🔄 Starting presence tracking for user:", currentUsername);
+  
+  const userPresenceDoc = doc(db, "presence", currentUser.uid);
+  const userPresenceData = {
+    userId: currentUser.uid,
+    username: currentUsername,
+    location: currentUserLocation,
+    age: currentUserAge,
+    room: currentRoom,
+    lastSeen: serverTimestamp(),
+    isOnline: true,
+    joinedAt: serverTimestamp()
+  };
+  
+  setDoc(userPresenceDoc, userPresenceData).then(() => {
+    console.log("✅ User presence tracked successfully");
+  }).catch(error => {
+    console.error("❌ Error tracking presence:", error);
+  });
+  
+  // Clear existing interval
+  if (presenceUpdateInterval) {
+    clearInterval(presenceUpdateInterval);
+  }
+  
+  // Update presence every 30 seconds
+  presenceUpdateInterval = setInterval(() => {
+    if (isJoined && currentUser) {
+      const updateData = {
+        ...userPresenceData,
         room: currentRoom,
-        lastSeen: serverTimestamp(),
-        isOnline: true,
-        joinedAt: serverTimestamp()
-    };
-    
-    setDoc(userPresenceDoc, userPresenceData).then(() => {
-        console.log("✅ User presence tracked successfully");
-    }).catch(error => {
-        console.error("❌ Error tracking presence:", error);
-    });
-    
-    // Clear existing interval
-    if (presenceUpdateInterval) {
-        clearInterval(presenceUpdateInterval);
+        lastSeen: serverTimestamp()
+      };
+      
+      setDoc(userPresenceDoc, updateData).then(() => {
+        console.log("🔄 Presence updated for:", currentUsername);
+      }).catch(error => {
+        console.error("❌ Error updating presence:", error);
+      });
     }
-    
-    // Update presence every 30 seconds
-    presenceUpdateInterval = setInterval(() => {
-        if (isJoined && currentUser) {
-            const updateData = {
-                ...userPresenceData,
-                room: currentRoom,
-                lastSeen: serverTimestamp()
-            };
-            
-            setDoc(userPresenceDoc, updateData).then(() => {
-                console.log("🔄 Presence updated for:", currentUsername);
-            }).catch(error => {
-                console.error("❌ Error updating presence:", error);
-            });
-        }
-    }, 30000);
+  }, 30000);
 }
 
 // Enhanced online users listener with room filtering
 function listenForOnlineUsers() {
-    console.log("🔍 Starting to listen for online users...");
+  console.log("🔍 Starting to listen for online users...");
+  
+  const presenceRef = collection(db, "presence");
+  
+  if (onlineUsersListener) {
+    onlineUsersListener();
+  }
+  
+  onlineUsersListener = onSnapshot(presenceRef, (querySnapshot) => {
+    console.log("📡 Received presence update, total docs:", querySnapshot.size);
     
-    const presenceRef = collection(db, "presence");
+    onlineUsers.clear();
+    const now = new Date();
+    const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
     
-    if (onlineUsersListener) {
-        onlineUsersListener();
-    }
+    let activeUsers = 0;
+    let roomUsers = 0;
     
-    onlineUsersListener = onSnapshot(presenceRef, (querySnapshot) => {
-        console.log("📡 Received presence update, total docs:", querySnapshot.size);
+    querySnapshot.forEach((doc) => {
+      const userData = doc.data();
+      
+      if (userData.lastSeen && userData.lastSeen.toDate() > fiveMinutesAgo) {
+        onlineUsers.add(userData.userId);
+        activeUsers++;
         
-        onlineUsers.clear();
-        const now = new Date();
-        const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
-        
-        let activeUsers = 0;
-        let roomUsers = 0;
-        
-        querySnapshot.forEach((doc) => {
-            const userData = doc.data();
-            
-            if (userData.lastSeen && userData.lastSeen.toDate() > fiveMinutesAgo) {
-                onlineUsers.add(userData.userId);
-                activeUsers++;
-                
-                // Count users in current room
-                if (userData.room === currentRoom) {
-                    roomUsers++;
-                }
-            }
-        });
-        
-        console.log(`🎯 Total active users: ${activeUsers}, In current room: ${roomUsers}`);
-        updateOnlineCount(roomUsers);
-        
-    }, (error) => {
-        console.error("❌ Error listening for online users:", error);
+        // Count users in current room
+        if (userData.room === currentRoom) {
+          roomUsers++;
+        }
+      }
     });
+    
+    console.log(`🎯 Total active users: ${activeUsers}, In current room: ${roomUsers}`);
+    updateOnlineCount(roomUsers);
+    
+  }, (error) => {
+    console.error("❌ Error listening for online users:", error);
+  });
 }
 
 // Enhanced online count update
 function updateOnlineCount(roomUserCount = null) {
-    const peopleCountElement = document.getElementById("peopleCount");
-    if (peopleCountElement) {
-        const count = roomUserCount !== null ? roomUserCount : onlineUsers.size;
-        const roomText = currentRoom === "global" ? "nearby" : `in ${currentRoom}`;
-        peopleCountElement.textContent = `${count} people ${roomText}`;
-        console.log(`📊 Updated UI: ${count} people ${roomText}`);
-    }
+  const peopleCountElement = document.getElementById("peopleCount");
+  if (peopleCountElement) {
+    const count = roomUserCount !== null ? roomUserCount : onlineUsers.size;
+    const roomText = currentRoom === "global" ? "nearby" : `in ${currentRoom}`;
+    peopleCountElement.textContent = `${count} people ${roomText}`;
+    console.log(`📊 Updated UI: ${count} people ${roomText}`);
+  }
 }
 
 // Get user's current location
@@ -406,6 +408,7 @@ onAuthStateChanged(auth, (user) => {
     currentUser = user;
     console.log("User signed in:", user.uid);
   } else {
+    currentUser = null;
     console.log("User signed out");
   }
 });
@@ -414,7 +417,7 @@ onAuthStateChanged(auth, (user) => {
 async function joinChat(username, age, location) {
   console.log("Join chat called with:", { username, age, location });
   
-  if (!username.trim()) {
+  if (!username || !username.trim()) {
     alert("Please enter your name");
     return;
   }
@@ -424,7 +427,7 @@ async function joinChat(username, age, location) {
     return;
   }
   
-  if (!location.trim()) {
+  if (!location || !location.trim()) {
     alert("Please provide your location");
     return;
   }
@@ -438,9 +441,9 @@ async function joinChat(username, age, location) {
     console.log("Attempting to sign in anonymously...");
     await signInAnonymously(auth);
     
-    currentUsername = username;
+    currentUsername = username.trim();
     currentUserAge = parseInt(age);
-    currentUserLocation = location;
+    currentUserLocation = location.trim();
     isJoined = true;
     
     console.log("Sign in successful, storing data...");
@@ -463,26 +466,30 @@ async function joinChat(username, age, location) {
     if (mainContainer) {
       mainContainer.classList.add("chat-active");
     }
-    joinView.classList.add("hidden");
-    chatsView.classList.remove("hidden");
-    document.body.classList.add("chat-active");
+    if (joinView) joinView.classList.add("hidden");
+    if (chatsView) chatsView.classList.remove("hidden");
+    if (document.body) document.body.classList.add("chat-active");
     
     // Update UI
     updateRoomUI();
     
     // Apply mobile-specific styles
     if (window.innerWidth <= 480) {
-        chatsView.style.position = 'fixed';
-        chatsView.style.top = '0';
-        chatsView.style.left = '0';
-        chatsView.style.width = '100vw';
-        chatsView.style.height = '100vh';
-        chatsView.style.zIndex = '9999';
+        if (chatsView) {
+            chatsView.style.position = 'fixed';
+            chatsView.style.top = '0';
+            chatsView.style.left = '0';
+            chatsView.style.width = '100vw';
+            chatsView.style.height = '100vh';
+            chatsView.style.zIndex = '9999';
+        }
     }
     
     // Clear messages and add welcome
-    messageList.innerHTML = "";
-    addSystemMessage(`Welcome ${currentUsername}! You're in ${currentRoom === "global" ? "global chat" : `room: ${currentRoom}`}`);
+    if (messageList) {
+      messageList.innerHTML = "";
+      addSystemMessage(`Welcome ${currentUsername}! You're in ${currentRoom === "global" ? "global chat" : `room: ${currentRoom}`}`);
+    }
     
     console.log("Starting to listen for messages...");
     listenForMessages();
@@ -504,54 +511,60 @@ async function joinChat(username, age, location) {
 
 // Enhanced send message function with room support
 async function sendMessage() {
-    const messageText = messageInput.value.trim();
-    
-    if (!messageText || !currentUser || !isJoined) {
-        return;
-    }
-    
-    // Clear input immediately
-    messageInput.value = "";
-    
-    // Create temporary message for instant display
-    const tempMessage = {
-        user: currentUsername,
-        message: messageText,
-        timestamp: new Date(),
-        location: currentUserLocation,
-        age: currentUserAge,
-        userId: currentUser.uid,
-        room: currentRoom,
-        isTemp: true
-    };
-    
+  if (!messageInput) return;
+  
+  const messageText = messageInput.value.trim();
+  
+  if (!messageText || !currentUser || !isJoined) {
+    return;
+  }
+  
+  // Clear input immediately
+  messageInput.value = "";
+  
+  // Create temporary message for instant display
+  const tempMessage = {
+    user: currentUsername,
+    message: messageText,
+    timestamp: new Date(),
+    location: currentUserLocation,
+    age: currentUserAge,
+    userId: currentUser.uid,
+    room: currentRoom,
+    isTemp: true
+  };
+  
+  if (messageList) {
     displayMessage(tempMessage);
     smoothScrollToBottom();
+  }
+  
+  try {
+    // Send to Firebase with room
+    await addDoc(collection(db, "messages"), {
+      user: currentUsername,
+      message: messageText,
+      timestamp: serverTimestamp(),
+      location: currentUserLocation,
+      age: currentUserAge,
+      userId: currentUser.uid,
+      room: currentRoom,
+      latitude: userLatitude,
+      longitude: userLongitude
+    });
     
-    try {
-        // Send to Firebase with room
-        await addDoc(collection(db, "messages"), {
-            user: currentUsername,
-            message: messageText,
-            timestamp: serverTimestamp(),
-            location: currentUserLocation,
-            age: currentUserAge,
-            userId: currentUser.uid,
-            room: currentRoom,
-            latitude: userLatitude,
-            longitude: userLongitude
-        });
-        
-        console.log("✅ Message sent successfully to room:", currentRoom);
-        
-    } catch (error) {
-        console.error("Error sending message:", error);
-        alert("Failed to send message");
-        
-        // Remove temporary message on error
-        const tempMessages = document.querySelectorAll('[data-temp="true"]');
-        tempMessages.forEach(msg => msg.remove());
+    console.log("✅ Message sent successfully to room:", currentRoom);
+    
+  } catch (error) {
+    console.error("Error sending message:", error);
+    alert("Failed to send message");
+    
+    // Remove temporary message on error
+    if (messageList) {
+      const tempMessages = messageList.querySelectorAll('[data-temp="true"]');
+      tempMessages.forEach(msg => msg.remove());
     }
+  }
 }
 
 // Enhanced listen for messages with room filtering
@@ -559,6 +572,11 @@ function listenForMessages() {
   // Stop existing listener
   if (messagesListener) {
     messagesListener();
+  }
+  
+  if (!db) {
+    console.error("Firestore not initialized");
+    return;
   }
   
   const messagesRef = collection(db, "messages");
@@ -570,6 +588,8 @@ function listenForMessages() {
   
   messagesListener = onSnapshot(q, (querySnapshot) => {
     const messageContainer = document.getElementById("messageList");
+    
+    if (!messageContainer) return;
     
     // Clear messages but keep system messages
     const systemMessages = messageContainer.querySelectorAll('[data-system="true"]');
@@ -586,12 +606,16 @@ function listenForMessages() {
     });
     
     setTimeout(() => smoothScrollToBottom(), 200);
+  }, (error) => {
+    console.error("Error listening for messages:", error);
   });
 }
 
 // Enhanced display message
 function displayMessage(messageData) {
   const messageContainer = document.getElementById("messageList");
+  if (!messageContainer) return;
+  
   const isCurrentUser = messageData.user === currentUsername;
   const isSystem = messageData.isSystem || messageData.user === "System";
   
@@ -639,6 +663,7 @@ function displayMessage(messageData) {
   
   messageContainer.appendChild(messageDiv);
   messageCount++;
+  smoothScrollToBottom();
 }
 
 // Check existing session
@@ -667,7 +692,7 @@ function checkExistingSession() {
 }
 
 // Enhanced logout function
-function logout() {
+async function logout() {
   console.log("🚪 User logging out...");
   
   // Clean up listeners
@@ -681,10 +706,19 @@ function logout() {
     messagesListener();
   }
   
+  // Sign out from Firebase
+  if (auth.currentUser) {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  }
+  
   // Reset UI
-  chatsView.classList.add("hidden");
-  joinView.classList.remove("hidden");
-  document.body.classList.remove("chat-active");
+  if (chatsView) chatsView.classList.add("hidden");
+  if (joinView) joinView.classList.remove("hidden");
+  if (document.body) document.body.classList.remove("chat-active");
   
   const mainContainer = document.getElementById("mainContainer");
   if (mainContainer) {
@@ -726,9 +760,9 @@ document.addEventListener("DOMContentLoaded", function() {
   if (joinButton) {
     joinButton.addEventListener("click", function(e) {
       e.preventDefault();
-      const username = usernameInput?.value.trim();
+      const username = usernameInput?.value?.trim();
       const age = ageInput?.value;
-      const location = locationInput?.value.trim();
+      const location = locationInput?.value?.trim();
       
       joinChat(username, age, location);
     });
@@ -767,7 +801,7 @@ document.addEventListener("DOMContentLoaded", function() {
   
   if (joinRoomBtn) {
     joinRoomBtn.addEventListener("click", () => {
-      const roomKey = roomKeyInput?.value.trim();
+      const roomKey = roomKeyInput?.value?.trim();
       if (roomKey) {
         createOrJoinRoom(roomKey);
       } else {
@@ -776,10 +810,9 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
   
-  // Fixed: Use correct ID for modal create button
   if (createRoomBtnModal) {
     createRoomBtnModal.addEventListener("click", () => {
-      const roomKey = roomKeyInput?.value.trim();
+      const roomKey = roomKeyInput?.value?.trim();
       if (roomKey) {
         createOrJoinRoom(roomKey);
       } else {
