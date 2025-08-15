@@ -1,1042 +1,270 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Gappkar Online</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#000000">
-  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-dark: #000000;
-      --bg-light: #ffffff;
-      --text-dark: #000000;
-      --text-light: #ffffff;
-      --accent: #ff3b30;
-      --gray: #888888;
-      --border-radius: 12px;
-      --border-thin: 1.5px solid #000;
-      --system-bg: #f5f5f5;
-      --system-text: #666666;
-      --modal-bg: rgba(0, 0, 0, 0.8);
-    }
-    [data-theme="dark"] {
-      --bg-dark: #ffffff;
-      --bg-light: #000000;
-      --text-dark: #ffffff;
-      --text-light: #000000;
-      --accent: #ff3b30;
-      --gray: #aaaaaa;
-      --border-thin: 1.5px solid #fff;
-      --system-bg: #1a1a1a;
-      --system-text: #cccccc;
-      --modal-bg: rgba(255, 255, 255, 0.8);
-    }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      transition: background-color 0.3s ease,
-                  border-color 0.3s ease,
-                  color 0.3s ease;
-    }
-    body {
-      font-family: 'DotGothic16', monospace;
-      background: var(--bg-light);
-      color: var(--text-dark);
-      letter-spacing: 0.5px;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-    .app-container {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    .main-container {
-      width: 100%;
-      max-width: 400px;
-      background: var(--bg-light);
-      border-radius: var(--border-radius);
-      border: var(--border-thin);
-      overflow: hidden;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-    }
-    .app-header {
-      background: var(--bg-light);
-      padding: 20px;
-      text-align: center;
-      border-bottom: var(--border-thin);
-    }
-    .chat-active .app-header {
-      display: none !important;
-    }
-    .theme-toggle {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: transparent;
-      border: var(--border-thin);
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-dark);
-    }
-    .theme-toggle:hover {
-      background: var(--accent);
-      color: var(--text-light);
-    }
-    .logo-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-    .logo-icon {
-      width: 64px;
-      height: 64px;
-      border-radius: var(--border-radius);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: var(--border-thin);
-      font-weight: 700;
-      font-size: 24px;
-      background: var(--bg-light);
-      color: var(--text-dark);
-      overflow: hidden;
-    }
-    .logo-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: var(--border-radius);
-    }
-    .app-title {
-      font-size: 26px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--text-dark);
-    }
-    .app-subtitle {
-      font-size: 13px;
-      color: var(--gray);
-    }
-    #joinView {
-      padding: 24px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-    #joinView.hidden {
-      display: none !important;
-    }
-    .section-header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    .section-icon {
-      font-size: 28px;
-      margin-bottom: 12px;
-    }
-    .section-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      color: var(--text-dark);
-    }
-    .section-description {
-      color: var(--gray);
-      font-size: 14px;
-    }
-    .form-group {
-      margin-bottom: 18px;
-    }
-    .form-label {
-      display: block;
-      font-weight: 500;
-      margin-bottom: 6px;
-      font-size: 14px;
-      color: var(--text-dark);
-    }
-    .form-input {
-      width: 100%;
-      padding: 12px;
-      border: var(--border-thin);
-      border-radius: var(--border-radius);
-      font-size: 14px;
-      font-family: inherit;
-      background: var(--bg-light);
-      color: var(--text-dark);
-      outline: none;
-    }
-    .form-input:focus {
-      border-color: var(--accent);
-    }
-    .form-input::placeholder {
-      color: var(--gray);
-    }
-    .location-options {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    #locationStatus {
-      padding: 8px;
-      border-radius: var(--border-radius);
-      text-align: center;
-      margin-top: 10px;
-      font-size: 12px;
-      border: var(--border-thin);
-    }
-    #locationStatus.success {
-      background: #d4edda;
-      color: #155724;
-      border-color: #c3e6cb;
-    }
-    #locationStatus.error {
-      background: #f8d7da;
-      color: #721c24;
-      border-color: #f5c6cb;
-    }
-    .btn {
-      width: 100%;
-      padding: 14px;
-      border-radius: var(--border-radius);
-      font-size: 14px;
-      font-weight: 600;
-      text-transform: uppercase;
-      cursor: pointer;
-      border: none;
-      font-family: inherit;
-    }
-    .btn-location {
-      background: var(--bg-dark);
-      color: var(--text-light);
-      margin-bottom: 0;
-    }
-    .btn-location:hover {
-      background: var(--accent);
-    }
-    .btn-success {
-      background: var(--bg-dark);
-      color: var(--text-light);
-    }
-    .btn-success:hover {
-      background: var(--accent);
-    }
-    #chatsView {
-      display: none;
-      flex-direction: column;
-      background: var(--bg-light);
-      height: 100%;
-      max-height: 100vh;
-      overflow: hidden;
-    }
-    #chatsView:not(.hidden) {
-      display: flex !important;
-    }
-    .chat-header {
-      background: var(--bg-light);
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border-bottom: var(--border-thin);
-      flex-shrink: 0;
-    }
-    .back-button {
-      border: var(--border-thin);
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      font-size: 16px;
-      color: var(--text-dark);
-    }
-    .back-button:hover {
-      background: var(--accent);
-      color: var(--text-light);
-    }
-    .chat-header-info {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .header-logo-section {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex: 1;
-    }
-    .header-logo-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: var(--border-thin);
-      font-weight: 600;
-      font-size: 14px;
-      background: var(--bg-light);
-      color: var(--text-dark);
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-    .header-logo-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 6px;
-    }
-    .header-app-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .header-app-name {
-      font-size: 14px;
-      font-weight: 700;
-      text-transform: uppercase;
-      color: var(--text-dark);
-      letter-spacing: 1px;
-      line-height: 1.2;
-    }
-    .header-room-info {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--gray);
-      margin-top: 2px;
-    }
-    .room-indicator {
-      background: var(--accent);
-      color: var(--text-light);
-      padding: 2px 6px;
-      border-radius: 6px;
-      font-size: 9px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .online-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-    .create-room-btn {
-      border: var(--border-thin);
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: transparent;
-      font-size: 16px;
-      color: var(--text-dark);
-    }
-    .create-room-btn:hover {
-      background: var(--accent);
-      color: var(--text-light);
-    }
-    .room-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: var(--modal-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-    }
-    .room-modal.show {
-      opacity: 1;
-      visibility: visible;
-    }
-    .room-modal-content {
-      background: var(--bg-light);
-      border: var(--border-thin);
-      border-radius: var(--border-radius);
-      padding: 24px;
-      max-width: 350px;
-      width: 90%;
-      position: relative;
-      transform: scale(0.9);
-      transition: transform 0.3s ease;
-    }
-    .room-modal.show .room-modal-content {
-      transform: scale(1);
-    }
-    .room-modal-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .room-modal-title {
-      font-size: 18px;
-      font-weight: 600;
-      text-transform: uppercase;
-      color: var(--text-dark);
-      margin-bottom: 8px;
-    }
-    .room-modal-description {
-      font-size: 14px;
-      color: var(--gray);
-    }
-    .room-modal-close {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: transparent;
-      border: var(--border-thin);
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      color: var(--text-dark);
-    }
-    .room-modal-close:hover {
-      background: var(--accent);
-      color: var(--text-light);
-    }
-    .room-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 16px;
-    }
-    .btn-room {
-      flex: 1;
-      padding: 12px;
-      border-radius: var(--border-radius);
-      font-size: 14px;
-      font-weight: 600;
-      text-transform: uppercase;
-      cursor: pointer;
-      border: var(--border-thin);
-      font-family: inherit;
-      background: transparent;
-      color: var(--text-dark);
-    }
-    .btn-room:hover {
-      background: var(--accent);
-      color: var(--text-light);
-    }
-    .btn-room.primary {
-      background: var(--bg-dark);
-      color: var(--text-light);
-    }
-    .btn-room.primary:hover {
-      background: var(--accent);
-    }
-    #messageList {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      background: var(--bg-light);
-      scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
-    }
-    .message {
-      display: flex;
-      width: 100%;
-      animation: messageSlideIn 0.3s ease;
-    }
-    @keyframes messageSlideIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .message-bubble {
-      border: var(--border-thin);
-      border-radius: var(--border-radius);
-      padding: 10px 14px;
-      font-size: 14px;
-      word-wrap: break-word;
-      max-width: 75%;
-      position: relative;
-    }
-    .message.sent {
-      justify-content: flex-end;
-    }
-    .message.sent .message-bubble {
-      background: var(--bg-dark);
-      color: var(--text-light);
-      border: none;
-    }
-    .message.received {
-      justify-content: flex-start;
-    }
-    .message.received .message-bubble {
-      background: var(--bg-light);
-      color: var(--text-dark);
-    }
-    .message.system {
-      justify-content: center;
-    }
-    .message.system .message-bubble {
-      background: var(--system-bg);
-      color: var(--system-text);
-      border: 1px dashed var(--gray);
-      font-size: 12px;
-      max-width: 90%;
-      text-align: center;
-    }
-    .message-time {
-      font-size: 10px;
-      opacity: 0.7;
-      margin-top: 4px;
-    }
-    .sender-name {
-      font-size: 11px;
-      font-weight: 600;
-      margin-bottom: 2px;
-      color: var(--accent);
-    }
-    .message-location {
-      font-size: 10px;
-      opacity: 0.7;
-      margin-top: 2px;
-    }
-    .message-info {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      max-width: 75%;
-    }
-    .chat-input {
-      border-top: var(--border-thin);
-      padding: 10px 16px;
-      display: flex;
-      gap: 10px;
-      background: var(--bg-light);
-      flex-shrink: 0;
-    }
-    .message-input {
-      flex: 1;
-      padding: 10px;
-      border: var(--border-thin);
-      border-radius: var(--border-radius);
-      font-family: inherit;
-      font-size: 14px;
-      outline: none;
-      background: var(--bg-light);
-      color: var(--text-dark);
-    }
-    .message-input:focus {
-      border-color: var(--accent);
-    }
-    .message-input::placeholder {
-      color: var(--gray);
-    }
-    .send-button {
-      width: 40px;
-      height: 40px;
-      background: var(--bg-dark);
-      border-radius: 50%;
-      border: none;
-      color: var(--text-light);
-      cursor: pointer;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .send-button:hover:not(:disabled) {
-      background: var(--accent);
-      transform: scale(1.05);
-    }
-    @media (max-width: 480px) {
-      body {
-        height: 100vh;
-        overflow: hidden;
-      }
-      .app-container {
-        padding: 0;
-        height: 100%;
-      }
-      .main-container {
-        width: 100%;
-        height: 100%;
-        border-radius: 0;
-        border: none;
-        display: flex;
-        flex-direction: column;
-      }
-      #chatsView:not(.hidden) {
-        flex: 1;
-        display: flex !important;
-        flex-direction: column;
-        overflow: hidden;
-        position: static !important;
-        width: 100% !important;
-        height: 100% !important;
-      }
-      #messageList {
-        flex: 1;
-        overflow-y: auto;
-        min-height: 0;
-      }
-      .chat-input {
-        position: static !important;
-        width: 100% !important;
-        flex-shrink: 0;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="app-container">
-    <div class="main-container" id="mainContainer">
-      <div class="app-header">
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-          <span id="themeIcon">🌙</span>
-        </button>
-        <div class="logo-section">
-          <div class="logo-icon">
-            <img src="your-icon.jpg" alt="Gappkar Logo" class="logo-image" onerror="this.style.display='none'; this.parentNode.innerHTML='G';">
-          </div>
-          <h1 class="app-title">gappkar</h1>
-          <p class="app-subtitle">Connect with people around you</p>
-        </div>
-      </div>
-      <div id="joinView" class="active">
-        <div class="section-header">
-          <div class="section-icon">👋</div>
-          <h2 class="section-title">Join the Chat</h2>
-          <p class="section-description">Enter your info to start gapping</p>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="usernameInput">Name</label>
-          <input type="text" id="usernameInput" class="form-input" placeholder="Enter your display name" maxlength="30" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="ageInput">Age</label>
-          <input type="number" id="ageInput" class="form-input" placeholder="Enter your age" min="13" max="99" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Location</label>
-          <div class="location-options">
-            <button type="button" class="btn btn-location" id="getLocationBtn">📍 Get My Location</button>
-            <input type="text" id="locationInput" class="form-input" placeholder="Or enter your city manually" style="margin-top: 10px;">
-          </div>
-        </div>
-        <button type="button" class="btn btn-success" id="joinButton">🚀 Start Chatting</button>
-        <div id="locationStatus"></div>
-      </div>
-      <div id="chatsView" class="hidden">
-        <div class="chat-header">
-          <button class="back-button" id="backButton">←</button>
-          <div class="chat-header-info">
-            <div class="header-logo-section">
-              <div class="header-logo-icon">
-                <img src="your-icon.jpg" alt="Gappkar Logo" class="header-logo-image" onerror="this.style.display='none'; this.parentNode.innerHTML='G';">
-              </div>
-              <div class="header-app-info">
-                <div class="header-app-name">gappkar</div>
-                <div class="header-room-info">
-                  <span class="room-indicator" id="roomIndicator">Global</span>
-                  <span class="online-dot"></span>
-                  <span id="peopleCount">connecting...</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <button class="create-room-btn" id="createRoomBtn" title="Create/Join Room">+</button>
-        </div>
-        <div id="messageList"></div>
-        <div class="chat-input" id="chatInput">
-          <input type="text" class="message-input" placeholder="Type a message..." id="messageInput" maxlength="500" autocomplete="off">
-          <button class="send-button" id="sendButton">➤</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="room-modal" id="roomModal">
-    <div class="room-modal-content">
-      <button class="room-modal-close" id="roomModalClose">×</button>
-      <div class="room-modal-header">
-        <h3 class="room-modal-title">Room Manager</h3>
-        <p class="room-modal-description">Create or join a private room</p>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="roomKeyInput">Room Key</label>
-        <input type="text" id="roomKeyInput" class="form-input" placeholder="Enter room key (e.g., myroom123)" maxlength="50">
-      </div>
-      <div class="room-buttons">
-        <button class="btn-room" id="joinRoomBtn">Join Room</button>
-        <button class="btn-room primary" id="createRoomBtnModal">Create Room</button>
-      </div>
-      <div class="room-buttons" style="margin-top: 10px;">
-        <button class="btn-room" id="leaveRoomBtn" style="width: 100%;">Leave Current Room</button>
-      </div>
-    </div>
-  </div>
+// --------------------------- Gappkar Chat – UPDATED & FIXED JS ---------------------------
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { getFirestore, addDoc, collection, doc, setDoc, onSnapshot, orderBy, query, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-  <script type="module">
-    // --------------------------- Gappkar Chat – UPDATED & FIXED JS ---------------------------
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-    import { getFirestore, addDoc, collection, doc, setDoc, onSnapshot, orderBy, query, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+/* ───────────────────────── Firebase config ───────────────────────── */
+// 🚨 REMINDER: Make sure your Firestore Security Rules in the Firebase Console
+// have been updated to allow writes to the `rooms/{roomId}/messages` collection!
+const firebaseConfig = {
+  apiKey: "AIzaSyCOmLxxqPesNaBr4Z9fVIU6K2BLW6OsED0",
+  authDomain: "gappkar-v1-b3afe.firebaseapp.com",
+  databaseURL: "https://gappkar-v1-b3afe-default-rtdb.firebaseio.com",
+  projectId: "gappkar-v1-b3afe",
+  storageBucket: "gappkar-v1-b3afe.appspot.com",
+  messagingSenderId: "726018257415",
+  appId: "1:726018257415:web:12142708abdf47952af0a2",
+  measurementId: "G-EWK4436NRB"
+};
 
-    /* ───────────────────────── Firebase config ───────────────────────── */
-    const firebaseConfig = {
-      apiKey: "AIzaSyCOmLxxqPesNaBr4Z9fVIU6K2BLW6OsED0",
-      authDomain: "gappkar-v1-b3afe.firebaseapp.com",
-      databaseURL: "https://gappkar-v1-b3afe-default-rtdb.firebaseio.com",
-      projectId: "gappkar-v1-b3afe",
-      storageBucket: "gappkar-v1-b3afe.appspot.com", // ← Corrected typo
-      messagingSenderId: "726018257415",
-      appId: "1:726018257415:web:12142708abdf47952af0a2",
-      measurementId: "G-EWK4436NRB"
-    };
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
+/* ───────────────────────── Global state ───────────────────────── */
+let currentUser = null, currentUsername = "", currentUserAge = 0, currentUserLocation = "";
+let userLatitude = null, userLongitude = null, isJoined = false, currentRoom = "global";
+let messagesListener = null, presenceTimer = null, onlineListener = null;
 
-    /* ───────────────────────── Global state ───────────────────────── */
-    let currentUser = null;
-    let currentUsername = "";
-    let currentUserAge = 0;
-    let currentUserLocation = "";
-    let userLatitude = null;
-    let userLongitude = null;
-    let isJoined = false;
-    let currentRoom = "global";
-    let messagesListener = null;
-    let presenceTimer = null;
-    let onlineListener = null;
+/* ───────────────────────── DOM helpers ───────────────────────── */
+const $ = id => document.getElementById(id);
+const joinView = $("joinView"), chatsView = $("chatsView"), messageList = $("messageList");
+const messageInput = $("messageInput"), sendButton = $("sendButton"), backButton = $("backButton");
+const usernameInput = $("usernameInput"), ageInput = $("ageInput"), locationInput = $("locationInput");
+const joinButton = $("joinButton"), getLocationBtn = $("getLocationBtn"), peopleCount = $("peopleCount");
+const createRoomBtnH = $("createRoomBtn"), roomModal = $("roomModal"), roomModalClose = $("roomModalClose");
+const roomKeyInput = $("roomKeyInput"), joinRoomBtn = $("joinRoomBtn"), createRoomBtnM = $("createRoomBtnModal");
+const leaveRoomBtn = $("leaveRoomBtn"), roomIndicator = $("roomIndicator");
 
-    /* ───────────────────────── DOM helpers ───────────────────────── */
-    const $ = id => document.getElementById(id);
-    const joinView = $("joinView"), chatsView = $("chatsView"), messageList = $("messageList");
-    const messageInput = $("messageInput"), sendButton = $("sendButton"), backButton = $("backButton");
-    const usernameInput = $("usernameInput"), ageInput = $("ageInput"), locationInput = $("locationInput");
-    const joinButton = $("joinButton"), getLocationBtn = $("getLocationBtn"), peopleCount = $("peopleCount");
-    const createRoomBtnH = $("createRoomBtn"), roomModal = $("roomModal"), roomModalClose = $("roomModalClose");
-    const roomKeyInput = $("roomKeyInput"), joinRoomBtn = $("joinRoomBtn"), createRoomBtnM = $("createRoomBtnModal");
-    const leaveRoomBtn = $("leaveRoomBtn"), roomIndicator = $("roomIndicator");
+const roomMessagesRef = room => collection(db, "rooms", room, "messages");
 
-    /* ───────────────────────── Firestore paths ───────────────────────── */
-    const roomMessagesRef = room => collection(db, "rooms", room, "messages");
+/* ───────────────────────── UI utilities ───────────────────────── */
+const timeStr = ts => {
+  const d = ts?.toDate ? ts.toDate() : (ts || new Date());
+  let h = d.getHours();
+  const m = d.getMinutes().toString().padStart(2, "0");
+  const a = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  return `${h}:${m} ${a}`;
+};
+const scrollBottom = () => messageList && (messageList.scrollTop = messageList.scrollHeight);
+const updateRoomUI = () => {
+  if (!roomIndicator) return;
+  roomIndicator.textContent = currentRoom === "global" ? "Global" : currentRoom;
+  roomIndicator.style.background = currentRoom === "global" ? "var(--accent)" : "#28a745";
+};
+const addSystemMsg = txt => {
+  const div = document.createElement("div");
+  div.className = "message system";
+  div.innerHTML = `<div class="message-bubble">${txt}</div>`;
+  messageList.appendChild(div);
+  scrollBottom();
+};
 
-    /* ───────────────────────── UI utilities ───────────────────────── */
-    const timeStr = ts => {
-      const d = ts?.toDate ? ts.toDate() : (ts || new Date());
-      let h = d.getHours();
-      const m = d.getMinutes().toString().padStart(2, "0");
-      const a = h >= 12 ? "PM" : "AM";
-      h = h % 12 || 12;
-      return `${h}:${m} ${a}`;
-    };
-
-    const scrollBottom = () => messageList && (messageList.scrollTop = messageList.scrollHeight);
-
-    const updateRoomUI = () => {
-      if (!roomIndicator) return;
-      roomIndicator.textContent = currentRoom === "global" ? "Global" : currentRoom;
-      roomIndicator.style.background = currentRoom === "global" ? "var(--accent)" : "#28a745";
-    };
-
-    const addSystemMsg = txt => {
-      const div = document.createElement("div");
-      div.className = "message system";
-      div.innerHTML = `<div class="message-bubble">${txt}</div>`;
-      messageList.appendChild(div);
-      scrollBottom();
-    };
-
-    /* ───────────────────────── Presence tracking ───────────────────────── */
-    function trackPresence() {
-      if (!currentUser || !currentUsername) return;
-      const ref = doc(db, "presence", currentUser.uid);
-      const data = {
-        userId: currentUser.uid, username: currentUsername, location: currentUserLocation,
-        age: currentUserAge, room: currentRoom, lastSeen: serverTimestamp(), isOnline: true
-      };
-      setDoc(ref, data, { merge: true });
-      clearInterval(presenceTimer);
-      presenceTimer = setInterval(() => setDoc(ref, { room: currentRoom, lastSeen: serverTimestamp() }, { merge: true }), 30000);
-    }
-
-    function listenOnlineUsers() {
-      onlineListener && onlineListener();
-      onlineListener = onSnapshot(collection(db, "presence"), snap => {
-        const fiveAgo = Date.now() - 5 * 60 * 1000;
-        let roomCnt = 0;
-        snap.forEach(doc => {
-          const d = doc.data();
-          if (d.lastSeen?.toDate && d.lastSeen.toDate().getTime() > fiveAgo && d.room === currentRoom) roomCnt++;
-        });
-        peopleCount.textContent = `${roomCnt} people ${currentRoom === "global" ? "nearby" : "in " + currentRoom}`;
-      });
-    }
-    
-    /* ───────────────────────── Location Services ───────────────────────── */
-    async function getUserLocation() {
-        const statusDiv = $("locationStatus");
-        if (!navigator.geolocation) {
-            statusDiv.textContent = "Geolocation is not supported.";
-            statusDiv.className = "error";
-            return;
-        }
-        statusDiv.textContent = "Getting your location...";
-        statusDiv.className = "";
-        try {
-            const position = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
-            });
-            userLatitude = position.coords.latitude;
-            userLongitude = position.coords.longitude;
-            const locationName = await getCityFromCoordinates(userLatitude, userLongitude);
-            currentUserLocation = locationName || `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
-            statusDiv.textContent = `Location found: ${currentUserLocation}`;
-            statusDiv.className = "success";
-            locationInput.value = currentUserLocation;
-        } catch (error) {
-            statusDiv.textContent = "Could not get location. Enter manually.";
-            statusDiv.className = "error";
-        }
-    }
-
-    async function getCityFromCoordinates(lat, lon) {
-      try {
-        const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
-        return (await response.json()).city;
-      } catch (error) { return null; }
-    }
-
-    /* ───────────────────────── Room helpers ───────────────────────── */
-    function showModal() { roomModal.classList.add("show"); }
-    function hideModal() { roomModal.classList.remove("show"); roomKeyInput.value = ""; }
-
-    async function joinRoom(key) {
-      const k = key.trim().toLowerCase();
-      if (!k) return alert("Enter a room key");
-      if (k === currentRoom) return hideModal();
-      messagesListener && messagesListener();
-      currentRoom = k;
-      localStorage.setItem("gappkar_current_room", currentRoom);
-      updateRoomUI();
-      messageList.innerHTML = "";
-      addSystemMsg(`Joined room: ${currentRoom}`);
-      listenMessages();
-      trackPresence();
-      hideModal();
-    }
-
-    function leaveRoom() {
-      if (currentRoom === "global") return hideModal();
-      messagesListener && messagesListener();
-      currentRoom = "global";
-      localStorage.removeItem("gappkar_current_room");
-      updateRoomUI();
-      messageList.innerHTML = "";
-      addSystemMsg("Left room, back to global chat");
-      listenMessages();
-      trackPresence();
-      hideModal();
-    }
-
-    /* ───────────────────────── Messaging ───────────────────────── */
-    function displayMsg(d) {
-      const mine = d.user === currentUsername;
-      const div = document.createElement("div");
-      div.className = `message ${mine ? "sent" : "received"}`;
-      const time = timeStr(d.timestamp);
-      div.innerHTML = mine
-        ? `<div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>`
-        : `<div class="message-info">
-             <div class="sender-name">${d.user}${d.age ? ` (${d.age})` : ""}</div>
-             <div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>
-             ${d.location ? `<div class="message-location">📍 ${d.location}</div>` : ""}
-           </div>`;
-      messageList.appendChild(div);
-    }
-    
-    // ✅ FIXED: This function now uses docChanges() to avoid duplicating messages.
-    function listenMessages() {
-      messagesListener && messagesListener();
-      const q = query(roomMessagesRef(currentRoom), orderBy("timestamp", "asc"));
-      messagesListener = onSnapshot(q, (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          if (change.type === "added") {
-            // Remove the temporary optimistic message before adding the real one
-            const temp = messageList.querySelector('[data-temp="true"]');
-            if (temp) temp.remove();
-            displayMsg(change.doc.data());
-          }
-        });
-        scrollBottom();
-      });
-    }
-
-    async function sendMessage() {
-      const txt = messageInput.value.trim();
-      if (!txt || !isJoined) return;
-      messageInput.value = "";
-
-      // Optimistic render for better UX
-      const tempMsg = { user: currentUsername, message: txt, timestamp: new Date() };
-      const div = document.createElement("div");
-      div.className = "message sent";
-      div.dataset.temp = "true";
-      div.innerHTML = `<div class="message-bubble">${tempMsg.message}<div class="message-time">${timeStr(tempMsg.timestamp)}</div></div>`;
-      messageList.appendChild(div);
-      scrollBottom();
-      
-      try {
-        await addDoc(roomMessagesRef(currentRoom), {
-          user: currentUsername, message: txt, timestamp: serverTimestamp(),
-          location: currentUserLocation, age: currentUserAge, userId: currentUser.uid
-        });
-      } catch (e) {
-        console.error("Send failed:", e);
-        // If sending fails, remove the optimistic message
-        const tempNode = messageList.querySelector('[data-temp="true"]');
-        if (tempNode) tempNode.remove();
-        addSystemMsg("Message failed to send.");
-      }
-    }
-
-    /* ───────────────────────── Join/Logout Flow ───────────────────────── */
-    async function joinChat(name, age, loc) {
-      if (!name.trim()) return alert("Enter name");
-      if (age < 13 || age > 99) return alert("Age 13-99 only");
-      if (!loc.trim()) return alert("Enter location");
-      if (isJoined) return;
-
-      await signInAnonymously(auth);
-      currentUsername = name.trim();
-      currentUserAge = parseInt(age, 10);
-      currentUserLocation = loc.trim();
-      isJoined = true;
-
-      const savedRoom = localStorage.getItem("gappkar_current_room");
-      if (savedRoom) currentRoom = savedRoom;
-
-      joinView.classList.add("hidden");
-      chatsView.classList.remove("hidden");
-      document.body.classList.add("chat-active");
-      updateRoomUI();
-
-      messageList.innerHTML = "";
-      addSystemMsg(`Welcome ${currentUsername}!`);
-      listenMessages();
-      trackPresence();
-      listenOnlineUsers();
-
-      localStorage.setItem("gappkar_username", currentUsername);
-      localStorage.setItem("gappkar_age", currentUserAge);
-      localStorage.setItem("gappkar_location", currentUserLocation);
-      localStorage.setItem("gappkar_joined", "true");
-    }
-
-    onAuthStateChanged(auth, u => currentUser = u || null);
-
-    // ✅ FIXED: This function now properly deletes the user's presence document on logout.
-    async function logout() {
-      presenceTimer && clearInterval(presenceTimer);
-      onlineListener && onlineListener();
-      messagesListener && messagesListener();
-
-      if (currentUser) {
-        try { await deleteDoc(doc(db, "presence", currentUser.uid)); } catch(e) { console.error("Presence cleanup failed:", e) }
-      }
-
-      try { await signOut(auth); } catch {}
-
-      isJoined = false;
-      currentRoom = "global";
-      localStorage.clear();
-
-      chatsView.classList.add("hidden");
-      joinView.classList.remove("hidden");
-      document.body.classList.remove("chat-active");
-    }
-
-    /* ───────────────────────── Event wiring ───────────────────────── */
-    document.addEventListener("DOMContentLoaded", () => {
-      if (localStorage.getItem("gappkar_joined") === "true") {
-        joinChat(
-          localStorage.getItem("gappkar_username") || "",
-          localStorage.getItem("gappkar_age") || 0,
-          localStorage.getItem("gappkar_location") || ""
-        );
-      }
-      
-      getLocationBtn.addEventListener("click", getUserLocation);
-      joinButton.addEventListener("click", () => joinChat(usernameInput.value, ageInput.value, locationInput.value));
-      sendButton.addEventListener("click", sendMessage);
-      messageInput.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
-      backButton.addEventListener("click", logout);
-
-      createRoomBtnH.addEventListener("click", showModal);
-      roomModalClose.addEventListener("click", hideModal);
-      joinRoomBtn.addEventListener("click", () => joinRoom(roomKeyInput.value));
-      createRoomBtnM.addEventListener("click", () => joinRoom(roomKeyInput.value));
-      leaveRoomBtn.addEventListener("click", leaveRoom);
-      roomModal.addEventListener("click", e => { if (e.target === roomModal) hideModal(); });
+/* ───────────────── Presence & Location ────────────────── */
+function trackPresence() {
+  if (!currentUser || !currentUsername) return;
+  const ref = doc(db, "presence", currentUser.uid);
+  const data = {
+    userId: currentUser.uid, username: currentUsername, location: currentUserLocation,
+    age: currentUserAge, room: currentRoom, lastSeen: serverTimestamp(), isOnline: true
+  };
+  setDoc(ref, data, { merge: true });
+  clearInterval(presenceTimer);
+  presenceTimer = setInterval(() => setDoc(ref, { room: currentRoom, lastSeen: serverTimestamp() }, { merge: true }), 30000);
+}
+function listenOnlineUsers() {
+  onlineListener && onlineListener();
+  onlineListener = onSnapshot(collection(db, "presence"), snap => {
+    const fiveAgo = Date.now() - 5 * 60 * 1000;
+    let roomCnt = 0;
+    snap.forEach(doc => {
+      const d = doc.data();
+      if (d.lastSeen?.toDate && d.lastSeen.toDate().getTime() > fiveAgo && d.room === currentRoom) roomCnt++;
     });
-    
-  </script>
-  <script>
-    // Theme Toggle Script
-    document.addEventListener('DOMContentLoaded', function() {
-      const themeToggle = document.getElementById('themeToggle');
-      const themeIcon = document.getElementById('themeIcon');
-      function toggleTheme() {
-        const body = document.body;
-        if (body.getAttribute('data-theme') === 'dark') {
-          body.removeAttribute('data-theme');
-          if (themeIcon) themeIcon.textContent = '🌙';
-        } else {
-          body.setAttribute('data-theme', 'dark');
-          if (themeIcon) themeIcon.textContent = '☀️';
-        }
-      }
-      if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
+    peopleCount.textContent = `${roomCnt} people ${currentRoom === "global" ? "nearby" : "in " + currentRoom}`;
+  });
+}
+async function getUserLocation() {
+    const statusDiv = $("locationStatus");
+    if (!navigator.geolocation) {
+        statusDiv.textContent = "Geolocation is not supported."; statusDiv.className = "error"; return;
+    }
+    statusDiv.textContent = "Getting your location..."; statusDiv.className = "";
+    try {
+        const position = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 }));
+        userLatitude = position.coords.latitude; userLongitude = position.coords.longitude;
+        const locationName = await (async (lat, lon) => { try { const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`); return (await r.json()).city; } catch (e) { return null; } })(userLatitude, userLongitude);
+        currentUserLocation = locationName || `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
+        statusDiv.textContent = `Location found: ${currentUserLocation}`; statusDiv.className = "success";
+        locationInput.value = currentUserLocation;
+    } catch (error) {
+        statusDiv.textContent = "Could not get location. Enter manually."; statusDiv.className = "error";
+    }
+}
+
+/* ───────────────────── Room helpers ────────────────────── */
+function showModal() { roomModal.classList.add("show"); }
+function hideModal() { roomModal.classList.remove("show"); roomKeyInput.value = ""; }
+async function joinRoom(key) {
+  const k = key.trim().toLowerCase();
+  if (!k) return alert("Enter a room key");
+  if (k === currentRoom) return hideModal();
+  messagesListener && messagesListener();
+  currentRoom = k;
+  localStorage.setItem("gappkar_current_room", currentRoom);
+  updateRoomUI(); messageList.innerHTML = "";
+  addSystemMsg(`Joined room: ${currentRoom}`);
+  listenMessages(); trackPresence(); hideModal();
+}
+function leaveRoom() {
+  if (currentRoom === "global") return hideModal();
+  messagesListener && messagesListener();
+  currentRoom = "global";
+  localStorage.removeItem("gappkar_current_room");
+  updateRoomUI(); messageList.innerHTML = "";
+  addSystemMsg("Left room, back to global chat");
+  listenMessages(); trackPresence(); hideModal();
+}
+
+/* ───────────────────── Messaging ───────────────────────── */
+function displayMsg(d) {
+  const mine = d.user === currentUsername;
+  const div = document.createElement("div");
+  div.className = `message ${mine ? "sent" : "received"}`;
+  const time = timeStr(d.timestamp);
+  div.innerHTML = mine
+    ? `<div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>`
+    : `<div class="message-info"><div class="sender-name">${d.user}${d.age ? ` (${d.age})` : ""}</div><div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>${d.location ? `<div class="message-location">📍 ${d.location}</div>` : ""}</div>`;
+  messageList.appendChild(div);
+}
+function listenMessages() {
+  messagesListener && messagesListener();
+  const q = query(roomMessagesRef(currentRoom), orderBy("timestamp", "asc"));
+  messagesListener = onSnapshot(q, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+      if (change.type === "added") {
+        const temp = messageList.querySelector('[data-temp="true"]');
+        if (temp) temp.remove();
+        displayMsg(change.doc.data());
       }
     });
-  </script>
-</body>
-</html>
+    scrollBottom();
+  });
+}
+
+// ✅ UPDATED & FIXED: sendMessage function with better error feedback
+async function sendMessage() {
+  const txt = messageInput.value.trim();
+  if (!txt || !isJoined) return;
+  messageInput.value = "";
+
+  const tempId = `temp_${Date.now()}`;
+  const div = document.createElement("div");
+  div.className = "message sent";
+  div.id = tempId;
+  div.dataset.temp = "true"; // Mark as temporary
+  div.innerHTML = `<div class="message-bubble">${txt}<div class="message-time" style="opacity: 0.5;">sending...</div></div>`;
+  messageList.appendChild(div);
+  scrollBottom();
+  
+  try {
+    await addDoc(roomMessagesRef(currentRoom), {
+      user: currentUsername, message: txt, timestamp: serverTimestamp(),
+      location: currentUserLocation, age: currentUserAge, userId: currentUser.uid
+    });
+  } catch (e) {
+    console.error("Send failed:", e);
+    const failedNode = document.getElementById(tempId);
+    if (failedNode) {
+      failedNode.querySelector('.message-bubble').style.backgroundColor = '#d32f2f';
+      failedNode.querySelector('.message-time').innerText = 'Failed to send!';
+    }
+  }
+}
+
+/* ─────────────────── Join/Logout Flow ──────────────────── */
+async function joinChat(name, age, loc) {
+  if (!name.trim()) return alert("Enter name");
+  if (age < 13 || age > 99) return alert("Age 13-99 only");
+  if (!loc.trim()) return alert("Enter location");
+  if (isJoined) return;
+
+  await signInAnonymously(auth);
+  currentUsername = name.trim();
+  currentUserAge = parseInt(age, 10);
+  currentUserLocation = loc.trim();
+  isJoined = true;
+
+  const savedRoom = localStorage.getItem("gappkar_current_room");
+  if (savedRoom) currentRoom = savedRoom;
+
+  joinView.classList.add("hidden");
+  chatsView.classList.remove("hidden");
+  document.body.classList.add("chat-active");
+  updateRoomUI();
+
+  messageList.innerHTML = "";
+  addSystemMsg(`Welcome ${currentUsername}!`);
+  listenMessages(); trackPresence(); listenOnlineUsers();
+
+  localStorage.setItem("gappkar_username", currentUsername);
+  localStorage.setItem("gappkar_age", currentUserAge);
+  localStorage.setItem("gappkar_location", currentUserLocation);
+  localStorage.setItem("gappkar_joined", "true");
+}
+onAuthStateChanged(auth, u => currentUser = u || null);
+async function logout() {
+  presenceTimer && clearInterval(presenceTimer);
+  onlineListener && onlineListener();
+  messagesListener && messagesListener();
+
+  if (currentUser) {
+    try { await deleteDoc(doc(db, "presence", currentUser.uid)); } catch(e) { console.error("Presence cleanup failed:", e) }
+  }
+  try { await signOut(auth); } catch {}
+
+  isJoined = false; currentRoom = "global";
+  localStorage.clear();
+  chatsView.classList.add("hidden");
+  joinView.classList.remove("hidden");
+  document.body.classList.remove("chat-active");
+}
+
+/* ─────────────────── Event wiring ──────────────────────── */
+document.addEventListener("DOMContentLoaded", () => {
+  if (localStorage.getItem("gappkar_joined") === "true") {
+    joinChat(localStorage.getItem("gappkar_username") || "", localStorage.getItem("gappkar_age") || 0, localStorage.getItem("gappkar_location") || "");
+  }
+  
+  getLocationBtn.addEventListener("click", getUserLocation);
+  joinButton.addEventListener("click", () => joinChat(usernameInput.value, ageInput.value, locationInput.value));
+  sendButton.addEventListener("click", sendMessage);
+  messageInput.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+  backButton.addEventListener("click", logout);
+
+  createRoomBtnH.addEventListener("click", showModal);
+  roomModalClose.addEventListener("click", hideModal);
+  joinRoomBtn.addEventListener("click", () => joinRoom(roomKeyInput.value));
+  createRoomBtnM.addEventListener("click", () => joinRoom(roomKeyInput.value));
+  leaveRoomBtn.addEventListener("click", leaveRoom);
+  roomModal.addEventListener("click", e => { if (e.target === roomModal) hideModal(); });
+});
+
+// --- Theme Toggler Script ---
+// This can be in a separate <script> tag if you prefer.
+document.addEventListener('DOMContentLoaded', function() {
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  function toggleTheme() {
+    const body = document.body;
+    if (body.getAttribute('data-theme') === 'dark') {
+      body.removeAttribute('data-theme');
+      if (themeIcon) themeIcon.textContent = '🌙';
+    } else {
+      body.setAttribute('data-theme', 'dark');
+      if (themeIcon) themeIcon.textContent = '☀️';
+    }
+  }
+  if (themeToggle) { themeToggle.addEventListener('click', toggleTheme); }
+});
