@@ -19,11 +19,12 @@
             --white: #ffffff;
             --success-green: #27ae60;
             --error-red: #e74c3c;
-            --current-user-bg: #007bff;
-            --other-user-bg: #f8f9fa;
+            --sent-message-bg: #25d366;
+            --received-message-bg: #ffffff;
             --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
             --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
             --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+            --message-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
             --border-radius-sm: 8px;
             --border-radius-md: 12px;
             --border-radius-lg: 16px;
@@ -37,6 +38,7 @@
             --very-light-gray: #34495e;
             --dark-gray: #ecf0f1;
             --medium-gray: #bdc3c7;
+            --received-message-bg: #3a3a3a;
         }
 
         * {
@@ -53,6 +55,7 @@
             line-height: 1.6;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            transition: all 0.3s ease;
         }
 
         /* Modern Container */
@@ -62,6 +65,7 @@
             align-items: flex-start;
             min-height: 100vh;
             padding: 20px;
+            transition: all 0.3s ease;
         }
 
         .main-container {
@@ -72,6 +76,7 @@
             box-shadow: var(--shadow-lg);
             overflow: hidden;
             position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* App Header */
@@ -307,7 +312,7 @@
             transform: none;
         }
 
-        /* FIXED Chat Interface - Proper Layout */
+        /* ENHANCED Chat Interface */
         #chatsView {
             display: none;
             flex-direction: column;
@@ -316,146 +321,88 @@
             height: 100vh;
             max-height: 100vh;
             overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         #chatsView:not(.hidden) {
             display: flex !important;
         }
 
-        /* Chat Header - Fixed Height */
+        /* ENHANCED Chat Header with Back Button */
         .chat-header {
             background: linear-gradient(135deg, var(--primary-yellow), var(--accent-yellow));
-            padding: 16px;
+            padding: 12px 16px;
             display: flex;
-            flex-direction: column;
-            gap: 10px;
+            align-items: center;
+            gap: 12px;
             box-shadow: var(--shadow-md);
             flex-shrink: 0;
-            height: auto;
-            min-height: 120px;
+            min-height: 70px;
+            position: relative;
+            z-index: 100;
         }
 
-        .chat-header-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .chat-branding {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .chat-logo {
-            width: 32px;
-            height: 32px;
-            background: var(--white);
-            border-radius: 8px;
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow-sm);
-            overflow: hidden;
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--primary-yellow);
-            flex-shrink: 0;
-        }
-
-        .chat-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-
-        .brand-info {
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-        }
-
-        .brand-name {
-            font-size: 16px;
-            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
             color: var(--white);
-            line-height: 1;
         }
 
-        .brand-tagline {
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.8);
-            line-height: 1;
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
         }
 
-        .user-profile-section {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 2px;
-        }
-
-        .user-name-age {
+        .chat-header-info {
+            flex: 1;
             display: flex;
             align-items: center;
-            gap: 6px;
-        }
-
-        .user-name-display {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--white);
-        }
-
-        .user-age-badge {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 500;
-            color: var(--white);
-        }
-
-        .user-location-display {
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.8);
-            text-align: right;
-        }
-
-        .chat-header-bottom {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 8px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .chat-stats {
-            display: flex;
             gap: 12px;
         }
 
-        .stat-item {
+        .contact-avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--primary-yellow);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 2px;
+        }
+
+        .contact-status {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
             display: flex;
             align-items: center;
             gap: 4px;
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.9);
-            background: rgba(255, 255, 255, 0.1);
-            padding: 4px 8px;
-            border-radius: 8px;
         }
 
-        .online-indicator {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 10px;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .status-dot {
+        .online-dot {
             width: 6px;
             height: 6px;
             background: var(--success-green);
@@ -468,214 +415,220 @@
             50% { opacity: 0.5; }
         }
 
-        /* FIXED Message List - Proper Scrolling */
+        /* ENHANCED Message List with Smooth Scrolling */
         #messageList {
             flex: 1;
             padding: 16px;
             overflow-y: auto;
-            background: linear-gradient(to bottom, #fafafa, #f5f5f5);
+            background: #f0f0f0;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            -webkit-overflow-scrolling: touch;
+            gap: 12px;
             scroll-behavior: smooth;
             min-height: 0;
-            height: calc(100vh - 250px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
         }
 
+        /* ENHANCED Message Bubbles */
         .message {
-            animation: messageSlide 0.3s ease;
+            display: flex;
             width: 100%;
+            margin-bottom: 8px;
+            animation: messageSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes messageSlide {
+        @keyframes messageSlideIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(20px) scale(0.95);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
 
-        /* Current User Messages */
-        .message-wrapper.current-user-wrapper {
-            display: flex;
+        /* Sent Messages (Green Bubbles) */
+        .message.sent {
             justify-content: flex-end;
-            margin-left: 20%;
         }
 
-        .message-content.current-user-content {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            max-width: 100%;
-        }
-
-        .message-bubble.current-user-bubble {
-            background: var(--current-user-bg);
+        .message.sent .message-bubble {
+            background: var(--sent-message-bg);
             color: white;
+            border-radius: 20px 20px 5px 20px;
+            max-width: 80%;
             padding: 12px 16px;
-            border-radius: 18px 18px 4px 18px;
-            max-width: 100%;
+            box-shadow: var(--message-shadow);
+            position: relative;
             word-wrap: break-word;
-            box-shadow: var(--shadow-sm);
-            font-size: 14px;
+            font-size: 15px;
             line-height: 1.4;
         }
 
-        .message-info.current-user-info {
+        .message.sent .message-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: -8px;
+            width: 0;
+            height: 0;
+            border: 8px solid transparent;
+            border-top-color: var(--sent-message-bg);
+            border-right: none;
+            transform: rotate(45deg);
+        }
+
+        .message.sent .message-time {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
             margin-top: 4px;
             text-align: right;
         }
 
-        .message-info.current-user-info .timestamp {
-            color: var(--light-gray);
-            font-size: 11px;
-        }
-
-        /* Other User Messages */
-        .message-wrapper.other-user-wrapper {
-            display: flex;
+        /* Received Messages (White Bubbles) */
+        .message.received {
             justify-content: flex-start;
-            margin-right: 20%;
         }
 
-        .message-content.other-user-content {
+        .message.received .message-bubble {
+            background: var(--received-message-bg);
+            color: var(--dark-gray);
+            border-radius: 20px 20px 20px 5px;
+            max-width: 80%;
+            padding: 12px 16px;
+            box-shadow: var(--message-shadow);
+            position: relative;
+            word-wrap: break-word;
+            font-size: 15px;
+            line-height: 1.4;
+            border: 1px solid #e0e0e0;
+        }
+
+        .message.received .message-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -8px;
+            width: 0;
+            height: 0;
+            border: 8px solid transparent;
+            border-top-color: var(--received-message-bg);
+            border-left: none;
+            transform: rotate(-45deg);
+        }
+
+        .message.received .message-info {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            max-width: 100%;
         }
 
-        .message-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .message.received .sender-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary-yellow);
             margin-bottom: 4px;
         }
 
-        .username {
-            background: var(--dark-gray);
-            color: white;
-            padding: 3px 8px;
-            border-radius: var(--border-radius-sm);
+        .message.received .message-time {
             font-size: 11px;
-            font-weight: 500;
-        }
-
-        .user-age {
-            background: rgba(0, 123, 255, 0.1);
-            color: #007bff;
-            padding: 2px 6px;
-            border-radius: var(--border-radius-sm);
-            font-size: 10px;
-            font-weight: 500;
-        }
-
-        .timestamp {
-            color: var(--light-gray);
-            font-size: 11px;
-        }
-
-        .message-bubble.other-user-bubble {
-            background: var(--other-user-bg);
-            color: var(--dark-gray);
-            border: 1px solid #e9ecef;
-            padding: 12px 16px;
-            border-radius: 18px 18px 18px 4px;
-            max-width: 100%;
-            word-wrap: break-word;
-            box-shadow: var(--shadow-sm);
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .message-location {
-            font-size: 10px;
             color: var(--light-gray);
             margin-top: 4px;
         }
 
-        /* FIXED Chat Input - Always Visible at Bottom */
+        /* ENHANCED Chat Input Bar */
         .chat-input {
             background: var(--white);
-            border-top: 1px solid var(--very-light-gray);
-            padding: 16px;
+            border-top: 1px solid #e0e0e0;
+            padding: 12px 16px;
             flex-shrink: 0;
-            position: sticky;
-            bottom: 0;
-            z-index: 1000;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-        }
-
-        .input-container {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: var(--very-light-gray);
-            border-radius: 24px;
-            padding: 8px 12px;
-            width: 100%;
-            transition: all 0.3s ease;
-            min-height: 48px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: sticky;
+            bottom: 0;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .input-container:focus-within {
-            background: white;
-            box-shadow: var(--shadow-md);
-            border: 2px solid var(--primary-yellow);
-            padding: 6px 10px;
+        .input-container {
+            flex: 1;
+            position: relative;
         }
 
         .message-input {
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 12px 16px;
-            background: transparent;
-            color: var(--dark-gray);
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
             font-size: 16px;
             font-family: inherit;
+            color: var(--dark-gray);
+            background: var(--white);
+            outline: none;
+            transition: all 0.3s ease;
             resize: none;
-            min-height: 24px;
+            min-height: 44px;
+            max-height: 120px;
+        }
+
+        .message-input:focus {
+            border-color: var(--primary-yellow);
+            box-shadow: 0 0 0 3px rgba(244, 208, 63, 0.1);
         }
 
         .message-input::placeholder {
             color: var(--light-gray);
         }
 
-        .send-btn {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary-yellow), var(--accent-yellow));
+        .send-button {
+            width: 44px;
+            height: 44px;
+            background: var(--sent-message-bg);
             border: none;
             border-radius: 50%;
-            color: var(--white);
+            color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--message-shadow);
             transition: all 0.3s ease;
-            font-size: 16px;
+            font-size: 18px;
             flex-shrink: 0;
         }
 
-        .send-btn:hover:not(:disabled) {
-            transform: scale(1.05);
-            box-shadow: var(--shadow-lg);
+        .send-button:hover:not(:disabled) {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-md);
         }
 
-        .send-btn:disabled {
+        .send-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
+        }
+
+        /* Mobile Keyboard Behavior */
+        .keyboard-active {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .keyboard-active #messageList {
+            padding-bottom: 20px;
+        }
+
+        .keyboard-active .chat-input {
+            transform: translateY(0);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 10000;
         }
 
         /* Desktop Responsive */
@@ -692,7 +645,7 @@
             }
             
             #messageList {
-                height: calc(600px - 200px);
+                height: calc(600px - 140px);
                 max-height: 400px;
             }
             
@@ -702,7 +655,7 @@
             }
         }
 
-        /* FIXED Mobile Responsive - Keyboard Handling */
+        /* ENHANCED Mobile Responsive */
         @media (max-width: 480px) {
             body {
                 margin: 0;
@@ -741,14 +694,13 @@
                 flex-direction: column;
             }
             
-            /* Fixed mobile message list height */
             #messageList {
-                height: calc(100vh - 200px);
+                height: calc(100vh - 140px);
                 flex: 1;
                 min-height: 0;
             }
             
-            /* FIXED Mobile Input - Always at Bottom Above Keyboard */
+            /* Enhanced Mobile Input Positioning */
             .chat-input {
                 position: fixed !important;
                 bottom: 0 !important;
@@ -757,25 +709,21 @@
                 width: 100vw !important;
                 z-index: 10000 !important;
                 background: var(--white) !important;
-                border-top: 1px solid var(--very-light-gray);
-                padding: 16px !important;
+                border-top: 1px solid #e0e0e0;
+                padding: 12px 16px !important;
                 box-shadow: 0 -4px 20px rgba(0,0,0,0.15) !important;
-                transform: translateZ(0);
             }
             
-            /* Keyboard open adjustments */
-            .keyboard-open .chat-input {
+            /* Keyboard adjustments */
+            .keyboard-active .chat-input {
                 position: fixed !important;
                 bottom: 0 !important;
-                padding-bottom: 20px !important;
+                transform: translateY(0) !important;
+                padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
             }
             
-            .message-wrapper.current-user-wrapper {
-                margin-left: 15%;
-            }
-            
-            .message-wrapper.other-user-wrapper {
-                margin-right: 15%;
+            .keyboard-active #messageList {
+                padding-bottom: 80px;
             }
         }
 
@@ -783,9 +731,20 @@
         @supports (-webkit-touch-callout: none) {
             @media (max-width: 480px) {
                 .chat-input {
+                    padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+                }
+                
+                .keyboard-active .chat-input {
                     padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
                 }
             }
+        }
+
+        /* Smooth transitions for all elements */
+        * {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>
@@ -865,67 +824,49 @@
                 <div id="locationStatus"></div>
             </div>
 
-            <!-- Chat Interface -->
+            <!-- ENHANCED Chat Interface -->
             <div id="chatsView" class="hidden">
+                <!-- Enhanced Chat Header with Back Button -->
                 <div class="chat-header">
-                    <div class="chat-header-top">
-                        <div class="chat-branding">
-                            <div class="chat-logo">
-                                <img src="mylogo.png" alt="Gappkar Logo" onerror="this.style.display='none'; this.parentNode.innerHTML='G';">
-                            </div>
-                            <div class="brand-info">
-                                <div class="brand-name">gappkar</div>
-                                <div class="brand-tagline">Connect Locally</div>
-                            </div>
+                    <button class="back-button" id="backButton" onclick="logout()">
+                        ←
+                    </button>
+                    
+                    <div class="chat-header-info">
+                        <div class="contact-avatar">
+                            <img src="mylogo.png" alt="Chat" onerror="this.style.display='none'; this.parentNode.innerHTML='💬';">
                         </div>
                         
-                        <div class="user-profile-section">
-                            <div class="user-name-age">
-                                <span class="user-name-display" id="userNameDisplay">User</span>
-                                <span class="user-age-badge" id="userAgeDisplay">25</span>
-                            </div>
-                            <div class="user-location-display" id="userLocationDisplay">Mangalagiri, AP</div>
-                        </div>
-                    </div>
-                    
-                    <div class="chat-header-bottom">
-                        <div class="chat-stats">
-                            <div class="stat-item">
-                                <span>👥</span>
+                        <div class="contact-info">
+                            <div class="contact-name">Local Chat</div>
+                            <div class="contact-status">
+                                <span class="online-dot"></span>
                                 <span id="peopleCount">12 people nearby</span>
                             </div>
-                            <div class="stat-item">
-                                <span>💬</span>
-                                <span id="messageCount">0 messages</span>
-                            </div>
-                        </div>
-                        <div class="online-indicator">
-                            <span class="status-dot"></span>
-                            <span>Online</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Messages area -->
+                <!-- Enhanced Messages Area -->
                 <div id="messageList">
-                    <!-- Messages will appear here -->
+                    <!-- Sample messages will appear here -->
                 </div>
 
-                <!-- Fixed Input -->
+                <!-- Enhanced Input Bar -->
                 <div class="chat-input" id="chatInput">
                     <div class="input-container">
                         <input 
                             type="text" 
                             class="message-input" 
-                            placeholder="Type your message here..." 
+                            placeholder="Type a message..." 
                             id="messageInput"
                             maxlength="500"
                             autocomplete="off"
                         >
-                        <button class="send-btn" id="sendButton">
-                            ➤
-                        </button>
                     </div>
+                    <button class="send-button" id="sendButton">
+                        ➤
+                    </button>
                 </div>
             </div>
         </div>
@@ -934,8 +875,105 @@
     <!-- Firebase Integration Script -->
     <script type="module" src="main.js"></script>
     
-    <!-- Theme Toggle Function -->
+    <!-- Enhanced Mobile Keyboard Script -->
     <script>
+        // Enhanced mobile keyboard handling
+        function setupEnhancedKeyboardHandling() {
+            const messageInput = document.getElementById('messageInput');
+            const chatInput = document.getElementById('chatInput');
+            const messageList = document.getElementById('messageList');
+            const chatsView = document.getElementById('chatsView');
+            
+            if (!messageInput || !chatInput || !messageList) return;
+
+            let initialViewportHeight = window.innerHeight;
+            let isKeyboardOpen = false;
+
+            // Smooth scroll to bottom
+            function smoothScrollToBottom() {
+                requestAnimationFrame(() => {
+                    messageList.scrollTo({
+                        top: messageList.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+
+            // Handle keyboard open/close
+            function handleKeyboardToggle() {
+                const currentHeight = window.innerHeight;
+                const heightDifference = initialViewportHeight - currentHeight;
+                
+                if (heightDifference > 150 && !isKeyboardOpen) {
+                    // Keyboard opened
+                    isKeyboardOpen = true;
+                    document.body.classList.add('keyboard-active');
+                    
+                    // Adjust layout for mobile
+                    if (window.innerWidth <= 480) {
+                        messageList.style.height = `calc(100vh - 140px - ${heightDifference}px)`;
+                        setTimeout(() => smoothScrollToBottom(), 300);
+                    }
+                    
+                } else if (heightDifference <= 150 && isKeyboardOpen) {
+                    // Keyboard closed
+                    isKeyboardOpen = false;
+                    document.body.classList.remove('keyboard-active');
+                    
+                    if (window.innerWidth <= 480) {
+                        messageList.style.height = 'calc(100vh - 140px)';
+                    }
+                }
+            }
+
+            // Visual Viewport API for better keyboard detection
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', () => {
+                    const viewport = window.visualViewport;
+                    const keyboardHeight = window.innerHeight - viewport.height;
+                    
+                    if (keyboardHeight > 150 && !isKeyboardOpen) {
+                        isKeyboardOpen = true;
+                        document.body.classList.add('keyboard-active');
+                        
+                        if (window.innerWidth <= 480) {
+                            messageList.style.height = `calc(100vh - 140px - ${keyboardHeight}px)`;
+                            setTimeout(() => smoothScrollToBottom(), 300);
+                        }
+                        
+                    } else if (keyboardHeight <= 150 && isKeyboardOpen) {
+                        isKeyboardOpen = false;
+                        document.body.classList.remove('keyboard-active');
+                        
+                        if (window.innerWidth <= 480) {
+                            messageList.style.height = 'calc(100vh - 140px)';
+                        }
+                    }
+                });
+            } else {
+                // Fallback for older browsers
+                window.addEventListener('resize', handleKeyboardToggle);
+            }
+
+            // Input focus handling
+            messageInput.addEventListener('focus', () => {
+                setTimeout(() => {
+                    smoothScrollToBottom();
+                    if (window.innerWidth <= 480) {
+                        messageInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 400);
+            });
+
+            // Scroll when typing
+            messageInput.addEventListener('input', () => {
+                if (isKeyboardOpen) {
+                    smoothScrollToBottom();
+                }
+            });
+        }
+
+        // Theme toggle function
         function toggleTheme() {
             const body = document.body;
             const themeIcon = document.getElementById('themeIcon');
@@ -954,6 +992,9 @@
             if (themeToggle) {
                 themeToggle.addEventListener('click', toggleTheme);
             }
+            
+            // Setup enhanced keyboard handling
+            setupEnhancedKeyboardHandling();
         });
     </script>
 </body>
