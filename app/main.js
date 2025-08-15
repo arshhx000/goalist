@@ -30,7 +30,7 @@ let userLongitude = null;
 let isJoined = false;
 let messageCount = 0;
 
-// NEW: Room variables
+// Room variables
 let currentRoom = "global"; // Default to global chat
 let messagesListener = null;
 
@@ -52,16 +52,15 @@ const ageInput = document.getElementById("ageInput");
 const locationInput = document.getElementById("locationInput");
 const joinButton = document.getElementById("joinButton");
 const getLocationBtn = document.getElementById("getLocationBtn");
-const chatContactName = document.getElementById("contactName");
 const peopleCount = document.getElementById("peopleCount");
 
-// NEW: Room DOM elements
+// Updated Room DOM elements
 const createRoomBtnHeader = document.getElementById("createRoomBtn");
 const roomModal = document.getElementById("roomModal");
 const roomModalClose = document.getElementById("roomModalClose");
 const roomKeyInput = document.getElementById("roomKeyInput");
 const joinRoomBtn = document.getElementById("joinRoomBtn");
-const createRoomBtn = document.getElementById("createRoomBtn");
+const createRoomBtnModal = document.getElementById("createRoomBtnModal"); // Updated ID
 const leaveRoomBtn = document.getElementById("leaveRoomBtn");
 const roomIndicator = document.getElementById("roomIndicator");
 
@@ -87,24 +86,35 @@ function smoothScrollToBottom() {
     }
 }
 
-// NEW: Room Management Functions
+// Room Management Functions
 function showRoomModal() {
-    roomModal.classList.add('show');
+    if (roomModal) {
+        roomModal.classList.add('show');
+    }
 }
 
 function hideRoomModal() {
-    roomModal.classList.remove('show');
-    roomKeyInput.value = '';
+    if (roomModal) {
+        roomModal.classList.remove('show');
+        if (roomKeyInput) {
+            roomKeyInput.value = '';
+        }
+    }
 }
 
 function updateRoomUI() {
-    if (currentRoom === "global") {
-        chatContactName.textContent = "Global Chat";
-        roomIndicator.textContent = "🌐";
-    } else {
-        chatContactName.textContent = `Room: ${currentRoom}`;
-        roomIndicator.textContent = "🔒";
+    // Update room indicator in header
+    if (roomIndicator) {
+        if (currentRoom === "global") {
+            roomIndicator.textContent = "Global";
+            roomIndicator.style.background = "var(--accent)";
+        } else {
+            roomIndicator.textContent = currentRoom;
+            roomIndicator.style.background = "#28a745"; // Green for private rooms
+        }
     }
+    
+    console.log(`🎯 UI updated for room: ${currentRoom}`);
 }
 
 async function createOrJoinRoom(roomKey) {
@@ -112,14 +122,20 @@ async function createOrJoinRoom(roomKey) {
         alert("Please enter a room key");
         return;
     }
-
+    
     const sanitizedRoomKey = roomKey.trim().toLowerCase();
+    
+    // Don't rejoin the same room
+    if (sanitizedRoomKey === currentRoom) {
+        hideRoomModal();
+        return;
+    }
     
     // Stop current message listener
     if (messagesListener) {
         messagesListener();
     }
-
+    
     // Update current room
     currentRoom = sanitizedRoomKey;
     
@@ -133,6 +149,11 @@ async function createOrJoinRoom(roomKey) {
     // Start listening to room messages
     listenForMessages();
     
+    // Update presence with new room
+    if (currentUser && isJoined) {
+        trackUserPresence();
+    }
+    
     // Hide modal
     hideRoomModal();
     
@@ -143,11 +164,17 @@ async function createOrJoinRoom(roomKey) {
 }
 
 function leaveRoom() {
+    // Don't leave if already in global
+    if (currentRoom === "global") {
+        hideRoomModal();
+        return;
+    }
+    
     // Stop current message listener
     if (messagesListener) {
         messagesListener();
     }
-
+    
     // Reset to global
     currentRoom = "global";
     
@@ -161,6 +188,11 @@ function leaveRoom() {
     // Start listening to global messages
     listenForMessages();
     
+    // Update presence with new room
+    if (currentUser && isJoined) {
+        trackUserPresence();
+    }
+    
     // Hide modal
     hideRoomModal();
     
@@ -170,7 +202,7 @@ function leaveRoom() {
     console.log("✅ Left room, back to global chat");
 }
 
-// NEW: Add system message
+// Add system message
 function addSystemMessage(text) {
     const systemMsg = {
         user: "System",
@@ -196,7 +228,7 @@ function trackUserPresence() {
         username: currentUsername,
         location: currentUserLocation,
         age: currentUserAge,
-        room: currentRoom, // NEW: Track current room
+        room: currentRoom,
         lastSeen: serverTimestamp(),
         isOnline: true,
         joinedAt: serverTimestamp()
@@ -208,12 +240,17 @@ function trackUserPresence() {
         console.error("❌ Error tracking presence:", error);
     });
     
+    // Clear existing interval
+    if (presenceUpdateInterval) {
+        clearInterval(presenceUpdateInterval);
+    }
+    
     // Update presence every 30 seconds
     presenceUpdateInterval = setInterval(() => {
         if (isJoined && currentUser) {
             const updateData = {
                 ...userPresenceData,
-                room: currentRoom, // Update current room
+                room: currentRoom,
                 lastSeen: serverTimestamp()
             };
             
@@ -231,6 +268,10 @@ function listenForOnlineUsers() {
     console.log("🔍 Starting to listen for online users...");
     
     const presenceRef = collection(db, "presence");
+    
+    if (onlineUsersListener) {
+        onlineUsersListener();
+    }
     
     onlineUsersListener = onSnapshot(presenceRef, (querySnapshot) => {
         console.log("📡 Received presence update, total docs:", querySnapshot.size);
@@ -281,15 +322,19 @@ function getUserLocation() {
     const statusDiv = document.getElementById('locationStatus');
     
     if (!navigator.geolocation) {
-      statusDiv.textContent = "Geolocation is not supported by this browser";
-      statusDiv.className = "error";
+      if (statusDiv) {
+        statusDiv.textContent = "Geolocation is not supported by this browser";
+        statusDiv.className = "error";
+      }
       reject("Geolocation not supported");
       return;
     }
-
-    statusDiv.textContent = "Getting your location...";
-    statusDiv.className = "";
-
+    
+    if (statusDiv) {
+      statusDiv.textContent = "Getting your location...";
+      statusDiv.className = "";
+    }
+    
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         userLatitude = position.coords.latitude;
@@ -299,15 +344,21 @@ function getUserLocation() {
           const locationName = await getCityFromCoordinates(userLatitude, userLongitude);
           currentUserLocation = locationName || `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
           
-          statusDiv.textContent = `Location found: ${currentUserLocation}`;
-          statusDiv.className = "success";
+          if (statusDiv) {
+            statusDiv.textContent = `Location found: ${currentUserLocation}`;
+            statusDiv.className = "success";
+          }
           
-          document.getElementById('locationInput').value = currentUserLocation;
+          if (locationInput) {
+            locationInput.value = currentUserLocation;
+          }
           resolve(currentUserLocation);
         } catch (error) {
           currentUserLocation = `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
-          statusDiv.textContent = `Location: ${currentUserLocation}`;
-          statusDiv.className = "success";
+          if (statusDiv) {
+            statusDiv.textContent = `Location: ${currentUserLocation}`;
+            statusDiv.className = "success";
+          }
           resolve(currentUserLocation);
         }
       },
@@ -327,8 +378,10 @@ function getUserLocation() {
             errorMessage = "An unknown error occurred";
         }
         
-        statusDiv.textContent = errorMessage;
-        statusDiv.className = "error";
+        if (statusDiv) {
+          statusDiv.textContent = errorMessage;
+          statusDiv.className = "error";
+        }
         reject(errorMessage);
       }
     );
@@ -407,7 +460,9 @@ async function joinChat(username, age, location) {
     // Switch views
     const mainContainer = document.getElementById("mainContainer");
     
-    mainContainer.classList.add("chat-active");
+    if (mainContainer) {
+      mainContainer.classList.add("chat-active");
+    }
     joinView.classList.add("hidden");
     chatsView.classList.remove("hidden");
     document.body.classList.add("chat-active");
@@ -466,7 +521,7 @@ async function sendMessage() {
         location: currentUserLocation,
         age: currentUserAge,
         userId: currentUser.uid,
-        room: currentRoom, // NEW: Include room
+        room: currentRoom,
         isTemp: true
     };
     
@@ -482,7 +537,7 @@ async function sendMessage() {
             location: currentUserLocation,
             age: currentUserAge,
             userId: currentUser.uid,
-            room: currentRoom, // NEW: Include room
+            room: currentRoom,
             latitude: userLatitude,
             longitude: userLongitude
         });
@@ -505,7 +560,7 @@ function listenForMessages() {
   if (messagesListener) {
     messagesListener();
   }
-
+  
   const messagesRef = collection(db, "messages");
   const q = query(
     messagesRef,
@@ -537,7 +592,6 @@ function listenForMessages() {
 // Enhanced display message
 function displayMessage(messageData) {
   const messageContainer = document.getElementById("messageList");
-  
   const isCurrentUser = messageData.user === currentUsername;
   const isSystem = messageData.isSystem || messageData.user === "System";
   
@@ -620,11 +674,9 @@ function logout() {
   if (presenceUpdateInterval) {
     clearInterval(presenceUpdateInterval);
   }
-  
   if (onlineUsersListener) {
     onlineUsersListener();
   }
-  
   if (messagesListener) {
     messagesListener();
   }
@@ -633,6 +685,11 @@ function logout() {
   chatsView.classList.add("hidden");
   joinView.classList.remove("hidden");
   document.body.classList.remove("chat-active");
+  
+  const mainContainer = document.getElementById("mainContainer");
+  if (mainContainer) {
+    mainContainer.classList.remove("chat-active");
+  }
   
   // Clear data
   localStorage.clear();
@@ -699,7 +756,7 @@ document.addEventListener("DOMContentLoaded", function() {
     backButton.addEventListener("click", logout);
   }
   
-  // NEW: Room management event listeners
+  // Room management event listeners
   if (createRoomBtnHeader) {
     createRoomBtnHeader.addEventListener("click", showRoomModal);
   }
@@ -713,15 +770,20 @@ document.addEventListener("DOMContentLoaded", function() {
       const roomKey = roomKeyInput?.value.trim();
       if (roomKey) {
         createOrJoinRoom(roomKey);
+      } else {
+        alert("Please enter a room key");
       }
     });
   }
   
-  if (createRoomBtn) {
-    createRoomBtn.addEventListener("click", () => {
+  // Fixed: Use correct ID for modal create button
+  if (createRoomBtnModal) {
+    createRoomBtnModal.addEventListener("click", () => {
       const roomKey = roomKeyInput?.value.trim();
       if (roomKey) {
         createOrJoinRoom(roomKey);
+      } else {
+        alert("Please enter a room key");
       }
     });
   }
@@ -747,10 +809,29 @@ document.addEventListener("DOMContentLoaded", function() {
         const roomKey = roomKeyInput.value.trim();
         if (roomKey) {
           createOrJoinRoom(roomKey);
+        } else {
+          alert("Please enter a room key");
         }
       }
     });
   }
+  
+  // Listen for custom events from HTML modal (additional support)
+  window.addEventListener('joinRoom', (e) => {
+    if (e.detail && e.detail.roomKey) {
+      createOrJoinRoom(e.detail.roomKey);
+    }
+  });
+  
+  window.addEventListener('createRoom', (e) => {
+    if (e.detail && e.detail.roomKey) {
+      createOrJoinRoom(e.detail.roomKey);
+    }
+  });
+  
+  window.addEventListener('leaveRoom', () => {
+    leaveRoom();
+  });
   
   // Form navigation with Enter key
   if (usernameInput) {
@@ -761,7 +842,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
   }
-
+  
   if (ageInput) {
     ageInput.addEventListener("keypress", function(e) {
       if (e.key === "Enter") {
@@ -770,7 +851,7 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
   }
-
+  
   if (locationInput) {
     locationInput.addEventListener("keypress", function(e) {
       if (e.key === "Enter") {
