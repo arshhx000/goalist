@@ -20,6 +20,7 @@
       --border-thin: 1.5px solid #000;
       --system-bg: #f5f5f5;
       --system-text: #666666;
+      --modal-bg: rgba(0, 0, 0, 0.8);
     }
 
     [data-theme="dark"] {
@@ -32,6 +33,7 @@
       --border-thin: 1.5px solid #fff;
       --system-bg: #1a1a1a;
       --system-text: #cccccc;
+      --modal-bg: rgba(255, 255, 255, 0.8);
     }
 
     * {
@@ -373,6 +375,151 @@
       50% { opacity: 0.5; }
     }
 
+    /* NEW: Create Room Button */
+    .create-room-btn {
+      border: var(--border-thin);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      font-size: 16px;
+      color: var(--text-dark);
+      transition: background 0.2s ease;
+    }
+
+    .create-room-btn:hover {
+      background: var(--accent);
+      color: var(--text-light);
+    }
+
+    /* NEW: Room Modal */
+    .room-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: var(--modal-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .room-modal.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .room-modal-content {
+      background: var(--bg-light);
+      border: var(--border-thin);
+      border-radius: var(--border-radius);
+      padding: 24px;
+      max-width: 350px;
+      width: 90%;
+      position: relative;
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+    }
+
+    .room-modal.show .room-modal-content {
+      transform: scale(1);
+    }
+
+    .room-modal-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .room-modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+    }
+
+    .room-modal-description {
+      font-size: 14px;
+      color: var(--gray);
+    }
+
+    .room-modal-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: transparent;
+      border: var(--border-thin);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--text-dark);
+    }
+
+    .room-modal-close:hover {
+      background: var(--accent);
+      color: var(--text-light);
+    }
+
+    .room-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn-room {
+      flex: 1;
+      padding: 12px;
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      cursor: pointer;
+      border: var(--border-thin);
+      transition: background 0.2s ease;
+      font-family: inherit;
+      background: transparent;
+      color: var(--text-dark);
+    }
+
+    .btn-room:hover {
+      background: var(--accent);
+      color: var(--text-light);
+    }
+
+    .btn-room.primary {
+      background: var(--bg-dark);
+      color: var(--text-light);
+    }
+
+    .btn-room.primary:hover {
+      background: var(--accent);
+    }
+
+    .room-indicator {
+      background: var(--accent);
+      color: var(--text-light);
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
     /* Enhanced Message List */
     #messageList {
       flex: 1;
@@ -536,48 +683,7 @@
       cursor: not-allowed;
     }
 
-    /* Mobile Keyboard Behavior */
-    .keyboard-active {
-      transition: all 0.3s ease;
-    }
-
-    .keyboard-active #messageList {
-      padding-bottom: 20px;
-    }
-
-    .keyboard-active .chat-input {
-      transform: translateY(0);
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 10000;
-    }
-
-    /* Desktop Responsive */
-    @media (min-width: 481px) {
-      #chatsView:not(.hidden) {
-        position: relative !important;
-        top: auto !important;
-        left: auto !important;
-        width: 100% !important;
-        height: 600px !important;
-        max-height: 600px !important;
-        z-index: auto !important;
-      }
-      
-      #messageList {
-        height: calc(600px - 120px);
-        max-height: 400px;
-      }
-      
-      .chat-input {
-        position: sticky;
-        bottom: 0;
-      }
-    }
-
-    /* Enhanced Mobile Responsive */
+    /* Mobile Responsive */
     @media (max-width: 480px) {
       body {
         margin: 0;
@@ -623,7 +729,6 @@
         min-height: 0;
       }
       
-      /* Enhanced Mobile Input Positioning */
       .chat-input {
         position: fixed !important;
         bottom: 0 !important;
@@ -634,31 +739,6 @@
         background: var(--bg-light) !important;
         border-top: var(--border-thin);
         padding: 10px 16px !important;
-      }
-      
-      /* Keyboard adjustments */
-      .keyboard-active .chat-input {
-        position: fixed !important;
-        bottom: 0 !important;
-        transform: translateY(0) !important;
-        padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
-      }
-      
-      .keyboard-active #messageList {
-        padding-bottom: 80px;
-      }
-    }
-
-    /* iOS specific fixes */
-    @supports (-webkit-touch-callout: none) {
-      @media (max-width: 480px) {
-        .chat-input {
-          padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
-        }
-        
-        .keyboard-active .chat-input {
-          padding-bottom: max(20px, env(safe-area-inset-bottom)) !important;
-        }
       }
     }
 
@@ -722,15 +802,19 @@
         <div class="chat-header">
           <button class="back-button" id="backButton" onclick="logout()">←</button>
           <div class="chat-header-info">
-            <div class="contact-avatar">💬</div>
+            <div class="contact-avatar" id="roomIndicator">🌐</div>
             <div class="contact-info">
-              <div class="contact-name" id="contactName">Local Chat</div>
+              <div class="contact-name" id="contactName">Global Chat</div>
               <div class="contact-status">
                 <span class="online-dot"></span>
                 <span id="peopleCount">0 people nearby</span>
               </div>
             </div>
           </div>
+          <!-- NEW: Create Room Button -->
+          <button class="create-room-btn" id="createRoomBtn" title="Create/Join Room">
+            +
+          </button>
         </div>
 
         <div id="messageList"></div>
@@ -739,6 +823,31 @@
           <input type="text" class="message-input" placeholder="Type a message..." id="messageInput" maxlength="500" autocomplete="off">
           <button class="send-button" id="sendButton">➤</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW: Room Modal -->
+  <div class="room-modal" id="roomModal">
+    <div class="room-modal-content">
+      <button class="room-modal-close" id="roomModalClose">×</button>
+      <div class="room-modal-header">
+        <h3 class="room-modal-title">Room Manager</h3>
+        <p class="room-modal-description">Create or join a private room</p>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="roomKeyInput">Room Key</label>
+        <input type="text" id="roomKeyInput" class="form-input" placeholder="Enter room key (e.g., myroom123)" maxlength="50">
+      </div>
+
+      <div class="room-buttons">
+        <button class="btn-room" id="joinRoomBtn">Join Room</button>
+        <button class="btn-room primary" id="createRoomBtn">Create Room</button>
+      </div>
+
+      <div class="room-buttons" style="margin-top: 10px;">
+        <button class="btn-room" id="leaveRoomBtn" style="width: 100%;">Leave Current Room</button>
       </div>
     </div>
   </div>
@@ -761,100 +870,11 @@
       }
     }
 
-    // Enhanced mobile keyboard handling
-    function setupEnhancedKeyboardHandling() {
-      const messageInput = document.getElementById('messageInput');
-      const chatInput = document.getElementById('chatInput');
-      const messageList = document.getElementById('messageList');
-      
-      if (!messageInput || !chatInput || !messageList) return;
-
-      let initialViewportHeight = window.innerHeight;
-      let isKeyboardOpen = false;
-
-      function smoothScrollToBottom() {
-        requestAnimationFrame(() => {
-          messageList.scrollTo({
-            top: messageList.scrollHeight,
-            behavior: 'smooth'
-          });
-        });
-      }
-
-      function handleKeyboardToggle() {
-        const currentHeight = window.innerHeight;
-        const heightDifference = initialViewportHeight - currentHeight;
-        
-        if (heightDifference > 150 && !isKeyboardOpen) {
-          isKeyboardOpen = true;
-          document.body.classList.add('keyboard-active');
-          
-          if (window.innerWidth <= 480) {
-            messageList.style.height = `calc(100vh - 120px - ${heightDifference}px)`;
-            setTimeout(() => smoothScrollToBottom(), 300);
-          }
-          
-        } else if (heightDifference <= 150 && isKeyboardOpen) {
-          isKeyboardOpen = false;
-          document.body.classList.remove('keyboard-active');
-          
-          if (window.innerWidth <= 480) {
-            messageList.style.height = 'calc(100vh - 120px)';
-          }
-        }
-      }
-
-      if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', () => {
-          const viewport = window.visualViewport;
-          const keyboardHeight = window.innerHeight - viewport.height;
-          
-          if (keyboardHeight > 150 && !isKeyboardOpen) {
-            isKeyboardOpen = true;
-            document.body.classList.add('keyboard-active');
-            
-            if (window.innerWidth <= 480) {
-              messageList.style.height = `calc(100vh - 120px - ${keyboardHeight}px)`;
-              setTimeout(() => smoothScrollToBottom(), 300);
-            }
-            
-          } else if (keyboardHeight <= 150 && isKeyboardOpen) {
-            isKeyboardOpen = false;
-            document.body.classList.remove('keyboard-active');
-            
-            if (window.innerWidth <= 480) {
-              messageList.style.height = 'calc(100vh - 120px)';
-            }
-          }
-        });
-      } else {
-        window.addEventListener('resize', handleKeyboardToggle);
-      }
-
-      messageInput.addEventListener('focus', () => {
-        setTimeout(() => {
-          smoothScrollToBottom();
-          if (window.innerWidth <= 480) {
-            messageInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        }, 400);
-      });
-
-      messageInput.addEventListener('input', () => {
-        if (isKeyboardOpen) {
-          smoothScrollToBottom();
-        }
-      });
-    }
-
     document.addEventListener('DOMContentLoaded', function() {
       const themeToggle = document.getElementById('themeToggle');
       if (themeToggle) {
         themeToggle.addEventListener('click', toggleTheme);
       }
-      
-      // Setup enhanced keyboard handling
-      setupEnhancedKeyboardHandling();
     });
   </script>
 </body>
