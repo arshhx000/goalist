@@ -35,7 +35,6 @@ const joinButton = $("joinButton"), getLocationBtn = $("getLocationBtn"), people
 const createRoomBtnH = $("createRoomBtn"), roomModal = $("roomModal"), roomModalClose = $("roomModalClose");
 const roomKeyInput = $("roomKeyInput"), joinRoomBtn = $("joinRoomBtn"), createRoomBtnM = $("createRoomBtnModal");
 const leaveRoomBtn = $("leaveRoomBtn"), roomIndicator = $("roomIndicator");
-
 const roomMessagesRef = room => collection(db, "rooms", room, "messages");
 
 /* ───────────────────────── UI utilities ───────────────────────── */
@@ -47,12 +46,25 @@ const timeStr = ts => {
   h = h % 12 || 12;
   return `${h}:${m} ${a}`;
 };
-const scrollBottom = () => messageList && (messageList.scrollTop = messageList.scrollHeight);
+
+const scrollBottom = () => {
+  if (messageList) {
+    messageList.scrollTop = messageList.scrollHeight;
+    // Enhanced mobile scrolling
+    if (window.innerWidth <= 480 && document.body.classList.contains('keyboard-visible')) {
+      setTimeout(() => {
+        messageList.scrollTop = messageList.scrollHeight;
+      }, 100);
+    }
+  }
+};
+
 const updateRoomUI = () => {
   if (!roomIndicator) return;
   roomIndicator.textContent = currentRoom === "global" ? "Global" : currentRoom;
   roomIndicator.style.background = currentRoom === "global" ? "var(--accent)" : "#28a745";
 };
+
 const addSystemMsg = txt => {
   const div = document.createElement("div");
   div.className = "message system";
@@ -66,13 +78,22 @@ function trackPresence() {
   if (!currentUser || !currentUsername) return;
   const ref = doc(db, "presence", currentUser.uid);
   const data = {
-    userId: currentUser.uid, username: currentUsername, location: currentUserLocation,
-    age: currentUserAge, room: currentRoom, lastSeen: serverTimestamp(), isOnline: true
+    userId: currentUser.uid, 
+    username: currentUsername, 
+    location: currentUserLocation,
+    age: currentUserAge, 
+    room: currentRoom, 
+    lastSeen: serverTimestamp(), 
+    isOnline: true
   };
   setDoc(ref, data, { merge: true });
   clearInterval(presenceTimer);
-  presenceTimer = setInterval(() => setDoc(ref, { room: currentRoom, lastSeen: serverTimestamp() }, { merge: true }), 30000);
+  presenceTimer = setInterval(() => setDoc(ref, { 
+    room: currentRoom, 
+    lastSeen: serverTimestamp() 
+  }, { merge: true }), 30000);
 }
+
 function listenOnlineUsers() {
   onlineListener && onlineListener();
   onlineListener = onSnapshot(collection(db, "presence"), snap => {
@@ -80,51 +101,90 @@ function listenOnlineUsers() {
     let roomCnt = 0;
     snap.forEach(doc => {
       const d = doc.data();
-      if (d.lastSeen?.toDate && d.lastSeen.toDate().getTime() > fiveAgo && d.room === currentRoom) roomCnt++;
+      if (d.lastSeen?.toDate && d.lastSeen.toDate().getTime() > fiveAgo && d.room === currentRoom) {
+        roomCnt++;
+      }
     });
     peopleCount.textContent = `${roomCnt} people ${currentRoom === "global" ? "nearby" : "in " + currentRoom}`;
   });
 }
+
 async function getUserLocation() {
-    const statusDiv = $("locationStatus");
-    if (!navigator.geolocation) {
-        statusDiv.textContent = "Geolocation is not supported."; statusDiv.className = "error"; return;
-    }
-    statusDiv.textContent = "Getting your location..."; statusDiv.className = "";
-    try {
-        const position = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 }));
-        userLatitude = position.coords.latitude; userLongitude = position.coords.longitude;
-        const locationName = await (async (lat, lon) => { try { const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`); return (await r.json()).city; } catch (e) { return null; } })(userLatitude, userLongitude);
-        currentUserLocation = locationName || `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
-        statusDiv.textContent = `Location found: ${currentUserLocation}`; statusDiv.className = "success";
-        locationInput.value = currentUserLocation;
-    } catch (error) {
-        statusDiv.textContent = "Could not get location. Enter manually."; statusDiv.className = "error";
-    }
+  const statusDiv = $("locationStatus");
+  if (!navigator.geolocation) {
+    statusDiv.textContent = "Geolocation is not supported."; 
+    statusDiv.className = "error"; 
+    return;
+  }
+  
+  statusDiv.textContent = "Getting your location..."; 
+  statusDiv.className = "";
+  
+  try {
+    const position = await new Promise((resolve, reject) => 
+      navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 })
+    );
+    
+    userLatitude = position.coords.latitude; 
+    userLongitude = position.coords.longitude;
+    
+    const locationName = await (async (lat, lon) => { 
+      try { 
+        const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`); 
+        return (await r.json()).city; 
+      } catch (e) { 
+        return null; 
+      } 
+    })(userLatitude, userLongitude);
+    
+    currentUserLocation = locationName || `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
+    statusDiv.textContent = `Location found: ${currentUserLocation}`; 
+    statusDiv.className = "success";
+    locationInput.value = currentUserLocation;
+  } catch (error) {
+    statusDiv.textContent = "Could not get location. Enter manually."; 
+    statusDiv.className = "error";
+  }
 }
 
 /* ───────────────────── Room helpers ────────────────────── */
-function showModal() { roomModal.classList.add("show"); }
-function hideModal() { roomModal.classList.remove("show"); roomKeyInput.value = ""; }
+function showModal() { 
+  roomModal.classList.add("show"); 
+}
+
+function hideModal() { 
+  roomModal.classList.remove("show"); 
+  roomKeyInput.value = ""; 
+}
+
 async function joinRoom(key) {
   const k = key.trim().toLowerCase();
   if (!k) return alert("Enter a room key");
   if (k === currentRoom) return hideModal();
+  
   messagesListener && messagesListener();
   currentRoom = k;
   localStorage.setItem("gappkar_current_room", currentRoom);
-  updateRoomUI(); messageList.innerHTML = "";
+  updateRoomUI(); 
+  messageList.innerHTML = "";
   addSystemMsg(`Joined room: ${currentRoom}`);
-  listenMessages(); trackPresence(); hideModal();
+  listenMessages(); 
+  trackPresence(); 
+  hideModal();
 }
+
 function leaveRoom() {
   if (currentRoom === "global") return hideModal();
+  
   messagesListener && messagesListener();
   currentRoom = "global";
   localStorage.removeItem("gappkar_current_room");
-  updateRoomUI(); messageList.innerHTML = "";
+  updateRoomUI(); 
+  messageList.innerHTML = "";
   addSystemMsg("Left room, back to global chat");
-  listenMessages(); trackPresence(); hideModal();
+  listenMessages(); 
+  trackPresence(); 
+  hideModal();
 }
 
 /* ───────────────────── Messaging ───────────────────────── */
@@ -133,11 +193,14 @@ function displayMsg(d) {
   const div = document.createElement("div");
   div.className = `message ${mine ? "sent" : "received"}`;
   const time = timeStr(d.timestamp);
+  
   div.innerHTML = mine
     ? `<div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>`
     : `<div class="message-info"><div class="sender-name">${d.user}${d.age ? ` (${d.age})` : ""}</div><div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>${d.location ? `<div class="message-location">📍 ${d.location}</div>` : ""}</div>`;
+  
   messageList.appendChild(div);
 }
+
 function listenMessages() {
   messagesListener && messagesListener();
   const q = query(roomMessagesRef(currentRoom), orderBy("timestamp", "asc"));
@@ -157,8 +220,8 @@ function listenMessages() {
 async function sendMessage() {
   const txt = messageInput.value.trim();
   if (!txt || !isJoined) return;
+  
   messageInput.value = "";
-
   const tempId = `temp_${Date.now()}`;
   const div = document.createElement("div");
   div.className = "message sent";
@@ -170,8 +233,12 @@ async function sendMessage() {
   
   try {
     await addDoc(roomMessagesRef(currentRoom), {
-      user: currentUsername, message: txt, timestamp: serverTimestamp(),
-      location: currentUserLocation, age: currentUserAge, userId: currentUser.uid
+      user: currentUsername, 
+      message: txt, 
+      timestamp: serverTimestamp(),
+      location: currentUserLocation, 
+      age: currentUserAge, 
+      userId: currentUser.uid
     });
   } catch (e) {
     console.error("Send failed:", e);
@@ -189,42 +256,52 @@ async function joinChat(name, age, loc) {
   if (age < 13 || age > 99) return alert("Age 13-99 only");
   if (!loc.trim()) return alert("Enter location");
   if (isJoined) return;
-
+  
   await signInAnonymously(auth);
   currentUsername = name.trim();
   currentUserAge = parseInt(age, 10);
   currentUserLocation = loc.trim();
   isJoined = true;
-
+  
   const savedRoom = localStorage.getItem("gappkar_current_room");
   if (savedRoom) currentRoom = savedRoom;
-
+  
   joinView.classList.add("hidden");
   chatsView.classList.remove("hidden");
   document.body.classList.add("chat-active");
   updateRoomUI();
-
   messageList.innerHTML = "";
   addSystemMsg(`Welcome ${currentUsername}!`);
-  listenMessages(); trackPresence(); listenOnlineUsers();
-
+  
+  listenMessages(); 
+  trackPresence(); 
+  listenOnlineUsers();
+  
   localStorage.setItem("gappkar_username", currentUsername);
   localStorage.setItem("gappkar_age", currentUserAge);
   localStorage.setItem("gappkar_location", currentUserLocation);
   localStorage.setItem("gappkar_joined", "true");
 }
+
 onAuthStateChanged(auth, u => currentUser = u || null);
+
 async function logout() {
   presenceTimer && clearInterval(presenceTimer);
   onlineListener && onlineListener();
   messagesListener && messagesListener();
-
+  
   if (currentUser) {
-    try { await deleteDoc(doc(db, "presence", currentUser.uid)); } catch(e) { console.error("Presence cleanup failed:", e) }
+    try { 
+      await deleteDoc(doc(db, "presence", currentUser.uid)); 
+    } catch(e) { 
+      console.error("Presence cleanup failed:", e) 
+    }
   }
+  
   try { await signOut(auth); } catch {}
-
-  isJoined = false; currentRoom = "global";
+  
+  isJoined = false; 
+  currentRoom = "global";
   localStorage.clear();
   chatsView.classList.add("hidden");
   joinView.classList.remove("hidden");
@@ -234,28 +311,38 @@ async function logout() {
 /* ─────────────────── Event wiring ──────────────────────── */
 document.addEventListener("DOMContentLoaded", () => {
   if (localStorage.getItem("gappkar_joined") === "true") {
-    joinChat(localStorage.getItem("gappkar_username") || "", localStorage.getItem("gappkar_age") || 0, localStorage.getItem("gappkar_location") || "");
+    joinChat(
+      localStorage.getItem("gappkar_username") || "", 
+      localStorage.getItem("gappkar_age") || 0, 
+      localStorage.getItem("gappkar_location") || ""
+    );
   }
   
   getLocationBtn.addEventListener("click", getUserLocation);
   joinButton.addEventListener("click", () => joinChat(usernameInput.value, ageInput.value, locationInput.value));
   sendButton.addEventListener("click", sendMessage);
-  messageInput.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+  messageInput.addEventListener("keydown", e => { 
+    if (e.key === "Enter" && !e.shiftKey) { 
+      e.preventDefault(); 
+      sendMessage(); 
+    } 
+  });
   backButton.addEventListener("click", logout);
-
   createRoomBtnH.addEventListener("click", showModal);
   roomModalClose.addEventListener("click", hideModal);
   joinRoomBtn.addEventListener("click", () => joinRoom(roomKeyInput.value));
   createRoomBtnM.addEventListener("click", () => joinRoom(roomKeyInput.value));
   leaveRoomBtn.addEventListener("click", leaveRoom);
-  roomModal.addEventListener("click", e => { if (e.target === roomModal) hideModal(); });
+  roomModal.addEventListener("click", e => { 
+    if (e.target === roomModal) hideModal(); 
+  });
 });
 
 // --- Theme Toggler Script ---
-// This can be in a separate <script> tag if you prefer.
 document.addEventListener('DOMContentLoaded', function() {
   const themeToggle = document.getElementById('themeToggle');
   const themeIcon = document.getElementById('themeIcon');
+  
   function toggleTheme() {
     const body = document.body;
     if (body.getAttribute('data-theme') === 'dark') {
@@ -266,5 +353,80 @@ document.addEventListener('DOMContentLoaded', function() {
       if (themeIcon) themeIcon.textContent = '☀️';
     }
   }
-  if (themeToggle) { themeToggle.addEventListener('click', toggleTheme); }
+  
+  if (themeToggle) { 
+    themeToggle.addEventListener('click', toggleTheme); 
+  }
 });
+
+// ✅ ADDED: Mobile Keyboard Handling JavaScript
+function setupMobileKeyboardHandling() {
+  if (!('ontouchstart' in window)) return; // Not a mobile device
+  
+  const messageInput = document.getElementById('messageInput');
+  const messageList = document.getElementById('messageList');
+  const chatInput = document.getElementById('chatInput');
+  let initialViewportHeight = window.innerHeight;
+  
+  function handleKeyboardShow() {
+    document.body.classList.add('keyboard-visible');
+    setTimeout(() => {
+      if (messageList) {
+        messageList.scrollTop = messageList.scrollHeight;
+      }
+    }, 300);
+  }
+  
+  function handleKeyboardHide() {
+    document.body.classList.remove('keyboard-visible');
+  }
+  
+  // iOS handling
+  if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+    messageInput.addEventListener('focus', () => {
+      setTimeout(handleKeyboardShow, 300);
+    });
+    
+    messageInput.addEventListener('blur', () => {
+      setTimeout(handleKeyboardHide, 100);
+    });
+    
+    // Viewport height change detection for iOS
+    window.addEventListener('resize', () => {
+      const currentHeight = window.innerHeight;
+      if (currentHeight < initialViewportHeight * 0.7) {
+        handleKeyboardShow();
+      } else if (currentHeight > initialViewportHeight * 0.9) {
+        handleKeyboardHide();
+        initialViewportHeight = currentHeight;
+      }
+    });
+  }
+  
+  // Android handling
+  else {
+    let lastHeight = window.innerHeight;
+    
+    const resizeObserver = new ResizeObserver(() => {
+      const currentHeight = window.innerHeight;
+      const heightDiff = lastHeight - currentHeight;
+      
+      if (heightDiff > 150) { // Keyboard likely opened
+        handleKeyboardShow();
+      } else if (heightDiff < -150) { // Keyboard likely closed
+        handleKeyboardHide();
+      }
+      
+      lastHeight = currentHeight;
+    });
+    
+    resizeObserver.observe(document.body);
+  }
+}
+
+// Initialize mobile keyboard handling when DOM is loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupMobileKeyboardHandling);
+} else {
+  setupMobileKeyboardHandling();
+}
