@@ -1,7 +1,7 @@
 // Import Firebase modules
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-import { getFirestore, addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, where, setDoc, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+import { getFirestore, addDoc, collection, onSnapshot, orderBy, query, serverTimestamp, setDoc, doc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -35,25 +35,28 @@ let onlineUsers = new Set();
 let presenceUpdateInterval = null;
 let onlineUsersListener = null;
 
-// Simple and reliable scroll to bottom function
-function scrollToBottom() {
+// Enhanced smooth scroll to bottom function
+function smoothScrollToBottom() {
     const messageList = document.getElementById('messageList');
     if (messageList) {
         requestAnimationFrame(() => {
-            messageList.scrollTop = messageList.scrollHeight;
+            messageList.scrollTo({
+                top: messageList.scrollHeight,
+                behavior: 'smooth'
+            });
         });
     }
 }
 
 // Enhanced mobile keyboard handling
-function setupMobileKeyboardFix() {
+function setupEnhancedMobileKeyboardFix() {
     const messageInput = document.getElementById('messageInput');
     const chatInput = document.getElementById('chatInput');
     const messageList = document.getElementById('messageList');
+    const chatsView = document.getElementById('chatsView');
     
     if (!messageInput || !chatInput || !messageList) return;
 
-    // Simple keyboard detection using viewport height changes
     let initialViewportHeight = window.innerHeight;
     let isKeyboardOpen = false;
 
@@ -61,24 +64,31 @@ function setupMobileKeyboardFix() {
         const currentHeight = window.innerHeight;
         const heightDifference = initialViewportHeight - currentHeight;
         
-        // If height decreased by more than 150px, keyboard is likely open
         if (heightDifference > 150 && !isKeyboardOpen) {
+            // Keyboard opened
             isKeyboardOpen = true;
-            // Add padding to prevent content from being hidden
-            chatInput.style.paddingBottom = `${heightDifference + 20}px`;
-            setTimeout(() => scrollToBottom(), 300);
-        } 
-        // If height is back to normal, keyboard is closed
-        else if (heightDifference <= 150 && isKeyboardOpen) {
+            document.body.classList.add('keyboard-active');
+            
+            // Adjust layout for mobile
+            if (window.innerWidth <= 480) {
+                messageList.style.height = `calc(100vh - 140px - ${heightDifference}px)`;
+                messageList.style.paddingBottom = '20px';
+                setTimeout(() => smoothScrollToBottom(), 300);
+            }
+            
+        } else if (heightDifference <= 150 && isKeyboardOpen) {
+            // Keyboard closed
             isKeyboardOpen = false;
-            chatInput.style.paddingBottom = 'max(16px, env(safe-area-inset-bottom))';
+            document.body.classList.remove('keyboard-active');
+            
+            if (window.innerWidth <= 480) {
+                messageList.style.height = 'calc(100vh - 140px)';
+                messageList.style.paddingBottom = '16px';
+            }
         }
     }
 
-    // Listen for viewport changes
-    window.addEventListener('resize', handleViewportChange);
-    
-    // Visual Viewport API support (better keyboard detection)
+    // Visual Viewport API for better keyboard detection
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', () => {
             const viewport = window.visualViewport;
@@ -86,38 +96,56 @@ function setupMobileKeyboardFix() {
             
             if (keyboardHeight > 150 && !isKeyboardOpen) {
                 isKeyboardOpen = true;
-                chatInput.style.paddingBottom = `${keyboardHeight + 20}px`;
-                setTimeout(() => scrollToBottom(), 300);
+                document.body.classList.add('keyboard-active');
+                
+                if (window.innerWidth <= 480) {
+                    messageList.style.height = `calc(100vh - 140px - ${keyboardHeight}px)`;
+                    messageList.style.paddingBottom = '20px';
+                    setTimeout(() => smoothScrollToBottom(), 300);
+                }
+                
             } else if (keyboardHeight <= 150 && isKeyboardOpen) {
                 isKeyboardOpen = false;
-                chatInput.style.paddingBottom = 'max(16px, env(safe-area-inset-bottom))';
+                document.body.classList.remove('keyboard-active');
+                
+                if (window.innerWidth <= 480) {
+                    messageList.style.height = 'calc(100vh - 140px)';
+                    messageList.style.paddingBottom = '16px';
+                }
             }
         });
+    } else {
+        // Fallback for older browsers
+        window.addEventListener('resize', handleViewportChange);
     }
 
-    // Scroll when input is focused
+    // Enhanced input focus handling
     messageInput.addEventListener('focus', () => {
-        setTimeout(() => scrollToBottom(), 400);
+        setTimeout(() => {
+            smoothScrollToBottom();
+            if (window.innerWidth <= 480) {
+                messageInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 400);
     });
 
     // Scroll when typing
     messageInput.addEventListener('input', () => {
         if (isKeyboardOpen) {
-            scrollToBottom();
+            smoothScrollToBottom();
         }
     });
 }
 
-// IMPROVED: Track user presence with proper document management
+// Enhanced user presence tracking
 function trackUserPresence() {
     if (!currentUser || !currentUsername) {
         console.log("Cannot track presence: No user or username");
         return;
     }
     
-    console.log("Starting presence tracking for user:", currentUsername);
+    console.log("🔄 Starting presence tracking for user:", currentUsername);
     
-    // Use userId as document ID to avoid duplicates
     const userPresenceDoc = doc(db, "presence", currentUser.uid);
     const userPresenceData = {
         userId: currentUser.uid,
@@ -150,36 +178,30 @@ function trackUserPresence() {
                 console.error("❌ Error updating presence:", error);
             });
         }
-    }, 30000); // 30 seconds
+    }, 30000);
 }
 
-// IMPROVED: Listen for online users with better filtering
+// Enhanced online users listener
 function listenForOnlineUsers() {
     console.log("🔍 Starting to listen for online users...");
     
     const presenceRef = collection(db, "presence");
     
-    // Listen to all presence documents in real-time
     onlineUsersListener = onSnapshot(presenceRef, (querySnapshot) => {
         console.log("📡 Received presence update, total docs:", querySnapshot.size);
         
         onlineUsers.clear();
         const now = new Date();
-        const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000); // 5 minutes ago
+        const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
         
         let activeUsers = 0;
         
         querySnapshot.forEach((doc) => {
             const userData = doc.data();
-            console.log("👤 Checking user:", userData.username, "Last seen:", userData.lastSeen?.toDate());
             
-            // Check if user was active within last 5 minutes
             if (userData.lastSeen && userData.lastSeen.toDate() > fiveMinutesAgo) {
                 onlineUsers.add(userData.userId);
                 activeUsers++;
-                console.log("✅ User is online:", userData.username);
-            } else {
-                console.log("❌ User is offline:", userData.username);
             }
         });
         
@@ -191,15 +213,13 @@ function listenForOnlineUsers() {
     });
 }
 
-// IMPROVED: Update the online count display with better logging
+// Enhanced online count update
 function updateOnlineCount() {
     const peopleCountElement = document.getElementById("peopleCount");
     if (peopleCountElement) {
         const count = onlineUsers.size;
         peopleCountElement.textContent = `${count} people nearby`;
         console.log(`📊 Updated UI: ${count} people nearby`);
-    } else {
-        console.error("❌ Could not find peopleCount element");
     }
 }
 
@@ -306,7 +326,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Fixed join chat function with improved online tracking
+// Enhanced join chat function
 async function joinChat(username, age, location) {
   console.log("Join chat called with:", { username, age, location });
   
@@ -347,12 +367,7 @@ async function joinChat(username, age, location) {
     localStorage.setItem('gappkar_location', location);
     localStorage.setItem('gappkar_joined', 'true');
     
-    // Update header info
-    document.getElementById("userNameDisplay").textContent = username;
-    document.getElementById("userAgeDisplay").textContent = age;
-    document.getElementById("userLocationDisplay").textContent = location.length > 15 ? location.substring(0, 15) + '...' : location;
-    
-    console.log("Switching to chat view...");
+    console.log("Switching to enhanced chat view...");
     
     // Switch views
     const mainContainer = document.getElementById("mainContainer");
@@ -377,17 +392,17 @@ async function joinChat(username, age, location) {
         chatsView.style.zIndex = '9999';
     }
     
-    console.log("Setting up mobile keyboard handling...");
+    console.log("Setting up enhanced mobile keyboard handling...");
     
-    // Setup mobile keyboard handling
-    setupMobileKeyboardFix();
+    // Setup enhanced mobile keyboard handling
+    setupEnhancedMobileKeyboardFix();
     
     console.log("Starting to listen for messages...");
     
     // Start listening for messages
     listenForMessages();
     
-    // IMPROVED: Start online user tracking with delay to ensure user is properly authenticated
+    // Start online user tracking with delay
     console.log("⏳ Starting online user tracking in 2 seconds...");
     setTimeout(() => {
         trackUserPresence();
@@ -395,7 +410,7 @@ async function joinChat(username, age, location) {
         console.log("🚀 Online user tracking started!");
     }, 2000);
     
-    console.log(`Successfully joined chat - Name: ${username}, Age: ${age}, Location: ${location}`);
+    console.log(`Successfully joined enhanced chat - Name: ${username}, Age: ${age}, Location: ${location}`);
   } catch (error) {
     console.error("Error joining chat:", error);
     isJoined = false;
@@ -403,7 +418,7 @@ async function joinChat(username, age, location) {
   }
 }
 
-// Send message function
+// Enhanced send message function with instant UI update
 async function sendMessage() {
     const messageInput = document.getElementById("messageInput");
     const messageText = messageInput.value.trim();
@@ -412,7 +427,26 @@ async function sendMessage() {
         return;
     }
     
+    // Clear input immediately for better UX
+    messageInput.value = "";
+    
+    // Create temporary message object for instant display
+    const tempMessage = {
+        user: currentUsername,
+        message: messageText,
+        timestamp: new Date(),
+        location: currentUserLocation,
+        age: currentUserAge,
+        userId: currentUser.uid,
+        isTemp: true
+    };
+    
+    // Display message instantly
+    displayMessage(tempMessage);
+    smoothScrollToBottom();
+    
     try {
+        // Send to Firebase
         await addDoc(collection(db, "messages"), {
             user: currentUsername,
             message: messageText,
@@ -424,16 +458,19 @@ async function sendMessage() {
             longitude: userLongitude
         });
         
-        messageInput.value = "";
-        scrollToBottom();
+        console.log("✅ Message sent successfully");
         
     } catch (error) {
         console.error("Error sending message:", error);
         alert("Failed to send message");
+        
+        // Remove temporary message on error
+        const tempMessages = document.querySelectorAll('[data-temp="true"]');
+        tempMessages.forEach(msg => msg.remove());
     }
 }
 
-// Listen for messages
+// Enhanced listen for messages
 function listenForMessages() {
   const q = query(
     collection(db, "messages"), 
@@ -442,66 +479,73 @@ function listenForMessages() {
   
   onSnapshot(q, (querySnapshot) => {
     const messageContainer = document.getElementById("messageList");
+    
+    // Clear only non-temporary messages
+    const tempMessages = messageContainer.querySelectorAll('[data-temp="true"]');
     messageContainer.innerHTML = "";
+    
+    // Re-add temporary messages
+    tempMessages.forEach(tempMsg => {
+        messageContainer.appendChild(tempMsg);
+    });
+    
     messageCount = 0;
     
     querySnapshot.forEach((doc) => {
       const messageData = doc.data();
-      displayMessage(messageData);
+      
+      // Skip if this is a temporary message we already displayed
+      if (!messageData.isTemp) {
+        displayMessage(messageData);
+      }
     });
     
-    // Update message count
-    document.getElementById("messageCount").textContent = `${messageCount} messages`;
-    
     // Auto scroll to bottom
-    scrollToBottom();
+    setTimeout(() => smoothScrollToBottom(), 200);
   });
 }
 
-// Display message
+// Enhanced display message with bubble styling
 function displayMessage(messageData) {
   const messageContainer = document.getElementById("messageList");
   
   const isCurrentUser = messageData.user === currentUsername;
   
   const messageDiv = document.createElement("div");
-  messageDiv.className = `message ${isCurrentUser ? 'current-user' : 'other-user'}`;
+  messageDiv.className = `message ${isCurrentUser ? 'sent' : 'received'}`;
+  
+  // Add temporary message attribute if needed
+  if (messageData.isTemp) {
+    messageDiv.setAttribute('data-temp', 'true');
+  }
   
   let timeString = "Just now";
   if (messageData.timestamp) {
-    timeString = messageData.timestamp.toDate().toLocaleTimeString([], {
+    const timestamp = messageData.timestamp.toDate ? messageData.timestamp.toDate() : messageData.timestamp;
+    timeString = timestamp.toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit'
     });
   }
   
   if (isCurrentUser) {
+    // Sent message (green bubble)
     messageDiv.innerHTML = `
-      <div class="message-wrapper current-user-wrapper">
-        <div class="message-content current-user-content">
-          <div class="message-bubble current-user-bubble">
-            ${messageData.message}
-          </div>
-          <div class="message-info current-user-info">
-            <span class="timestamp">${timeString}</span>
-          </div>
-        </div>
+      <div class="message-bubble">
+        ${messageData.message}
+        <div class="message-time">${timeString}</div>
       </div>
     `;
   } else {
+    // Received message (white bubble)
     messageDiv.innerHTML = `
-      <div class="message-wrapper other-user-wrapper">
-        <div class="message-content other-user-content">
-          <div class="message-header">
-            <span class="username">${messageData.user}</span>
-            ${messageData.age ? `<span class="user-age">${messageData.age}y</span>` : ''}
-            <span class="timestamp">${timeString}</span>
-          </div>
-          <div class="message-bubble other-user-bubble">
-            ${messageData.message}
-          </div>
-          ${messageData.location ? `<div class="message-location">📍 ${messageData.location}</div>` : ''}
+      <div class="message-info">
+        <div class="sender-name">${messageData.user}${messageData.age ? ` (${messageData.age})` : ''}</div>
+        <div class="message-bubble">
+          ${messageData.message}
+          <div class="message-time">${timeString}</div>
         </div>
+        ${messageData.location ? `<div class="message-location">📍 ${messageData.location}</div>` : ''}
       </div>
     `;
   }
@@ -510,7 +554,7 @@ function displayMessage(messageData) {
   messageCount++;
 }
 
-// Check existing session with improved online tracking
+// Check existing session
 function checkExistingSession() {
   const savedUsername = localStorage.getItem('gappkar_username');
   const savedAge = localStorage.getItem('gappkar_age');
@@ -530,9 +574,9 @@ function checkExistingSession() {
   }
 }
 
-// Event listeners
+// Enhanced event listeners
 document.addEventListener("DOMContentLoaded", function() {
-  console.log("DOM loaded, setting up event listeners...");
+  console.log("DOM loaded, setting up enhanced event listeners...");
   
   checkExistingSession();
   
@@ -562,20 +606,29 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   }
   
-  // Send message button
+  // Enhanced send message button
   const sendButton = document.getElementById("sendButton");
   if (sendButton) {
-    sendButton.addEventListener("click", sendMessage);
+    sendButton.addEventListener("click", function(e) {
+      e.preventDefault();
+      sendMessage();
+    });
   }
   
-  // Message input handling
+  // Enhanced message input handling
   const messageInput = document.getElementById("messageInput");
   if (messageInput) {
     messageInput.addEventListener("keypress", function(e) {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
             sendMessage();
         }
+    });
+    
+    // Auto-resize textarea (if needed)
+    messageInput.addEventListener("input", function() {
+        this.style.height = "auto";
+        this.style.height = Math.min(this.scrollHeight, 120) + "px";
     });
   }
   
@@ -611,7 +664,7 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 
-// Improved logout function
+// Enhanced logout function
 window.logout = function() {
   console.log("🚪 User logging out...");
   
@@ -641,7 +694,7 @@ window.logout = function() {
   }
 };
 
-// Clean up presence when user leaves
+// Enhanced cleanup on page unload
 window.addEventListener('beforeunload', () => {
     console.log("🔄 Page unloading, cleaning up presence...");
     
@@ -658,3 +711,10 @@ window.addEventListener('beforeunload', () => {
         clearInterval(presenceUpdateInterval);
     }
 });
+
+// Prevent body scroll when keyboard opens on mobile
+document.addEventListener('touchmove', function(e) {
+    if (document.body.classList.contains('keyboard-active')) {
+        e.preventDefault();
+    }
+}, { passive: false });
