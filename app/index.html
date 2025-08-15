@@ -583,41 +583,35 @@
       background: var(--accent);
       transform: scale(1.05);
     }
+    
+    /*
+     * ✅ NEW, MORE ROBUST MOBILE FIX
+     * This forces the app container to fill the screen, preventing the keyboard
+     * from hiding the input bar.
+    */
     @media (max-width: 480px) {
-      body {
-        height: 100vh;
-        overflow: hidden;
-      }
       .app-container {
         padding: 0;
-        height: 100%;
       }
       .main-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         width: 100%;
         height: 100%;
-        border-radius: 0;
+        max-width: none;
         border: none;
-        display: flex;
-        flex-direction: column;
+        border-radius: 0;
       }
       #chatsView:not(.hidden) {
         flex: 1;
-        display: flex !important;
-        flex-direction: column;
-        overflow: hidden;
-        position: static !important;
-        width: 100% !important;
-        height: 100% !important;
+        min-height: 0;
       }
       #messageList {
         flex: 1;
-        overflow-y: auto;
         min-height: 0;
-      }
-      .chat-input {
-        position: static !important;
-        width: 100% !important;
-        flex-shrink: 0;
       }
     }
   </style>
@@ -710,333 +704,7 @@
     </div>
   </div>
 
-  <script type="module">
-    // --------------------------- Gappkar Chat – UPDATED & FIXED JS ---------------------------
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-    import { getFirestore, addDoc, collection, doc, setDoc, onSnapshot, orderBy, query, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
-    /* ───────────────────────── Firebase config ───────────────────────── */
-    const firebaseConfig = {
-      apiKey: "AIzaSyCOmLxxqPesNaBr4Z9fVIU6K2BLW6OsED0",
-      authDomain: "gappkar-v1-b3afe.firebaseapp.com",
-      databaseURL: "https://gappkar-v1-b3afe-default-rtdb.firebaseio.com",
-      projectId: "gappkar-v1-b3afe",
-      storageBucket: "gappkar-v1-b3afe.appspot.com", // ← Corrected typo
-      messagingSenderId: "726018257415",
-      appId: "1:726018257415:web:12142708abdf47952af0a2",
-      measurementId: "G-EWK4436NRB"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    /* ───────────────────────── Global state ───────────────────────── */
-    let currentUser = null;
-    let currentUsername = "";
-    let currentUserAge = 0;
-    let currentUserLocation = "";
-    let userLatitude = null;
-    let userLongitude = null;
-    let isJoined = false;
-    let currentRoom = "global";
-    let messagesListener = null;
-    let presenceTimer = null;
-    let onlineListener = null;
-
-    /* ───────────────────────── DOM helpers ───────────────────────── */
-    const $ = id => document.getElementById(id);
-    const joinView = $("joinView"), chatsView = $("chatsView"), messageList = $("messageList");
-    const messageInput = $("messageInput"), sendButton = $("sendButton"), backButton = $("backButton");
-    const usernameInput = $("usernameInput"), ageInput = $("ageInput"), locationInput = $("locationInput");
-    const joinButton = $("joinButton"), getLocationBtn = $("getLocationBtn"), peopleCount = $("peopleCount");
-    const createRoomBtnH = $("createRoomBtn"), roomModal = $("roomModal"), roomModalClose = $("roomModalClose");
-    const roomKeyInput = $("roomKeyInput"), joinRoomBtn = $("joinRoomBtn"), createRoomBtnM = $("createRoomBtnModal");
-    const leaveRoomBtn = $("leaveRoomBtn"), roomIndicator = $("roomIndicator");
-
-    /* ───────────────────────── Firestore paths ───────────────────────── */
-    const roomMessagesRef = room => collection(db, "rooms", room, "messages");
-
-    /* ───────────────────────── UI utilities ───────────────────────── */
-    const timeStr = ts => {
-      const d = ts?.toDate ? ts.toDate() : (ts || new Date());
-      let h = d.getHours();
-      const m = d.getMinutes().toString().padStart(2, "0");
-      const a = h >= 12 ? "PM" : "AM";
-      h = h % 12 || 12;
-      return `${h}:${m} ${a}`;
-    };
-
-    const scrollBottom = () => messageList && (messageList.scrollTop = messageList.scrollHeight);
-
-    const updateRoomUI = () => {
-      if (!roomIndicator) return;
-      roomIndicator.textContent = currentRoom === "global" ? "Global" : currentRoom;
-      roomIndicator.style.background = currentRoom === "global" ? "var(--accent)" : "#28a745";
-    };
-
-    const addSystemMsg = txt => {
-      const div = document.createElement("div");
-      div.className = "message system";
-      div.innerHTML = `<div class="message-bubble">${txt}</div>`;
-      messageList.appendChild(div);
-      scrollBottom();
-    };
-
-    /* ───────────────────────── Presence tracking ───────────────────────── */
-    function trackPresence() {
-      if (!currentUser || !currentUsername) return;
-      const ref = doc(db, "presence", currentUser.uid);
-      const data = {
-        userId: currentUser.uid, username: currentUsername, location: currentUserLocation,
-        age: currentUserAge, room: currentRoom, lastSeen: serverTimestamp(), isOnline: true
-      };
-      setDoc(ref, data, { merge: true });
-      clearInterval(presenceTimer);
-      presenceTimer = setInterval(() => setDoc(ref, { room: currentRoom, lastSeen: serverTimestamp() }, { merge: true }), 30000);
-    }
-
-    function listenOnlineUsers() {
-      onlineListener && onlineListener();
-      onlineListener = onSnapshot(collection(db, "presence"), snap => {
-        const fiveAgo = Date.now() - 5 * 60 * 1000;
-        let roomCnt = 0;
-        snap.forEach(doc => {
-          const d = doc.data();
-          if (d.lastSeen?.toDate && d.lastSeen.toDate().getTime() > fiveAgo && d.room === currentRoom) roomCnt++;
-        });
-        peopleCount.textContent = `${roomCnt} people ${currentRoom === "global" ? "nearby" : "in " + currentRoom}`;
-      });
-    }
-    
-    /* ───────────────────────── Location Services ───────────────────────── */
-    async function getUserLocation() {
-        const statusDiv = $("locationStatus");
-        if (!navigator.geolocation) {
-            statusDiv.textContent = "Geolocation is not supported.";
-            statusDiv.className = "error";
-            return;
-        }
-        statusDiv.textContent = "Getting your location...";
-        statusDiv.className = "";
-        try {
-            const position = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
-            });
-            userLatitude = position.coords.latitude;
-            userLongitude = position.coords.longitude;
-            const locationName = await getCityFromCoordinates(userLatitude, userLongitude);
-            currentUserLocation = locationName || `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
-            statusDiv.textContent = `Location found: ${currentUserLocation}`;
-            statusDiv.className = "success";
-            locationInput.value = currentUserLocation;
-        } catch (error) {
-            statusDiv.textContent = "Could not get location. Enter manually.";
-            statusDiv.className = "error";
-        }
-    }
-
-    async function getCityFromCoordinates(lat, lon) {
-      try {
-        const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`);
-        return (await response.json()).city;
-      } catch (error) { return null; }
-    }
-
-    /* ───────────────────────── Room helpers ───────────────────────── */
-    function showModal() { roomModal.classList.add("show"); }
-    function hideModal() { roomModal.classList.remove("show"); roomKeyInput.value = ""; }
-
-    async function joinRoom(key) {
-      const k = key.trim().toLowerCase();
-      if (!k) return alert("Enter a room key");
-      if (k === currentRoom) return hideModal();
-      messagesListener && messagesListener();
-      currentRoom = k;
-      localStorage.setItem("gappkar_current_room", currentRoom);
-      updateRoomUI();
-      messageList.innerHTML = "";
-      addSystemMsg(`Joined room: ${currentRoom}`);
-      listenMessages();
-      trackPresence();
-      hideModal();
-    }
-
-    function leaveRoom() {
-      if (currentRoom === "global") return hideModal();
-      messagesListener && messagesListener();
-      currentRoom = "global";
-      localStorage.removeItem("gappkar_current_room");
-      updateRoomUI();
-      messageList.innerHTML = "";
-      addSystemMsg("Left room, back to global chat");
-      listenMessages();
-      trackPresence();
-      hideModal();
-    }
-
-    /* ───────────────────────── Messaging ───────────────────────── */
-    function displayMsg(d) {
-      const mine = d.user === currentUsername;
-      const div = document.createElement("div");
-      div.className = `message ${mine ? "sent" : "received"}`;
-      const time = timeStr(d.timestamp);
-      div.innerHTML = mine
-        ? `<div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>`
-        : `<div class="message-info">
-             <div class="sender-name">${d.user}${d.age ? ` (${d.age})` : ""}</div>
-             <div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>
-             ${d.location ? `<div class="message-location">📍 ${d.location}</div>` : ""}
-           </div>`;
-      messageList.appendChild(div);
-    }
-    
-    // ✅ FIXED: This function now uses docChanges() to avoid duplicating messages.
-    function listenMessages() {
-      messagesListener && messagesListener();
-      const q = query(roomMessagesRef(currentRoom), orderBy("timestamp", "asc"));
-      messagesListener = onSnapshot(q, (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          if (change.type === "added") {
-            // Remove the temporary optimistic message before adding the real one
-            const temp = messageList.querySelector('[data-temp="true"]');
-            if (temp) temp.remove();
-            displayMsg(change.doc.data());
-          }
-        });
-        scrollBottom();
-      });
-    }
-
-    async function sendMessage() {
-      const txt = messageInput.value.trim();
-      if (!txt || !isJoined) return;
-      messageInput.value = "";
-
-      // Optimistic render for better UX
-      const tempMsg = { user: currentUsername, message: txt, timestamp: new Date() };
-      const div = document.createElement("div");
-      div.className = "message sent";
-      div.dataset.temp = "true";
-      div.innerHTML = `<div class="message-bubble">${tempMsg.message}<div class="message-time">${timeStr(tempMsg.timestamp)}</div></div>`;
-      messageList.appendChild(div);
-      scrollBottom();
-      
-      try {
-        await addDoc(roomMessagesRef(currentRoom), {
-          user: currentUsername, message: txt, timestamp: serverTimestamp(),
-          location: currentUserLocation, age: currentUserAge, userId: currentUser.uid
-        });
-      } catch (e) {
-        console.error("Send failed:", e);
-        // If sending fails, remove the optimistic message
-        const tempNode = messageList.querySelector('[data-temp="true"]');
-        if (tempNode) tempNode.remove();
-        addSystemMsg("Message failed to send.");
-      }
-    }
-
-    /* ───────────────────────── Join/Logout Flow ───────────────────────── */
-    async function joinChat(name, age, loc) {
-      if (!name.trim()) return alert("Enter name");
-      if (age < 13 || age > 99) return alert("Age 13-99 only");
-      if (!loc.trim()) return alert("Enter location");
-      if (isJoined) return;
-
-      await signInAnonymously(auth);
-      currentUsername = name.trim();
-      currentUserAge = parseInt(age, 10);
-      currentUserLocation = loc.trim();
-      isJoined = true;
-
-      const savedRoom = localStorage.getItem("gappkar_current_room");
-      if (savedRoom) currentRoom = savedRoom;
-
-      joinView.classList.add("hidden");
-      chatsView.classList.remove("hidden");
-      document.body.classList.add("chat-active");
-      updateRoomUI();
-
-      messageList.innerHTML = "";
-      addSystemMsg(`Welcome ${currentUsername}!`);
-      listenMessages();
-      trackPresence();
-      listenOnlineUsers();
-
-      localStorage.setItem("gappkar_username", currentUsername);
-      localStorage.setItem("gappkar_age", currentUserAge);
-      localStorage.setItem("gappkar_location", currentUserLocation);
-      localStorage.setItem("gappkar_joined", "true");
-    }
-
-    onAuthStateChanged(auth, u => currentUser = u || null);
-
-    // ✅ FIXED: This function now properly deletes the user's presence document on logout.
-    async function logout() {
-      presenceTimer && clearInterval(presenceTimer);
-      onlineListener && onlineListener();
-      messagesListener && messagesListener();
-
-      if (currentUser) {
-        try { await deleteDoc(doc(db, "presence", currentUser.uid)); } catch(e) { console.error("Presence cleanup failed:", e) }
-      }
-
-      try { await signOut(auth); } catch {}
-
-      isJoined = false;
-      currentRoom = "global";
-      localStorage.clear();
-
-      chatsView.classList.add("hidden");
-      joinView.classList.remove("hidden");
-      document.body.classList.remove("chat-active");
-    }
-
-    /* ───────────────────────── Event wiring ───────────────────────── */
-    document.addEventListener("DOMContentLoaded", () => {
-      if (localStorage.getItem("gappkar_joined") === "true") {
-        joinChat(
-          localStorage.getItem("gappkar_username") || "",
-          localStorage.getItem("gappkar_age") || 0,
-          localStorage.getItem("gappkar_location") || ""
-        );
-      }
-      
-      getLocationBtn.addEventListener("click", getUserLocation);
-      joinButton.addEventListener("click", () => joinChat(usernameInput.value, ageInput.value, locationInput.value));
-      sendButton.addEventListener("click", sendMessage);
-      messageInput.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
-      backButton.addEventListener("click", logout);
-
-      createRoomBtnH.addEventListener("click", showModal);
-      roomModalClose.addEventListener("click", hideModal);
-      joinRoomBtn.addEventListener("click", () => joinRoom(roomKeyInput.value));
-      createRoomBtnM.addEventListener("click", () => joinRoom(roomKeyInput.value));
-      leaveRoomBtn.addEventListener("click", leaveRoom);
-      roomModal.addEventListener("click", e => { if (e.target === roomModal) hideModal(); });
-    });
-    
-  </script>
-  <script>
-    // Theme Toggle Script
-    document.addEventListener('DOMContentLoaded', function() {
-      const themeToggle = document.getElementById('themeToggle');
-      const themeIcon = document.getElementById('themeIcon');
-      function toggleTheme() {
-        const body = document.body;
-        if (body.getAttribute('data-theme') === 'dark') {
-          body.removeAttribute('data-theme');
-          if (themeIcon) themeIcon.textContent = '🌙';
-        } else {
-          body.setAttribute('data-theme', 'dark');
-          if (themeIcon) themeIcon.textContent = '☀️';
-        }
-      }
-      if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-      }
-    });
-  </script>
+  <script type="module" src="app.js"></script>
+  
 </body>
 </html>
