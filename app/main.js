@@ -53,7 +53,6 @@ function setupEnhancedMobileKeyboardFix() {
     const messageInput = document.getElementById('messageInput');
     const chatInput = document.getElementById('chatInput');
     const messageList = document.getElementById('messageList');
-    const chatsView = document.getElementById('chatsView');
     
     if (!messageInput || !chatInput || !messageList) return;
 
@@ -213,13 +212,15 @@ function listenForOnlineUsers() {
     });
 }
 
-// Enhanced online count update
+// FIXED: Enhanced online count update
 function updateOnlineCount() {
     const peopleCountElement = document.getElementById("peopleCount");
     if (peopleCountElement) {
         const count = onlineUsers.size;
         peopleCountElement.textContent = `${count} people nearby`;
         console.log(`📊 Updated UI: ${count} people nearby`);
+    } else {
+        console.error("❌ Could not find peopleCount element");
     }
 }
 
@@ -326,7 +327,7 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Enhanced join chat function
+// FIXED: Enhanced join chat function
 async function joinChat(username, age, location) {
   console.log("Join chat called with:", { username, age, location });
   
@@ -380,6 +381,12 @@ async function joinChat(username, age, location) {
     // Hide join view and show chat view
     joinView.classList.add("hidden");
     chatsView.classList.remove("hidden");
+    
+    // FIXED: Update contact name with user info
+    const contactNameElement = document.getElementById("contactName");
+    if (contactNameElement) {
+        contactNameElement.textContent = `${username}'s Chat`;
+    }
     
     // Apply mobile-specific styles if needed
     if (window.innerWidth <= 480) {
@@ -505,7 +512,7 @@ function listenForMessages() {
   });
 }
 
-// Enhanced display message with bubble styling
+// FIXED: Enhanced display message with bubble styling
 function displayMessage(messageData) {
   const messageContainer = document.getElementById("messageList");
   
