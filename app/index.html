@@ -85,6 +85,211 @@
         background-color: #f5f5f5;
         border-color: #c7c7c7;
     }
+
+    /* --- Chat Input Area --- */
+.chat-input-area {
+    flex-shrink: 0;
+    border-top: var(--border-thin);
+    background-color: var(--bg-light);
+}
+.input-row {
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.expand-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: var(--text-dark);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease, background-color 0.2s;
+}
+.expand-btn:hover {
+    background-color: var(--system-bg);
+}
+.expand-btn.active {
+    transform: rotate(45deg);
+    background-color: var(--accent);
+    color: var(--text-light);
+}
+.message-input {
+    flex-grow: 1;
+    border: var(--border-thin);
+    background-color: var(--bg-light);
+    border-radius: 20px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    color: var(--text-dark);
+}
+.chat-audio-play-btn {
+    width: 28px; height: 28px; border-radius: 50%; border: none;
+    background: var(--accent); color: white; cursor: pointer;
+    font-size: 12px; flex-shrink: 0;
+}
+
+/* --- Expandable Options Panel --- */
+.expand-options {
+    display: flex;
+    justify-content: space-around;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+    padding: 0 8px;
+    border-bottom: 1px solid transparent;
+}
+.expand-options.visible {
+    max-height: 100px;
+    padding: 12px 8px;
+    border-bottom: 1px solid var(--border-thin);
+}
+.expand-option-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    color: var(--gray);
+}
+.expand-option-btn .icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: var(--border-thin);
+    background-color: var(--bg-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--text-dark);
+}
+.expand-option-btn:hover .icon {
+    background-color: var(--system-bg);
+}
+
+/* --- Feature Panels (Stickers, Audio) --- */
+.feature-panel {
+    background-color: var(--bg-light);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
+}
+.feature-panel.visible {
+    max-height: 280px;
+}
+.feature-panel-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    border-bottom: var(--border-thin);
+    flex-shrink: 0;
+}
+.feature-panel-title {
+    flex-grow: 1;
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 14px;
+}
+.feature-panel-close-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: var(--border-thin);
+    background: transparent;
+    color: var(--text-dark);
+    cursor: pointer;
+    font-size: 16px;
+}
+.feature-panel-content {
+    padding: 16px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+.feature-search-bar {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 20px;
+    border: var(--border-thin);
+    background-color: var(--bg-light);
+    font-size: 14px;
+    font-family: inherit;
+    margin-bottom: 16px;
+    outline: none;
+    color: var(--text-dark);
+}
+#stickerGrid, #gif-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 10px;
+}
+.sticker-item, .gif-item {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: var(--system-bg);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+    overflow: hidden;
+}
+.sticker-item:hover, .gif-item:hover {
+    transform: scale(1.1);
+}
+.sticker-item img, .gif-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+#audioList {
+    list-style: none;
+}
+.audio-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    margin-bottom: 8px;
+    border: var(--border-thin);
+}
+.audio-item:hover {
+    background-color: var(--system-bg);
+}
+.audio-item .play-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--accent);
+    color: white;
+    font-size: 14px;
+    margin-right: 12px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.audio-item .audio-name {
+    font-size: 14px;
+    color: var(--text-dark);
+}
     /* --- GIF Picker Panel Styles --- */
     #gif-picker {
         position: fixed;
@@ -1054,6 +1259,58 @@
         </div>
       </div>
 
+      <!-- New Chat Input Area -->
+<div class="chat-input-area">
+    <!-- Sticker Panel -->
+    <div id="stickerPanel" class="feature-panel">
+        <div class="feature-panel-header">
+            <div class="feature-panel-title">Stickers</div>
+            <button class="feature-panel-close-btn" data-panel="stickerPanel">×</button>
+        </div>
+        <div class="feature-panel-content">
+            <input type="text" id="sticker-search-input" class="feature-search-bar" placeholder="Search stickers...">
+            <div id="stickerGrid"></div>
+        </div>
+    </div>
+
+    <!-- Audio Panel -->
+    <div id="audioPanel" class="feature-panel">
+        <div class="feature-panel-header">
+            <div class="feature-panel-title">Audio</div>
+            <button class="feature-panel-close-btn" data-panel="audioPanel">×</button>
+        </div>
+        <div class="feature-panel-content">
+            <input type="text" class="feature-search-bar" placeholder="Search sounds...">
+            <ul id="audioList"></ul>
+        </div>
+    </div>
+
+    <!-- GIF Panel -->
+    <div id="gif-picker" class="feature-panel">
+         <div class="feature-panel-header">
+            <div class="feature-panel-title">GIFs</div>
+            <button class="feature-panel-close-btn" data-panel="gif-picker">×</button>
+        </div>
+        <div class="feature-panel-content">
+            <input type="text" id="gif-search-input" class="feature-search-bar" placeholder="Search for GIFs...">
+            <div id="gif-results-grid"></div>
+        </div>
+    </div>
+
+    <!-- Expandable Options Menu -->
+    <div id="expandOptions" class="expand-options">
+        <button class="expand-option-btn" id="gifOptionBtn"><span class="icon">📄</span> GIF</button>
+        <button class="expand-option-btn" id="audioOptionBtn"><span class="icon">🎵</span> Audio</button>
+        <button class="expand-option-btn" id="stickerOptionBtn"><span class="icon">😊</span> Sticker</button>
+    </div>
+
+    <!-- Main Input Row -->
+    <div class="input-row">
+        <button class="expand-btn" id="expandBtn">+</button>
+        <input type="text" class="message-input" id="messageInput" placeholder="Type a message..." autocomplete="off">
+    </div>
+</div>
+
       <!-- Search Accounts View -->
       <div id="searchView" class="view find-view hidden">
         <div class="chat-header">
@@ -1419,6 +1676,146 @@
         scrollBottom();
       });
     }
+    // --- Add these variables with your other element declarations ---
+const expandBtn = $('expandBtn');
+const expandOptions = $('expandOptions');
+const gifOptionBtn = $('gifOptionBtn');
+const audioOptionBtn = $('audioOptionBtn');
+const stickerOptionBtn = $('stickerOptionBtn');
+const stickerPanel = $('stickerPanel');
+const audioPanel = $('audioPanel');
+const gifPicker = $('gif-picker');
+const allFeaturePanels = [stickerPanel, audioPanel, gifPicker];
+let currentAudio = null; // To manage audio playback
+
+const sounds = [
+    { name: 'Aand Bhat Khaoge', url: 'https://file.garden/aJ-bbmBvGxKiA5vP/Aand%20Bhat%20Khaoge%20Memes%20_%20%E0%A4%86%E0%A4%82%E0%A4%A1%20%E0%A4%AD%E0%A4%BE%E0%A4%A4%20%E0%A4%96%E0%A4%BE%E0%A4%93%E0%A4%97%E0%A5%87%20%E0%A4%AE%E0%A5%80%E0%A4%AE%20_%20Meme%20Centre(MP3_160K).mp3' },
+    { name: 'Notification', url: '' },
+    { name: 'Success', url: '' },
+    { name: 'Error', url: '' },
+];
+
+// --- Add these functions to your script ---
+const togglePanel = (panelToShow) => {
+    const isVisible = panelToShow.classList.contains('visible');
+    allFeaturePanels.forEach(p => p.classList.remove('visible'));
+    if (!isVisible) {
+        panelToShow.classList.add('visible');
+    }
+};
+
+const audioList = $('audioList');
+sounds.forEach(sound => {
+    const li = document.createElement('li');
+    li.className = 'audio-item';
+    li.innerHTML = `<button class="play-btn">▶</button><span class="audio-name">${sound.name}</span>`;
+    li.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'BUTTON') {
+            sendMessage(sound, 'audio');
+            togglePanel(audioPanel);
+        }
+    });
+    li.querySelector('.play-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+        }
+        if (sound.url) {
+            currentAudio = new Audio(sound.url);
+            currentAudio.play();
+        } else {
+            console.log(`No URL for sound: ${sound.name}`);
+        }
+    });
+    audioList.appendChild(li);
+});
+
+// --- Giphy API Logic ---
+const GIPHY_API_KEY = 'GLutXRXDEL19PuG3ztekK0JNDr5oySTh';
+let debounceTimer;
+
+function setupGiphyPanel(type, searchInputId, resultsGridId) {
+    const searchInput = $(searchInputId);
+    const resultsGrid = $(resultsGridId);
+    const endpoint = type === 'stickers' ? 'stickers' : 'gifs';
+
+    async function fetchItems(searchTerm = '') {
+        resultsGrid.innerHTML = '<div>Loading...</div>';
+        const url = searchTerm ?
+            `https://api.giphy.com/v1/${endpoint}/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(searchTerm)}&limit=24` :
+            `https://api.giphy.com/v1/${endpoint}/trending?api_key=${GIPHY_API_KEY}&limit=24`;
+        try {
+            const res = await fetch(url);
+            const { data } = await res.json();
+            resultsGrid.innerHTML = '';
+            data.forEach(item => {
+                const itemEl = document.createElement('div');
+                itemEl.className = type === 'stickers' ? 'sticker-item' : 'gif-item';
+                itemEl.innerHTML = `<img src="${item.images.fixed_width.url}" alt="${item.title}">`;
+                itemEl.onclick = () => {
+                    sendMessage(item.images.original.url, type === 'stickers' ? 'sticker' : 'gif');
+                    togglePanel($(type === 'stickers' ? 'stickerPanel' : 'gif-picker'));
+                };
+                resultsGrid.appendChild(itemEl);
+            });
+        } catch (e) {
+            resultsGrid.innerHTML = `<div>Failed to load ${type}.</div>`;
+        }
+    }
+
+    searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => fetchItems(searchInput.value), 500);
+    });
+    
+    fetchItems(); // Initial fetch for trending items
+}
+
+setupGiphyPanel('gifs', 'gif-search-input', 'gif-results-grid');
+setupGiphyPanel('stickers', 'sticker-search-input', 'stickerGrid');
+
+
+// --- Add these event listeners inside your DOMContentLoaded ---
+expandBtn.addEventListener('click', () => {
+    expandBtn.classList.toggle('active');
+    expandOptions.classList.toggle('visible');
+    if (!expandOptions.classList.contains('visible')) {
+        allFeaturePanels.forEach(p => p.classList.remove('visible'));
+    }
+});
+
+const setupOptionButton = (btn, panel) => {
+    btn.addEventListener('click', () => {
+         togglePanel(panel);
+         expandOptions.classList.remove('visible');
+         expandBtn.classList.remove('active');
+    });
+};
+
+setupOptionButton(stickerOptionBtn, stickerPanel);
+setupOptionButton(audioOptionBtn, audioPanel);
+setupOptionButton(gifOptionBtn, gifPicker);
+
+document.querySelectorAll('.feature-panel-close-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const panelId = btn.getAttribute('data-panel');
+        $(panelId).classList.remove('visible');
+    });
+});
+
+messageList.addEventListener('click', (e) => {
+    if (e.target.classList.contains('chat-audio-play-btn')) {
+        const audioSrc = e.target.dataset.src;
+        if (audioSrc) {
+            if (currentAudio) {
+                currentAudio.pause();
+            }
+            currentAudio = new Audio(audioSrc);
+            currentAudio.play();
+        }
+    }
+});
     
     async function sendMessage() {
       const txt = messageInput.value.trim();
