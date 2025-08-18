@@ -8,159 +8,160 @@
   <meta name="theme-color" content="#000000">
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
   <style>
-        /* --- Chat Container Styles --- */
-        #chat-container {
-            width: 100%;
-            max-width: 400px;
-            height: 90vh;
-            max-height: 700px;
-            background-color: #ffffff;
-            border: 1px solid #dbdbdb;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        #message-list {
-            flex-grow: 1;
-            padding: 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .system-message {
-            text-align: center;
-            font-size: 12px;
-            color: #8e8e8e;
-            padding: 8px;
-            background-color: #f0f2f5;
-            border-radius: 12px;
-        }
-        .chat-message {
-            display: flex;
-            max-width: 75%;
-        }
-        .chat-message.sent {
-            align-self: flex-end;
-        }
-        .chat-message img {
-            max-width: 100%;
-            border-radius: 16px;
-        }
-        #chat-input-bar {
-            padding: 10px;
-            border-top: 1px solid #dbdbdb;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        #chat-input-bar input {
-            flex-grow: 1;
-            border: 1.5px solid #dbdbdb;
-            border-radius: 18px;
-            padding: 8px 12px;
-            font-size: 14px;
-            background-color: #f5f5f5;
-        }
-        #gif-tab-button {
-            background-color: #ffffff;
-            color: #262626;
-            border: 1.5px solid #dbdbdb;
-            padding: 0;
-            width: 50px;
-            height: 36px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background-color 0.2s, border-color 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-            flex-shrink: 0;
-        }
-        #gif-tab-button:hover {
-            background-color: #f5f5f5;
-            border-color: #c7c7c7;
-        }
-        /* --- GIF Picker Panel Styles --- */
-        #gif-picker {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 60%;
-            background-color: #ffffff;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-            display: flex;
-            flex-direction: column;
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            z-index: 1000;
-        }
-        #gif-picker.visible {
-            transform: translateY(0);
-        }
-        .gif-picker-header {
-            padding: 12px 16px;
-            border-bottom: 1px solid #dbdbdb;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        #gif-search-input {
-            flex-grow: 1;
-            padding: 10px 15px;
-            border: none;
-            background-color: #efefef;
-            border-radius: 20px;
-            font-size: 16px;
-            outline: none;
-        }
-        #gif-picker-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            font-weight: 300;
-            color: #8e8e8e;
-            cursor: pointer;
-        }
-        #gif-results-grid {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 10px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 8px;
-        }
-        #gif-results-grid img {
-            width: 100%;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        #gif-results-grid img:hover {
-            transform: scale(1.05);
-        }
-        .loader {
-            margin: 40px auto;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #0095f6;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+    /* --- Chat Container Styles --- */
+    #chat-container {
+        width: 100%;
+        max-width: 400px;
+        height: 90vh;
+        max-height: 700px;
+        background-color: #ffffff;
+        border: 1px solid #dbdbdb;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    #message-list {
+        flex-grow: 1;
+        padding: 16px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .system-message {
+        text-align: center;
+        font-size: 12px;
+        color: #8e8e8e;
+        padding: 8px;
+        background-color: #f0f2f5;
+        border-radius: 12px;
+    }
+    .chat-message {
+        display: flex;
+        max-width: 75%;
+    }
+    .chat-message.sent {
+        align-self: flex-end;
+    }
+    .chat-message img {
+        max-width: 100%;
+        border-radius: 16px;
+    }
+    #chat-input-bar {
+        padding: 10px;
+        border-top: 1px solid #dbdbdb;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    #chat-input-bar input {
+        flex-grow: 1;
+        border: 1.5px solid #dbdbdb;
+        border-radius: 18px;
+        padding: 8px 12px;
+        font-size: 14px;
+        background-color: #f5f5f5;
+    }
+    #gif-tab-button {
+        background-color: #ffffff;
+        color: #262626;
+        border: 1.5px solid #dbdbdb;
+        padding: 0;
+        width: 50px;
+        height: 36px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background-color 0.2s, border-color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        flex-shrink: 0;
+    }
+    #gif-tab-button:hover {
+        background-color: #f5f5f5;
+        border-color: #c7c7c7;
+    }
+    /* --- GIF Picker Panel Styles --- */
+    #gif-picker {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 60%;
+        background-color: #ffffff;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+        display: flex;
+        flex-direction: column;
+        transform: translateY(100%);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 1000;
+    }
+    #gif-picker.visible {
+        transform: translateY(0);
+    }
+    .gif-picker-header {
+        padding: 12px 16px;
+        border-bottom: 1px solid #dbdbdb;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    #gif-search-input {
+        flex-grow: 1;
+        padding: 10px 15px;
+        border: none;
+        background-color: #efefef;
+        border-radius: 20px;
+        font-size: 16px;
+        outline: none;
+    }
+    #gif-picker-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        font-weight: 300;
+        color: #8e8e8e;
+        cursor: pointer;
+    }
+    #gif-results-grid {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 10px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+    }
+    #gif-results-grid img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    #gif-results-grid img:hover {
+        transform: scale(1.05);
+    }
+    .loader {
+        margin: 40px auto;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #0095f6;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
     :root {
       --bg-dark: #000000;
       --bg-light: #ffffff;
@@ -173,7 +174,10 @@
       --system-bg: #f5f5f5;
       --system-text: #666666;
       --modal-bg: rgba(0, 0, 0, 0.8);
+      --pastel-accent: #f0f2f5;
+      --shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
     }
+    
     [data-theme="dark"] {
       --bg-dark: #ffffff;
       --bg-light: #000000;
@@ -185,7 +189,9 @@
       --system-bg: #1a1a1a;
       --system-text: #cccccc;
       --modal-bg: rgba(255, 255, 255, 0.8);
+      --pastel-accent: #1a1a1a;
     }
+    
     * {
       margin: 0;
       padding: 0;
@@ -194,6 +200,7 @@
                   border-color 0.3s ease,
                   color 0.3s ease;
     }
+    
     body {
       font-family: 'DotGothic16', monospace;
       background: var(--bg-light);
@@ -203,6 +210,7 @@
       -webkit-font-smoothing: antialiased;
       position: relative;
     }
+    
     .app-container {
       display: flex;
       justify-content: center;
@@ -210,6 +218,7 @@
       min-height: 100vh;
       padding: 20px;
     }
+    
     .main-container {
       width: 100%;
       max-width: 400px;
@@ -221,15 +230,18 @@
       display: flex;
       flex-direction: column;
     }
+    
     .app-header {
       background: var(--bg-light);
       padding: 20px;
       text-align: center;
       border-bottom: var(--border-thin);
     }
+    
     .chat-active .app-header {
       display: none !important;
     }
+    
     .theme-toggle {
       position: absolute;
       top: 16px;
@@ -250,12 +262,14 @@
       background: var(--accent);
       color: var(--text-light);
     }
+    
     .logo-section {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 12px;
     }
+    
     .logo-icon {
       width: 64px;
       height: 64px;
@@ -270,12 +284,14 @@
       color: var(--text-dark);
       overflow: hidden;
     }
+    
     .logo-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
       border-radius: var(--border-radius);
     }
+    
     .app-title {
       font-size: 26px;
       font-weight: 700;
@@ -287,15 +303,18 @@
       font-size: 13px;
       color: var(--gray);
     }
+    
     #joinView {
       padding: 24px;
       flex: 1;
       display: flex;
       flex-direction: column;
     }
-    #joinView.hidden {
+    
+    .view.hidden {
       display: none !important;
     }
+    
     .section-header {
       text-align: center;
       margin-bottom: 24px;
@@ -391,6 +410,7 @@
     .btn-success:hover {
       background: var(--accent);
     }
+    
     #chatsView {
       display: none;
       flex-direction: column;
@@ -402,6 +422,7 @@
     #chatsView:not(.hidden) {
       display: flex !important;
     }
+    
     .chat-header {
       background: var(--bg-light);
       padding: 12px 16px;
@@ -411,7 +432,8 @@
       border-bottom: var(--border-thin);
       flex-shrink: 0;
     }
-    .back-button {
+    
+    .back-button, .header-btn {
       border: var(--border-thin);
       width: 36px;
       height: 36px;
@@ -424,10 +446,11 @@
       font-size: 16px;
       color: var(--text-dark);
     }
-    .back-button:hover {
+    .back-button:hover, .header-btn:hover {
       background: var(--accent);
       color: var(--text-light);
     }
+    
     .chat-header-info {
       flex: 1;
       display: flex;
@@ -616,6 +639,7 @@
     .btn-room.primary:hover {
       background: var(--accent);
     }
+    
     #messageList {
       flex: 1;
       padding: 16px;
@@ -694,6 +718,7 @@
       align-items: flex-start;
       max-width: 75%;
     }
+    
     .chat-input {
       border-top: var(--border-thin);
       padding: 10px 16px;
@@ -737,7 +762,114 @@
       background: var(--accent);
       transform: scale(1.05);
     }
-    /* ✅ FIXED: Mobile Responsive CSS with keyboard handling */
+
+    /* --- Find/Search View Styles --- */
+    .find-view {
+        display: flex;
+        flex-direction: column;
+        padding: 24px;
+        flex-grow: 1;
+        background-color: var(--bg-light);
+    }
+    #findMenuView {
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    #findMenuView h2 {
+        font-size: 22px;
+        margin-bottom: 10px;
+        color: var(--text-dark);
+    }
+    #findMenuView p {
+        color: var(--gray);
+        margin-bottom: 40px;
+    }
+    .find-menu-btn {
+        width: 100%;
+        padding: 16px;
+        border-radius: var(--border-radius);
+        border: var(--border-thin);
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        margin-bottom: 16px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        font-family: inherit;
+        background: var(--bg-light);
+        color: var(--text-dark);
+    }
+    .find-menu-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow);
+        border-color: var(--accent);
+    }
+    .find-menu-btn.primary {
+        background: var(--bg-dark);
+        color: var(--text-light);
+        border: none;
+    }
+    .screen-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .screen-header h2 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+    .search-bar {
+        width: 100%;
+        padding: 12px 16px;
+        font-size: 14px;
+        border-radius: 25px;
+        border: var(--border-thin);
+        background: var(--pastel-accent);
+        margin-bottom: 24px;
+        outline: none;
+        font-family: inherit;
+        color: var(--text-dark);
+    }
+    .search-bar:focus {
+        border-color: var(--accent);
+    }
+    .user-list {
+        list-style: none;
+        overflow-y: auto;
+        flex-grow: 1;
+    }
+    .user-card {
+        display: flex;
+        align-items: center;
+        background: var(--bg-light);
+        padding: 12px;
+        border-radius: var(--border-radius);
+        margin-bottom: 12px;
+        border: var(--border-thin);
+    }
+    .profile-pic {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 12px;
+        border: var(--border-thin);
+    }
+    .user-info h3 {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-dark);
+    }
+    .user-info p {
+        font-size: 12px;
+        color: var(--gray);
+    }
+    
+    /* --- Mobile & Keyboard Handling --- */
     @media (max-width: 480px) {
       html {
         height: 100%;
@@ -811,112 +943,6 @@
         }
       }
     }
-
-    /* --- ✨ Find/Search View Styles --- */
-.find-view {
-    display: flex;
-    flex-direction: column;
-    padding: 24px;
-    flex-grow: 1;
-    background-color: var(--bg-light);
-}
-#findMenuView {
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-#findMenuView h2 {
-    font-size: 22px;
-    margin-bottom: 10px;
-    color: var(--text-dark);
-}
-#findMenuView p {
-    color: var(--gray);
-    margin-bottom: 40px;
-}
-.find-menu-btn {
-    width: 100%;
-    padding: 16px;
-    border-radius: var(--border-radius);
-    border: var(--border-thin);
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    margin-bottom: 16px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    font-family: inherit;
-    background: var(--bg-light);
-    color: var(--text-dark);
-}
-.find-menu-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow);
-    border-color: var(--accent);
-}
-.find-menu-btn.primary {
-    background: var(--bg-dark);
-    color: var(--text-light);
-    border: none;
-}
-.screen-header {
-    text-align: center;
-    margin-bottom: 20px;
-}
-.screen-header h2 {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-dark);
-}
-.search-bar {
-    width: 100%;
-    padding: 12px 16px;
-    font-size: 14px;
-    border-radius: 25px;
-    border: var(--border-thin);
-    background: var(--pastel-accent);
-    margin-bottom: 24px;
-    outline: none;
-    font-family: inherit;
-    color: var(--text-dark);
-}
-.search-bar:focus {
-    border-color: var(--accent);
-}
-.user-list {
-    list-style: none;
-    overflow-y: auto;
-    flex-grow: 1;
-}
-.user-card {
-    display: flex;
-    align-items: center;
-    background: var(--bg-light);
-    padding: 12px;
-    border-radius: var(--border-radius);
-    margin-bottom: 12px;
-    border: var(--border-thin);
-}
-.profile-pic {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 12px;
-    border: var(--border-thin);
-}
-.user-info h3 {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-dark);
-}
-.user-info p {
-    font-size: 12px;
-    color: var(--gray);
-}
   </style>
 </head>
 <body>
@@ -934,7 +960,8 @@
           <p class="app-subtitle">Connect with people around you</p>
         </div>
       </div>
-      <div id="joinView" class="active">
+      
+      <div id="joinView" class="view active">
         <div class="section-header">
           <div class="section-icon">👋</div>
           <h2 class="section-title">Join the Chat</h2>
@@ -958,7 +985,8 @@
         <button type="button" class="btn btn-success" id="joinButton">🚀 Start Chatting</button>
         <div id="locationStatus"></div>
       </div>
-      <div id="chatsView" class="hidden">
+      
+      <div id="chatsView" class="view hidden">
         <div class="chat-header">
           <button class="back-button" id="backButton">←</button>
           <div class="chat-header-info">
@@ -976,69 +1004,9 @@
               </div>
             </div>
           </div>
+          <button class="header-btn" id="findBtn" title="Find Users">🔍</button>
           <button class="create-room-btn" id="createRoomBtn" title="Create/Join Room">+</button>
         </div>
-
-        <!-- Button in the Main Chat Header -->
-<button class="header-btn" id="findBtn" title="Find Users">🔍</button>
-
-<!-- View 3: Find Menu -->
-<div id="findMenuView" class="view find-view hidden">
-    <div class="chat-header">
-      <button class="back-button" id="findMenuBackBtn">←</button>
-      <div class="chat-header-info">
-          <div class="header-app-name">Find Users</div>
-      </div>
-    </div>
-    <div style="padding: 24px;">
-        <h2>Find Connections</h2>
-        <p>Discover new people on Gappkar</p>
-        <button class="find-menu-btn primary" id="findAccountsBtn">
-            <span>👤</span> Find Accounts
-        </button>
-        <button class="find-menu-btn" id="nearbyBtn">
-            <span>📍</span> Nearby
-        </button>
-    </div>
-</div>
-
-<!-- View 4: Nearby Users -->
-<div id="nearbyView" class="view find-view hidden">
-    <div class="chat-header">
-      <button class="back-button" id="nearbyBackBtn">←</button>
-      <div class="chat-header-info">
-          <div class="header-app-name">Nearby Users</div>
-      </div>
-    </div>
-    <div style="padding: 24px;">
-        <div class="screen-header">
-            <h2>Nearby Recommendations</h2>
-        </div>
-        <input type="text" class="search-bar" id="nearbySearchInput" placeholder="Filter by name...">
-        <ul class="user-list" id="nearbyUserList">
-            <!-- JS will populate this list -->
-        </ul>
-    </div>
-</div>
-
-<!-- View 5: Search Accounts -->
-<div id="searchView" class="view find-view hidden">
-    <div class="chat-header">
-      <button class="back-button" id="searchBackBtn">←</button>
-      <div class="chat-header-info">
-          <div class="header-app-name">Search Accounts</div>
-      </div>
-    </div>
-    <div style="padding: 24px;">
-         <div class="screen-header">
-            <h2>Search Accounts</h2>
-        </div>
-        <input type="text" class="search-bar" id="accountSearchInput" placeholder="Search by name or location...">
-        <ul class="user-list" id="userResultsList">
-            <!-- JS will populate this list -->
-        </ul>
-    </div>
-</div>
         <div id="messageList"></div>
         <div class="chat-input" id="chatInput">
           <input type="text" class="message-input" placeholder="Type a message..." id="messageInput" maxlength="500" autocomplete="off">
@@ -1046,8 +1014,67 @@
           <button class="send-button" id="sendButton">➤</button>
         </div>
       </div>
+
+      <!-- Find Menu View -->
+      <div id="findMenuView" class="view find-view hidden">
+        <div class="chat-header">
+          <button class="back-button" id="findMenuBackBtn">←</button>
+          <div class="chat-header-info">
+              <div class="header-app-name">Find Users</div>
+          </div>
+        </div>
+        <div style="padding: 24px;">
+            <h2>Find Connections</h2>
+            <p>Discover new people on Gappkar</p>
+            <button class="find-menu-btn primary" id="findAccountsBtn">
+                <span>👤</span> Find Accounts
+            </button>
+            <button class="find-menu-btn" id="nearbyBtn">
+                <span>📍</span> Nearby
+            </button>
+        </div>
+      </div>
+
+      <!-- Nearby Users View -->
+      <div id="nearbyView" class="view find-view hidden">
+        <div class="chat-header">
+          <button class="back-button" id="nearbyBackBtn">←</button>
+          <div class="chat-header-info">
+              <div class="header-app-name">Nearby Users</div>
+          </div>
+        </div>
+        <div style="padding: 24px;">
+            <div class="screen-header">
+                <h2>Nearby Recommendations</h2>
+            </div>
+            <input type="text" class="search-bar" id="nearbySearchInput" placeholder="Filter by name...">
+            <ul class="user-list" id="nearbyUserList">
+                <!-- JS will populate this list -->
+            </ul>
+        </div>
+      </div>
+
+      <!-- Search Accounts View -->
+      <div id="searchView" class="view find-view hidden">
+        <div class="chat-header">
+          <button class="back-button" id="searchBackBtn">←</button>
+          <div class="chat-header-info">
+              <div class="header-app-name">Search Accounts</div>
+          </div>
+        </div>
+        <div style="padding: 24px;">
+             <div class="screen-header">
+                <h2>Search Accounts</h2>
+            </div>
+            <input type="text" class="search-bar" id="accountSearchInput" placeholder="Search by name or location...">
+            <ul class="user-list" id="userResultsList">
+                <!-- JS will populate this list -->
+            </ul>
+        </div>
+      </div>
     </div>
   </div>
+  
   <div class="room-modal" id="roomModal">
     <div class="room-modal-content">
       <button class="room-modal-close" id="roomModalClose">×</button>
@@ -1068,7 +1095,8 @@
       </div>
     </div>
   </div>
-  <!-- This is the hidden GIF picker panel -->
+  
+  <!-- GIF Picker Panel -->
   <div id="gif-picker">
     <header class="gif-picker-header">
       <input type="text" id="gif-search-input" placeholder="Search for GIFs...">
@@ -1078,7 +1106,8 @@
       <!-- GIFs will be loaded here by JavaScript -->
     </div>
   </div>
-  <!-- ✅ ADDED: Mobile Keyboard Handling Script -->
+
+  <!-- Mobile Keyboard Handling Script -->
   <script>
     // Mobile keyboard handling
     function setupMobileKeyboardHandling() {
@@ -1087,6 +1116,7 @@
       const messageList = document.getElementById('messageList');
       const chatInput = document.getElementById('chatInput');
       let initialViewportHeight = window.innerHeight;
+      
       function handleKeyboardShow() {
         document.body.classList.add('keyboard-visible');
         setTimeout(() => {
@@ -1095,9 +1125,11 @@
           }
         }, 300);
       }
+      
       function handleKeyboardHide() {
         document.body.classList.remove('keyboard-visible');
       }
+      
       // iOS handling
       if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
         messageInput.addEventListener('focus', () => {
@@ -1106,6 +1138,7 @@
         messageInput.addEventListener('blur', () => {
           setTimeout(handleKeyboardHide, 100);
         });
+        
         // Viewport height change detection for iOS
         window.addEventListener('resize', () => {
           const currentHeight = window.innerHeight;
@@ -1132,6 +1165,7 @@
         });
         resizeObserver.observe(document.body);
       }
+      
       // Enhanced scroll behavior for new messages
       const originalScrollBottom = window.scrollBottom;
       window.scrollBottom = () => {
@@ -1146,6 +1180,7 @@
         }
       };
     }
+    
     // Initialize when DOM is loaded
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', setupMobileKeyboardHandling);
@@ -1153,11 +1188,13 @@
       setupMobileKeyboardHandling();
     }
   </script>
-  <!-- Your existing Firebase script -->
+
+  <!-- Main Firebase Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-    import { getFirestore, addDoc, collection, doc, setDoc, onSnapshot, orderBy, query, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    import { getFirestore, addDoc, collection, doc, setDoc, onSnapshot, orderBy, query, serverTimestamp, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+    
     const firebaseConfig = {
       apiKey: "AIzaSyCOmLxxqPesNaBr4Z9fVIU6K2BLW6OsED0",
       authDomain: "gappkar-v1-b3afe.firebaseapp.com",
@@ -1168,13 +1205,18 @@
       appId: "1:726018257415:web:12142708abdf47952af0a2",
       measurementId: "G-EWK4436NRB"
     };
+    
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
+    
     let currentUser = null, currentUsername = "", currentUserAge = 0, currentUserLocation = "";
     let userLatitude = null, userLongitude = null, isJoined = false, currentRoom = "global";
     let messagesListener = null, presenceTimer = null, onlineListener = null;
+    let currentView = 'joinView';
+    
     const $ = id => document.getElementById(id);
+    const allViews = document.querySelectorAll('.view');
     const joinView = $("joinView"), chatsView = $("chatsView"), messageList = $("messageList");
     const messageInput = $("messageInput"), sendButton = $("sendButton"), backButton = $("backButton");
     const usernameInput = $("usernameInput"), ageInput = $("ageInput"), locationInput = $("locationInput");
@@ -1182,7 +1224,18 @@
     const createRoomBtnH = $("createRoomBtn"), roomModal = $("roomModal"), roomModalClose = $("roomModalClose");
     const roomKeyInput = $("roomKeyInput"), joinRoomBtn = $("joinRoomBtn"), createRoomBtnM = $("createRoomBtnModal");
     const leaveRoomBtn = $("leaveRoomBtn"), roomIndicator = $("roomIndicator");
+
+    // Find/Search Elements
+    const findBtn = $("findBtn");
+    const findAccountsBtn = $("findAccountsBtn");
+    const nearbyBtn = $("nearbyBtn");
+    const nearbyUserList = $("nearbyUserList");
+    const userResultsList = $("userResultsList");
+    const accountSearchInput = $("accountSearchInput");
+    const nearbySearchInput = $("nearbySearchInput");
+    
     const roomMessagesRef = room => collection(db, "rooms", room, "messages");
+    
     const timeStr = ts => {
       const d = ts?.toDate ? ts.toDate() : (ts || new Date());
       let h = d.getHours();
@@ -1191,6 +1244,7 @@
       h = h % 12 || 12;
       return `${h}:${m} ${a}`;
     };
+    
     const scrollBottom = () => {
       if (messageList) {
         messageList.scrollTop = messageList.scrollHeight;
@@ -1202,11 +1256,26 @@
         }
       }
     };
+
+    // View Management
+    function showView(viewId) {
+      currentView = viewId;
+      allViews.forEach(v => v.classList.add('hidden'));
+      $(viewId)?.classList.remove('hidden');
+      
+      // Only show app header for join view
+      const appHeader = document.querySelector('.app-header');
+      if (appHeader) {
+        appHeader.style.display = viewId === 'joinView' ? 'block' : 'none';
+      }
+    }
+    
     const updateRoomUI = () => {
       if (!roomIndicator) return;
       roomIndicator.textContent = currentRoom === "global" ? "Global" : currentRoom;
       roomIndicator.style.background = currentRoom === "global" ? "var(--accent)" : "#28a745";
     };
+    
     const addSystemMsg = txt => {
       const div = document.createElement("div");
       div.className = "message system";
@@ -1214,6 +1283,7 @@
       messageList.appendChild(div);
       scrollBottom();
     };
+    
     function trackPresence() {
       if (!currentUser || !currentUsername) return;
       const ref = doc(db, "presence", currentUser.uid);
@@ -1225,6 +1295,7 @@
       clearInterval(presenceTimer);
       presenceTimer = setInterval(() => setDoc(ref, { room: currentRoom, lastSeen: serverTimestamp() }, { merge: true }), 30000);
     }
+    
     function listenOnlineUsers() {
       onlineListener && onlineListener();
       onlineListener = onSnapshot(collection(db, "presence"), snap => {
@@ -1237,25 +1308,62 @@
         peopleCount.textContent = `${roomCnt} people ${currentRoom === "global" ? "nearby" : "in " + currentRoom}`;
       });
     }
-    async function getUserLocation() {
-        const statusDiv = $("locationStatus");
-        if (!navigator.geolocation) {
-            statusDiv.textContent = "Geolocation is not supported."; statusDiv.className = "error"; return;
-        }
-        statusDiv.textContent = "Getting your location..."; statusDiv.className = "";
-        try {
-            const position = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 }));
-            userLatitude = position.coords.latitude; userLongitude = position.coords.longitude;
-            const locationName = await (async (lat, lon) => { try { const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`); return (await r.json()).city; } catch (e) { return null; } })(userLatitude, userLongitude);
-            currentUserLocation = locationName || `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
-            statusDiv.textContent = `Location found: ${currentUserLocation}`; statusDiv.className = "success";
-            locationInput.value = currentUserLocation;
-        } catch (error) {
-            statusDiv.textContent = "Could not get location. Enter manually."; statusDiv.className = "error";
-        }
+
+    // Find/Search Logic
+    function createUserCard(user) {
+      if (user.userId === currentUser?.uid) return '';
+      return `
+          <li class="user-card">
+              <img src="https://i.pravatar.cc/150?u=${user.userId}" alt="${user.username}" class="profile-pic">
+              <div class="user-info">
+                  <h3>${user.username} (${user.age})</h3>
+                  <p>📍 ${user.location || 'Unknown'}</p>
+              </div>
+          </li>
+      `;
     }
+
+    function renderUserList(targetList, users) {
+      if (!users || users.length === 0) {
+          targetList.innerHTML = '<p style="text-align:center; color: var(--gray); padding: 20px;">No users found.</p>';
+          return;
+      }
+      targetList.innerHTML = users.filter(u => u.userId !== currentUser?.uid).map(createUserCard).join('');
+    }
+
+    async function fetchAllOnlineUsers() {
+      const fiveAgo = new Date(Date.now() - 5 * 60 * 1000);
+      const q = query(collection(db, "presence"), where("lastSeen", ">", fiveAgo));
+      try {
+          const snapshot = await getDocs(q);
+          return snapshot.docs.map(doc => doc.data());
+      } catch (error) {
+          console.error("Error fetching users:", error);
+          return [];
+      }
+    }
+    
+    async function getUserLocation() {
+      const statusDiv = $("locationStatus");
+      if (!navigator.geolocation) {
+        statusDiv.textContent = "Geolocation is not supported."; statusDiv.className = "error"; return;
+      }
+      statusDiv.textContent = "Getting your location..."; statusDiv.className = "";
+      try {
+        const position = await new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 }));
+        userLatitude = position.coords.latitude; userLongitude = position.coords.longitude;
+        const locationName = await (async (lat, lon) => { try { const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`); return (await r.json()).city; } catch (e) { return null; } })(userLatitude, userLongitude);
+        currentUserLocation = locationName || `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
+        statusDiv.textContent = `Location found: ${currentUserLocation}`; statusDiv.className = "success";
+        locationInput.value = currentUserLocation;
+      } catch (error) {
+        statusDiv.textContent = "Could not get location. Enter manually."; statusDiv.className = "error";
+      }
+    }
+    
     function showModal() { roomModal.classList.add("show"); }
     function hideModal() { roomModal.classList.remove("show"); roomKeyInput.value = ""; }
+    
     async function joinRoom(key) {
       const k = key.trim().toLowerCase();
       if (!k) return alert("Enter a room key");
@@ -1267,6 +1375,7 @@
       addSystemMsg(`Joined room: ${currentRoom}`);
       listenMessages(); trackPresence(); hideModal();
     }
+    
     function leaveRoom() {
       if (currentRoom === "global") return hideModal();
       messagesListener && messagesListener();
@@ -1276,16 +1385,26 @@
       addSystemMsg("Left room, back to global chat");
       listenMessages(); trackPresence(); hideModal();
     }
+    
     function displayMsg(d) {
       const mine = d.user === currentUsername;
       const div = document.createElement("div");
       div.className = `message ${mine ? "sent" : "received"}`;
       const time = timeStr(d.timestamp);
-      div.innerHTML = mine
-        ? `<div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>`
-        : `<div class="message-info"><div class="sender-name">${d.user}${d.age ? ` (${d.age})` : ""}</div><div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>${d.location ? `<div class="message-location">📍 ${d.location}</div>` : ""}</div>`;
+
+      // Handle GIF messages
+      if (d.isGif && d.gifUrl) {
+        div.innerHTML = mine
+          ? `<div class="message-bubble"><img src="${d.gifUrl}" style="max-width: 250px; border-radius: 16px;"><div class="message-time">${time}</div></div>`
+          : `<div class="message-info"><div class="sender-name">${d.user}${d.age ? ` (${d.age})` : ""}</div><div class="message-bubble"><img src="${d.gifUrl}" style="max-width: 250px; border-radius: 16px;"><div class="message-time">${time}</div></div>${d.location ? `<div class="message-location">📍 ${d.location}</div>` : ""}</div>`;
+      } else {
+        div.innerHTML = mine
+          ? `<div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>`
+          : `<div class="message-info"><div class="sender-name">${d.user}${d.age ? ` (${d.age})` : ""}</div><div class="message-bubble">${d.message}<div class="message-time">${time}</div></div>${d.location ? `<div class="message-location">📍 ${d.location}</div>` : ""}</div>`;
+      }
       messageList.appendChild(div);
     }
+    
     function listenMessages() {
       messagesListener && messagesListener();
       const q = query(roomMessagesRef(currentRoom), orderBy("timestamp", "asc"));
@@ -1300,6 +1419,7 @@
         scrollBottom();
       });
     }
+    
     async function sendMessage() {
       const txt = messageInput.value.trim();
       if (!txt || !isJoined) return;
@@ -1326,6 +1446,7 @@
         }
       }
     }
+    
     async function joinChat(name, age, loc) {
       if (!name.trim()) return alert("Enter name");
       if (age < 13 || age > 99) return alert("Age 13-99 only");
@@ -1338,8 +1459,7 @@
       isJoined = true;
       const savedRoom = localStorage.getItem("gappkar_current_room");
       if (savedRoom) currentRoom = savedRoom;
-      joinView.classList.add("hidden");
-      chatsView.classList.remove("hidden");
+      showView('chatsView');
       document.body.classList.add("chat-active");
       updateRoomUI();
       messageList.innerHTML = "";
@@ -1350,7 +1470,9 @@
       localStorage.setItem("gappkar_location", currentUserLocation);
       localStorage.setItem("gappkar_joined", "true");
     }
+    
     onAuthStateChanged(auth, u => currentUser = u || null);
+    
     async function logout() {
       presenceTimer && clearInterval(presenceTimer);
       onlineListener && onlineListener();
@@ -1361,41 +1483,101 @@
       try { await signOut(auth); } catch {}
       isJoined = false; currentRoom = "global";
       localStorage.clear();
-      chatsView.classList.add("hidden");
-      joinView.classList.remove("hidden");
+      showView('joinView');
       document.body.classList.remove("chat-active");
     }
+
+    // Navigation functions
+    function handleMainBack() {
+      if (['findMenuView', 'nearbyView', 'searchView'].includes(currentView)) {
+        showView('chatsView');
+      } else {
+        logout();
+      }
+    }
+
+    function handleFindBack() {
+      showView('chatsView');
+    }
+    
+    // Make functions available globally for GIF script
+    window.isJoined = () => isJoined;
+    window.currentUser = () => currentUser;
+    window.currentUsername = () => currentUsername;
+    window.currentUserLocation = () => currentUserLocation;
+    window.currentUserAge = () => currentUserAge;
+    window.currentRoom = () => currentRoom;
+    window.roomMessagesRef = roomMessagesRef;
+    window.addDoc = addDoc;
+    window.serverTimestamp = serverTimestamp;
+    window.timeStr = timeStr;
+    window.scrollBottom = scrollBottom;
+    window.addSystemMsg = addSystemMsg;
+    
     document.addEventListener("DOMContentLoaded", () => {
       if (localStorage.getItem("gappkar_joined") === "true") {
         joinChat(localStorage.getItem("gappkar_username") || "", localStorage.getItem("gappkar_age") || 0, localStorage.getItem("gappkar_location") || "");
       }
+      
       getLocationBtn.addEventListener("click", getUserLocation);
       joinButton.addEventListener("click", () => joinChat(usernameInput.value, ageInput.value, locationInput.value));
       sendButton.addEventListener("click", sendMessage);
       messageInput.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
-      backButton.addEventListener("click", logout);
+      backButton.addEventListener("click", handleMainBack);
       createRoomBtnH.addEventListener("click", showModal);
       roomModalClose.addEventListener("click", hideModal);
       joinRoomBtn.addEventListener("click", () => joinRoom(roomKeyInput.value));
       createRoomBtnM.addEventListener("click", () => joinRoom(roomKeyInput.value));
       leaveRoomBtn.addEventListener("click", leaveRoom);
       roomModal.addEventListener("click", e => { if (e.target === roomModal) hideModal(); });
+
+      // Find/Search Event Listeners
+      findBtn.addEventListener('click', () => showView('findMenuView'));
+      $("findMenuBackBtn").addEventListener("click", handleFindBack);
+      $("nearbyBackBtn").addEventListener("click", () => showView('findMenuView'));
+      $("searchBackBtn").addEventListener("click", () => showView('findMenuView'));
+
+      nearbyBtn.addEventListener('click', async () => {
+        showView('nearbyView');
+        nearbyUserList.innerHTML = '<p style="text-align:center; color: var(--gray); padding: 20px;">Loading users...</p>';
+        const allOnlineUsers = await fetchAllOnlineUsers();
+        const nearbyUsers = allOnlineUsers.filter(u => u.location.toLowerCase() === currentUserLocation.toLowerCase());
+        renderUserList(nearbyUserList, nearbyUsers.length > 1 ? nearbyUsers : allOnlineUsers);
+      });
+
+      findAccountsBtn.addEventListener('click', () => {
+        showView('searchView');
+        renderUserList(userResultsList, []);
+      });
+
+      accountSearchInput.addEventListener('input', async (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+        if (!searchTerm) {
+          renderUserList(userResultsList, []);
+          return;
+        }
+        const allOnlineUsers = await fetchAllOnlineUsers();
+        const results = allOnlineUsers.filter(user => 
+          user.username.toLowerCase().includes(searchTerm) ||
+          user.location.toLowerCase().includes(searchTerm)
+        );
+        renderUserList(userResultsList, results);
+      });
     });
   </script>
+
+  <!-- GIF Functionality Script -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // --- 1. SETUP ---
       const GIPHY_API_KEY = 'GLutXRXDEL19PuG3ztekK0JNDr5oySTh';
-      // DOM Elements - Fixed to use the correct elements from the main chat
       const gifTabButton = document.getElementById('gif-tab-button');
       const gifPicker = document.getElementById('gif-picker');
       const gifPickerClose = document.getElementById('gif-picker-close');
       const gifSearchInput = document.getElementById('gif-search-input');
       const gifResultsGrid = document.getElementById('gif-results-grid');
-      const messageList = document.getElementById('messageList'); // Fixed: Use the correct message list
+      const messageList = document.getElementById('messageList');
       let debounceTimer;
       
-      // --- 2. EVENT LISTENERS ---
       gifTabButton.addEventListener('click', openGifPicker);
       gifPickerClose.addEventListener('click', closeGifPicker);
       gifSearchInput.addEventListener('input', (event) => {
@@ -1405,7 +1587,6 @@
         }, 500);
       });
       
-      // --- 3. FUNCTIONS ---
       function openGifPicker() {
         gifPicker.classList.add('visible');
         if (gifResultsGrid.innerHTML.trim() === '') {
@@ -1449,178 +1630,55 @@
       }
       
       async function selectGif(gif) {
-        // Only proceed if user is joined
-        if (!isJoined) {
-          addSystemMsg('Please join the chat first!');
+        if (!window.isJoined()) {
+          window.addSystemMsg('Please join the chat first!');
           closeGifPicker();
           return;
         }
         
-        // Create the message bubble element
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', 'sent');
-        
-        // Create the image element for the GIF
-        const gifImage = document.createElement('img');
-        gifImage.src = gif.images.original.url;
-        gifImage.alt = gif.title;
-        gifImage.style.maxWidth = '250px';
-        gifImage.style.borderRadius = '16px';
-        
-        // Create container for the image
-        const messageBubble = document.createElement('div');
-        messageBubble.classList.add('message-bubble');
-        messageBubble.style.background = 'var(--bg-dark)';
-        messageBubble.style.color = 'var(--text-light)';
-        messageBubble.style.border = 'none';
-        
-        // Add the image to the bubble
-        messageBubble.appendChild(gifImage);
-        
-        // Add timestamp
-        const timeDiv = document.createElement('div');
-        timeDiv.classList.add('message-time');
-        timeDiv.textContent = timeStr();
-        messageBubble.appendChild(timeDiv);
-        
-        // Append the bubble to the message
-        messageElement.appendChild(messageBubble);
-        
-        // Append the message to the message list
-        messageList.appendChild(messageElement);
-        
-        // Scroll to the bottom of the chat
-        scrollBottom();
-        
-        // Send the GIF to Firebase
         try {
-          await addDoc(roomMessagesRef(currentRoom), {
-            user: currentUsername, 
+          await window.addDoc(window.roomMessagesRef(window.currentRoom()), {
+            user: window.currentUsername(), 
             message: `[GIF] ${gif.title || 'Animated GIF'}`, 
-            timestamp: serverTimestamp(),
-            location: currentUserLocation, 
-            age: currentUserAge, 
-            userId: currentUser.uid,
+            timestamp: window.serverTimestamp(),
+            location: window.currentUserLocation(), 
+            age: window.currentUserAge(), 
+            userId: window.currentUser().uid,
             gifUrl: gif.images.original.url,
             isGif: true
           });
         } catch (e) {
           console.error("Failed to send GIF:", e);
-          // Optionally show error to user
-          const errorDiv = document.createElement('div');
-          errorDiv.textContent = 'Failed to send GIF';
-          errorDiv.style.color = 'red';
-          errorDiv.style.fontSize = '12px';
-          messageBubble.appendChild(errorDiv);
+          window.addSystemMsg('Failed to send GIF');
         }
         
-        // Close the picker after selection
         closeGifPicker();
       }
       
-      // Initial fetch of trending GIFs
       fetchGifs();
     });
   </script>
 
-  // --- DOM Element References ---
-const findBtn = $("findBtn");
-const findAccountsBtn = $("findAccountsBtn");
-const nearbyBtn = $("nearbyBtn");
-const nearbyUserList = $("nearbyUserList");
-const userResultsList = $("userResultsList");
-const accountSearchInput = $("accountSearchInput");
-const nearbySearchInput = $("nearbySearchInput");
-
-// --- Find/Search Logic ---
-function createUserCard(user) {
-    // Don't show the current user in the list
-    if (user.userId === currentUser?.uid) return '';
-    return `
-        <li class="user-card">
-            <img src="https://i.pravatar.cc/150?u=${user.userId}" alt="${user.username}" class="profile-pic">
-            <div class="user-info">
-                <h3>${user.username} (${user.age})</h3>
-                <p>📍 ${user.location || 'Unknown'}</p>
-            </div>
-        </li>
-    `;
-}
-
-function renderUserList(targetList, users) {
-    if (!users || users.length === 0) {
-        targetList.innerHTML = '<p style="text-align:center; color: var(--gray); padding: 20px;">No users found.</p>';
-        return;
-    }
-    // Filter out current user before mapping
-    targetList.innerHTML = users.filter(u => u.userId !== currentUser?.uid).map(createUserCard).join('');
-}
-
-async function fetchAllOnlineUsers() {
-    const fiveAgo = new Date(Date.now() - 5 * 60 * 1000);
-    const q = query(collection(db, "presence"), where("lastSeen", ">", fiveAgo));
-    try {
-        const snapshot = await getDocs(q);
-        return snapshot.docs.map(doc => doc.data());
-    } catch (error) {
-        console.error("Error fetching users:", error);
-        return [];
-    }
-}
-
-// --- Navigation and Event Listeners ---
-function handleFindBack() {
-    showView('chatsView');
-}
-
-// Add these inside your DOMContentLoaded event listener
-findBtn.addEventListener('click', () => showView('findMenuView'));
-$("findMenuBackBtn").addEventListener("click", handleFindBack);
-$("nearbyBackBtn").addEventListener("click", () => showView('findMenuView'));
-$("searchBackBtn").addEventListener("click", () => showView('findMenuView'));
-
-nearbyBtn.addEventListener('click', async () => {
-    showView('nearbyView');
-    nearbyUserList.innerHTML = '<p style="text-align:center; color: var(--gray); padding: 20px;">Loading users...</p>';
-    const allOnlineUsers = await fetchAllOnlineUsers();
-    // Simple "nearby" logic: filter for users in the same city
-    const nearbyUsers = allOnlineUsers.filter(u => u.location.toLowerCase() === currentUserLocation.toLowerCase());
-    renderUserList(nearbyUserList, nearbyUsers.length > 1 ? nearbyUsers : allOnlineUsers); // Fallback to all if no one in city
-});
-
-findAccountsBtn.addEventListener('click', () => {
-    showView('searchView');
-    renderUserList(userResultsList, []); // Start with empty list
-});
-
-accountSearchInput.addEventListener('input', async (e) => {
-    const searchTerm = e.target.value.toLowerCase();
-    if (!searchTerm) {
-        renderUserList(userResultsList, []);
-        return;
-    }
-    const allOnlineUsers = await fetchAllOnlineUsers();
-    const results = allOnlineUsers.filter(user => 
-        user.username.toLowerCase().includes(searchTerm) ||
-        user.location.toLowerCase().includes(searchTerm)
-    );
-    renderUserList(userResultsList, results);
-}
+  <!-- Theme Toggle Script -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const themeToggle = document.getElementById('themeToggle');
       const themeIcon = document.getElementById('themeIcon');
+      
       function toggleTheme() {
         const body = document.body;
         if (body.getAttribute('data-theme') === 'dark') {
           body.removeAttribute('data-theme');
-          if (themeIcon) themeIcon.textContent = 'dark';
+          if (themeIcon) themeIcon.textContent = '🌙';
         } else {
           body.setAttribute('data-theme', 'dark');
           if (themeIcon) themeIcon.textContent = '☀️';
         }
       }
-      if (themeToggle) { themeToggle.addEventListener('click', toggleTheme); }
+      
+      if (themeToggle) { 
+        themeToggle.addEventListener('click', toggleTheme); 
+      }
     });
   </script>
 </body>
