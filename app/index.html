@@ -1044,7 +1044,7 @@
             <img src="your-icon.jpg" alt="Gappkar Logo" class="logo-image" onerror="this.style.display='none'; this.parentNode.innerHTML='G';">
           </div>
           <h1 class="app-title">gappkar</h1>
-          <p class="app-subtitle">Connect with people around you</p>
+          <p class="app-subtitle">Connect with people Nearby you</p>
         </div>
       </div>
       
@@ -1063,13 +1063,13 @@
           <input type="number" id="ageInput" class="form-input" placeholder="Enter your age" min="13" max="99" required>
         </div>
         <div class="form-group">
-          <label class="form-label">Location</label>
+          <label class="form-label">Area</label>
           <div class="location-options">
-            <button type="button" class="btn btn-location" id="getLocationBtn">📍 Get My Location</button>
+            <button type="button" class="btn btn-location" id="getLocationBtn">📍 Get My Area</button>
             <input type="text" id="locationInput" class="form-input" placeholder="Or enter your city manually" style="margin-top: 10px;">
           </div>
         </div>
-        <button type="button" class="btn btn-success" id="joinButton">🚀 Start Chatting</button>
+        <button type="button" class="btn btn-success" id="joinButton">🚀 Start gapping</button>
         <div id="locationStatus"></div>
       </div>
       
@@ -1084,7 +1084,7 @@
               <div class="header-app-info">
                 <div class="header-app-name">gappkar</div>
                 <div class="header-room-info">
-                  <span class="room-indicator" id="roomIndicator">Global</span>
+                  <span class="room-indicator" id="roomIndicator">Local Chat</span>
                   <span class="online-dot"></span>
                   <span id="peopleCount">connecting...</span>
                 </div>
@@ -1113,7 +1113,7 @@
             <!-- Audio Panel -->
             <div id="audioPanel" class="feature-panel">
                 <div class="feature-panel-header">
-                    <div class="feature-panel-title">Audio</div>
+                    <div class="feature-panel-title">Sounds</div>
                     <button class="feature-panel-close-btn" data-panel="audioPanel">×</button>
                 </div>
                 <div class="feature-panel-content">
@@ -1137,7 +1137,7 @@
             <!-- Expandable Options Menu -->
             <div id="expandOptions" class="expand-options">
                 <button class="expand-option-btn" id="gifOptionBtn"><span class="icon">📄</span> GIF</button>
-                <button class="expand-option-btn" id="audioOptionBtn"><span class="icon">🎵</span> Audio</button>
+                <button class="expand-option-btn" id="audioOptionBtn"><span class="icon">🎵</span> Sounds</button>
                 <button class="expand-option-btn" id="stickerOptionBtn"><span class="icon">😊</span> Sticker</button>
             </div>
 
@@ -1162,7 +1162,7 @@
             <h2>Find Connections</h2>
             <p>Discover new people on Gappkar</p>
             <button class="find-menu-btn primary" id="findAccountsBtn">
-                <span>👤</span> Find Accounts
+                <span>👤</span> Find gappars
             </button>
             <button class="find-menu-btn" id="nearbyBtn">
                 <span>📍</span> Nearby
@@ -1175,12 +1175,12 @@
         <div class="chat-header">
           <button class="back-button" id="nearbyBackBtn">←</button>
           <div class="chat-header-info">
-              <div class="header-app-name">Nearby Users</div>
+              <div class="header-app-name">Nearby gappars</div>
           </div>
         </div>
         <div style="padding: 24px;">
             <div class="screen-header">
-                <h2>Nearby Recommendations</h2>
+                <h2>Recommendations</h2>
             </div>
             <input type="text" class="search-bar" id="nearbySearchInput" placeholder="Filter by name...">
             <ul class="user-list" id="nearbyUserList">
@@ -1199,7 +1199,7 @@
         </div>
         <div style="padding: 24px;">
              <div class="screen-header">
-                <h2>Search Accounts</h2>
+                <h2>Search gappars</h2>
             </div>
             <input type="text" class="search-bar" id="accountSearchInput" placeholder="Search by name or location...">
             <ul class="user-list" id="userResultsList">
@@ -1219,7 +1219,7 @@
       </div>
       <div class="form-group">
         <label class="form-label" for="roomKeyInput">Room Key</label>
-        <input type="text" id="roomKeyInput" class="form-input" placeholder="Enter room key (e.g., myroom123)" maxlength="50">
+        <input type="text" id="roomKeyInput" class="form-input" placeholder="Enter room key ( e.g Room123)" maxlength="50">
       </div>
       <div class="room-buttons">
         <button class="btn-room" id="joinRoomBtn">Join Room</button>
