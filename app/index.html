@@ -9,7 +9,6 @@
   <meta name="theme-color" content="#000000">
   <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
   <style>
-    /* ===== VARIABLES WITH UPDATED RED GRADIENT THEME ===== */
     :root {
       --bg-gradient: linear-gradient(180deg, #000000 0%, #1a0000 50%, #000000 100%);
       --bg-dark: #000000;
@@ -29,7 +28,7 @@
       --shadow: 0 4px 15px rgba(223, 19, 23, 0.3);
       --card-hover: 0 6px 20px rgba(223, 19, 23, 0.4);
     }
-    
+
     [data-theme="dark"] {
       --bg-gradient: linear-gradient(180deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%);
       --bg-dark: #ffffff;
@@ -41,15 +40,14 @@
       --system-text: #666666;
       --modal-bg: rgba(255, 255, 255, 0.9);
     }
-    
-    /* ===== RESET & BASE STYLES ===== */
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       transition: all 0.3s ease;
     }
-    
+
     body {
       font-family: 'DotGothic16', monospace;
       background: var(--bg-gradient);
@@ -59,8 +57,7 @@
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
-    
-    /* ===== MAIN CONTAINER ===== */
+
     .app-container {
       display: flex;
       justify-content: center;
@@ -68,7 +65,7 @@
       min-height: 100vh;
       padding: 0;
     }
-    
+
     .main-container {
       width: 100%;
       max-width: 400px;
@@ -79,12 +76,11 @@
       flex-direction: column;
       min-height: 100vh;
     }
-    
-    /* ===== GRADIENT BORDER HELPER ===== */
+
     .gradient-border {
       position: relative;
     }
-    
+
     .gradient-border::before {
       content: "";
       position: absolute;
@@ -95,18 +91,17 @@
       border-radius: inherit;
       padding: 2px;
       background: var(--border-gradient);
-      -webkit-mask: 
-        linear-gradient(#fff 0 0) content-box, 
+      -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
         linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
-      mask: 
-        linear-gradient(#fff 0 0) content-box, 
+      mask:
+        linear-gradient(#fff 0 0) content-box,
         linear-gradient(#fff 0 0);
       mask-composite: exclude;
       pointer-events: none;
     }
-    
-    /* ===== APP HEADER ===== */
+
     .app-header {
       background: var(--bg-dark);
       padding: 30px 20px;
@@ -114,11 +109,11 @@
       position: relative;
       border-bottom: 1px solid #333;
     }
-    
+
     .chat-active .app-header {
       display: none !important;
     }
-    
+
     .theme-toggle {
       position: absolute;
       top: 20px;
@@ -136,18 +131,18 @@
       transition: all 0.3s ease;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .theme-toggle.gradient-border {
       border: none;
     }
-    
+
     .theme-toggle:hover {
       background: var(--accent-gradient);
       color: white;
       transform: scale(1.1);
       box-shadow: var(--shadow);
     }
-    
+
     .logo-section {
       display: flex;
       flex-direction: column;
@@ -155,7 +150,7 @@
       gap: 20px;
       margin-top: 10px;
     }
-    
+
     .logo-icon {
       width: 70px;
       height: 70px;
@@ -172,7 +167,7 @@
       position: relative;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .logo-icon::after {
       content: "";
       position: absolute;
@@ -184,20 +179,20 @@
       transform: rotate(45deg);
       animation: shine 3s infinite;
     }
-    
+
     @keyframes shine {
       0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
       50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
       100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
     }
-    
+
     .logo-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
       border-radius: 23px;
     }
-    
+
     .app-title {
       font-size: 32px;
       font-weight: 700;
@@ -210,7 +205,7 @@
       text-shadow: 0 0 30px rgba(223, 19, 23, 0.5);
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .app-subtitle {
       font-size: 16px;
       color: var(--gray);
@@ -218,18 +213,16 @@
       letter-spacing: 1px;
       font-family: 'DotGothic16', monospace;
     }
-    
-    /* ===== VIEW MANAGEMENT ===== */
+
     .view {
       display: flex;
       flex-direction: column;
     }
-    
+
     .view.hidden {
       display: none !important;
     }
-    
-    /* ===== ENHANCED JOIN VIEW ===== */
+
     #joinView {
       padding: 30px 24px;
       flex: 1;
@@ -237,7 +230,7 @@
       flex-direction: column;
       background: var(--bg-gradient);
     }
-    
+
     .section-header {
       text-align: center;
       margin-bottom: 40px;
@@ -248,7 +241,7 @@
       position: relative;
       overflow: hidden;
     }
-    
+
     .section-header::before {
       content: "";
       position: absolute;
@@ -259,26 +252,26 @@
       background: var(--accent-gradient);
       animation: slideIn 2s infinite;
     }
-    
+
     @keyframes slideIn {
       0% { left: -100%; }
       50% { left: 100%; }
       100% { left: -100%; }
     }
-    
+
     .section-icon {
       font-size: 40px;
       margin-bottom: 15px;
       animation: bounce 2s infinite;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     @keyframes bounce {
       0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
       40% { transform: translateY(-10px); }
       60% { transform: translateY(-5px); }
     }
-    
+
     .section-title {
       font-size: 24px;
       font-weight: 700;
@@ -291,7 +284,7 @@
       letter-spacing: 2px;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .section-description {
       color: var(--gray);
       font-size: 16px;
@@ -299,11 +292,11 @@
       letter-spacing: 0.5px;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .form-group {
       margin-bottom: 25px;
     }
-    
+
     .form-label {
       display: block;
       font-weight: 700;
@@ -314,7 +307,7 @@
       letter-spacing: 1px;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .form-input {
       width: 100%;
       padding: 16px 20px;
@@ -328,28 +321,28 @@
       transition: all 0.3s ease;
       font-weight: 500;
     }
-    
+
     .form-input.gradient-border {
       background: var(--system-bg);
     }
-    
+
     .form-input:focus {
       box-shadow: 0 0 0 4px rgba(223, 19, 23, 0.2);
       transform: translateY(-2px);
       background: #333333;
     }
-    
+
     .form-input::placeholder {
       color: var(--gray);
       font-weight: 400;
     }
-    
+
     .location-options {
       display: flex;
       flex-direction: column;
       gap: 15px;
     }
-    
+
     #locationStatus {
       padding: 15px;
       border-radius: 15px;
@@ -360,20 +353,19 @@
       font-weight: 500;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     #locationStatus.success {
       background: linear-gradient(135deg, rgba(40, 167, 69, 0.2), rgba(32, 201, 151, 0.1));
       color: #20c997;
       border-color: rgba(32, 201, 151, 0.3);
     }
-    
+
     #locationStatus.error {
       background: linear-gradient(135deg, rgba(220, 53, 69, 0.2), rgba(255, 193, 203, 0.1));
       color: #ff6b6b;
       border-color: rgba(220, 53, 69, 0.3);
     }
-    
-    /* ===== ENHANCED BUTTON STYLING ===== */
+
     .btn {
       width: 100%;
       padding: 16px 18px;
@@ -389,7 +381,7 @@
       overflow: hidden;
       letter-spacing: 1px;
     }
-    
+
     .btn::before {
       content: "";
       position: absolute;
@@ -402,12 +394,12 @@
       transform: translate(-50%, -50%);
       transition: all 0.5s ease;
     }
-    
+
     .btn:hover::before {
       width: 300px;
       height: 300px;
     }
-    
+
     .btn-location, .btn-success {
       background: var(--system-bg);
       color: var(--text-dark);
@@ -415,34 +407,32 @@
       position: relative;
       z-index: 1;
     }
-    
+
     .btn-location.gradient-border, .btn-success.gradient-border {
       background: var(--system-bg);
     }
-    
+
     .btn-location:hover, .btn-success:hover {
       transform: translateY(-4px);
       box-shadow: var(--card-hover);
       background: var(--accent-gradient);
       color: white;
     }
-    
+
     .btn-location:active, .btn-success:active {
       transform: translateY(-1px);
     }
-    
-    /* Pulse animation for main action button */
+
     .btn-success {
       animation: pulse-glow 3s infinite;
     }
-    
+
     @keyframes pulse-glow {
       0% { box-shadow: var(--shadow); }
       50% { box-shadow: 0 0 20px rgba(223, 19, 23, 0.6); }
       100% { box-shadow: var(--shadow); }
     }
-    
-    /* ===== CHAT VIEW ===== */
+
     #chatsView {
       display: none;
       flex-direction: column;
@@ -450,11 +440,11 @@
       height: 100vh;
       overflow: hidden;
     }
-    
+
     #chatsView:not(.hidden) {
       display: flex !important;
     }
-    
+
     .chat-header {
       background: var(--bg-dark);
       padding: 12px 20px;
@@ -464,7 +454,7 @@
       border-bottom: 1px solid #333;
       flex-shrink: 0;
     }
-    
+
     .back-button, .header-btn {
       width: 40px;
       height: 40px;
@@ -480,31 +470,31 @@
       border: none;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .back-button.gradient-border, .header-btn.gradient-border {
       background: var(--system-bg);
     }
-    
+
     .back-button:hover, .header-btn:hover {
       background: var(--accent-gradient);
       color: white;
       transform: scale(1.1);
     }
-    
+
     .chat-header-info {
       flex: 1;
       display: flex;
       align-items: center;
       gap: 12px;
     }
-    
+
     .header-logo-section {
       display: flex;
       align-items: center;
       gap: 12px;
       flex: 1;
     }
-    
+
     .header-logo-icon {
       width: 40px;
       height: 40px;
@@ -520,19 +510,19 @@
       overflow: hidden;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .header-logo-image {
       width: 100%;
       height: 100%;
       object-fit: cover;
       border-radius: 8px;
     }
-    
+
     .header-app-info {
       flex: 1;
       min-width: 0;
     }
-    
+
     .header-app-name {
       font-size: 14px;
       font-weight: 700;
@@ -545,7 +535,7 @@
       line-height: 1.2;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .header-room-info {
       display: flex;
       align-items: center;
@@ -555,7 +545,7 @@
       margin-top: 2px;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .room-indicator {
       background: var(--accent-gradient);
       color: white;
@@ -567,7 +557,7 @@
       letter-spacing: 0.5px;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .online-dot {
       width: 6px;
       height: 6px;
@@ -575,13 +565,12 @@
       border-radius: 50%;
       animation: pulse 2s infinite;
     }
-    
+
     @keyframes pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
     }
-    
-    /* ===== FIND VIEW GRID ===== */
+
     .find-view {
       display: flex;
       flex-direction: column;
@@ -589,13 +578,13 @@
       flex-grow: 1;
       background: var(--bg-gradient);
     }
-    
+
     #findMenuView {
       align-items: stretch;
       justify-content: flex-start;
       text-align: left;
     }
-    
+
     .find-menu-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -603,7 +592,7 @@
       padding: 20px;
       margin-bottom: 20px;
     }
-    
+
     .find-menu-btn {
       position: relative;
       background: var(--system-bg);
@@ -624,25 +613,25 @@
       cursor: pointer;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .find-menu-btn.gradient-border {
       background: var(--system-bg);
     }
-    
+
     .find-menu-btn:hover {
       transform: translateY(-5px);
       box-shadow: var(--card-hover);
     }
-    
+
     .find-menu-btn.primary {
       background: var(--accent-gradient);
       color: white;
     }
-    
+
     .find-menu-btn.primary::before {
       display: none;
     }
-    
+
     .find-menu-icon {
       font-size: 32px;
       margin-bottom: 5px;
@@ -650,7 +639,7 @@
       z-index: 1;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .find-menu-text {
       font-size: 14px;
       font-weight: 600;
@@ -659,15 +648,14 @@
       text-transform: uppercase;
       font-family: 'DotGothic16', monospace;
     }
-    
-    /* ===== PROMOTIONAL BUTTONS ===== */
+
     .promo-buttons {
       display: flex;
       justify-content: space-around;
       padding: 0 20px 20px;
       gap: 10px;
     }
-    
+
     .promo-btn {
       flex: 1;
       padding: 10px 12px;
@@ -684,20 +672,19 @@
       box-shadow: var(--shadow);
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .promo-btn:hover {
       transform: translateY(-2px);
       box-shadow: var(--card-hover);
     }
-    
-    /* ===== USER LIST ===== */
+
     .user-list {
       list-style: none;
       overflow-y: auto;
       flex-grow: 1;
       padding: 0 20px;
     }
-    
+
     .user-card {
       display: flex;
       align-items: center;
@@ -707,16 +694,16 @@
       margin-bottom: 12px;
       transition: all 0.3s ease;
     }
-    
+
     .user-card.gradient-border {
       background: var(--system-bg);
     }
-    
+
     .user-card:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow);
     }
-    
+
     .profile-pic {
       width: 50px;
       height: 50px;
@@ -725,7 +712,7 @@
       margin-right: 15px;
       border: 2px solid var(--accent);
     }
-    
+
     .user-info h3 {
       font-size: 16px;
       font-weight: 600;
@@ -733,13 +720,13 @@
       margin-bottom: 4px;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .user-info p {
       font-size: 12px;
       color: var(--gray);
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .search-bar {
       width: calc(100% - 40px);
       margin: 0 20px 20px;
@@ -753,126 +740,333 @@
       color: var(--text-dark);
       transition: all 0.3s ease;
     }
-    
+
     .search-bar.gradient-border {
       background: var(--system-bg);
     }
-    
+
     .search-bar:focus {
       box-shadow: 0 0 0 3px rgba(223, 19, 23, 0.2);
       transform: translateY(-1px);
     }
-    
-    /* ===== MESSAGE STYLING ===== */
+
     #messageList {
       flex: 1;
       padding: 16px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
       background: transparent;
       scroll-behavior: smooth;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
     }
-    
-    .message {
+
+    .message-group {
       display: flex;
-      width: 100%;
+      flex-direction: column;
+      gap: 2px;
+      margin-bottom: 12px;
       animation: messageSlideIn 0.3s ease;
     }
-    
+
+    .message-group.sent {
+      align-items: flex-end;
+    }
+
+    .message-group.received {
+      align-items: flex-start;
+    }
+
+    .message-group.system {
+      align-items: center;
+    }
+
     @keyframes messageSlideIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    
+
+    .message-user-info {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 4px;
+      font-family: 'DotGothic16', monospace;
+    }
+
+    .message-user-info.sent {
+      align-items: flex-end;
+    }
+
+    .message-user-info.received {
+      align-items: flex-start;
+    }
+
+    .sender-name {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      font-family: 'DotGothic16', monospace;
+    }
+
+    .message-location {
+      font-size: 10px;
+      opacity: 0.7;
+      margin-top: 2px;
+      font-family: 'DotGothic16', monospace;
+      color: var(--gray);
+    }
+
     .message-bubble {
       border-radius: 18px;
       padding: 12px 16px;
       font-size: 12px;
-      word-wrap: break-word;
       max-width: 75%;
       position: relative;
       line-height: 1.4;
       font-family: 'DotGothic16', monospace;
+      margin-bottom: 2px;
+      word-wrap: break-word;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
+      hyphens: auto;
+      -webkit-hyphens: auto;
+      -ms-hyphens: auto;
     }
-    
-    .message.sent {
-      justify-content: flex-end;
-    }
-    
-    .message.sent .message-bubble {
+
+    .message-bubble.sent {
       background: var(--accent-gradient);
       color: white;
+      align-self: flex-end;
     }
-    
-    .message.received {
-      justify-content: flex-start;
-    }
-    
-    .message.received .message-bubble {
+
+    .message-bubble.received {
       background: var(--system-bg);
       color: var(--text-dark);
+      align-self: flex-start;
     }
-    
-    .message.system {
-      justify-content: center;
-    }
-    
-    .message.system .message-bubble {
+
+    .message-bubble.system {
       background: var(--system-bg);
       color: var(--gray);
       border: 1px dashed var(--gray);
       font-size: 12px;
       max-width: 90%;
       text-align: center;
+      align-self: center;
     }
-    
+
+    .message-bubble.grouped {
+      margin-top: 1px;
+    }
+
+    .message-bubble.grouped.sent {
+      border-top-right-radius: 8px;
+    }
+
+    .message-bubble.grouped.received {
+      border-top-left-radius: 8px;
+    }
+
     .message-time {
       font-size: 10px;
       opacity: 0.7;
       margin-top: 4px;
       font-family: 'DotGothic16', monospace;
+      text-align: right;
     }
-    
-    .sender-name {
+
+    .message-bubble.received .message-time {
+      text-align: left;
+    }
+
+    .reply-context {
+      display: grid;
+      grid-template-columns: 4px 1fr;
+      gap: 10px;
+      align-items: stretch;
+      padding: 0;
+      margin: 0 0 8px 0;
+      border-radius: 10px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .reply-context .reply-rail {
+      background: var(--accent);
+    }
+
+    .message-bubble.sent .reply-context {
+      background: rgba(0,0,0,0.18);
+    }
+
+    .reply-context-inner {
+      padding: 8px 10px;
+      min-width: 0;
+    }
+
+    .reply-author {
+      font-weight: 700;
       font-size: 11px;
-      font-weight: 600;
+      line-height: 1.2;
+      color: var(--accent);
       margin-bottom: 4px;
+    }
+
+    .message-bubble.sent .reply-author {
+      color: #fff;
+      opacity: 0.9;
+    }
+
+    .reply-text {
+      font-size: 11px;
+      line-height: 1.3;
+      color: var(--text-dark);
+      opacity: 0.85;
+      max-height: 42px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      word-break: break-word;
+    }
+
+    .message-bubble.sent .reply-text {
+      color: #fff;
+      opacity: 0.9;
+    }
+
+    .reply-meta {
+      font-size: 10px;
+      opacity: 0.7;
+      margin-top: 4px;
+    }
+
+    .reply-context[role="button"] {
+      cursor: pointer;
+    }
+
+    .reply-icon {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 24px;
+      height: 24px;
+      background: rgba(0, 0, 0, 0.6);
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 12px;
+      color: white;
+      transition: all 0.2s ease;
+      z-index: 10;
+      user-select: none;
+    }
+
+    .message-bubble:hover .reply-icon {
+      display: flex;
+    }
+
+    .reply-icon:hover {
+      background: var(--accent);
+      transform: scale(1.1);
+    }
+
+    .message-bubble.sent .reply-icon {
+      background: rgba(255, 255, 255, 0.3);
+      color: #000;
+    }
+
+    .message-bubble.sent:hover .reply-icon {
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .reply-preview {
+      background: var(--system-bg);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin: 12px 20px 0;
+      display: none;
+      position: relative;
+    }
+
+    .reply-preview.visible {
+      display: block;
+    }
+
+    .reply-preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .reply-preview-title {
+      font-size: 12px;
+      font-weight: 600;
       color: var(--accent);
       font-family: 'DotGothic16', monospace;
     }
-    
-    .message-location {
-      font-size: 10px;
-      opacity: 0.7;
-      margin-top: 2px;
-      font-family: 'DotGothic16', monospace;
-    }
-    
-    .message-info {
+
+    .reply-preview-close {
+      background: none;
+      border: none;
+      font-size: 16px;
+      color: var(--gray);
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      max-width: 75%;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s ease;
     }
-    
-    /* ===== CHAT INPUT AREA ===== */
+
+    .reply-preview-close:hover {
+      background: var(--accent);
+      color: white;
+    }
+
+    .reply-preview-content {
+      font-size: 11px;
+      color: var(--text-dark);
+      opacity: 0.85;
+      max-height: 40px;
+      overflow: hidden;
+      line-height: 1.3;
+      font-family: 'DotGothic16', monospace;
+      word-break: break-word;
+    }
+
+    @media (max-width: 480px) {
+      .reply-icon {
+        display: flex;
+        opacity: 0.85;
+      }
+      .message-bubble:hover .reply-icon {
+        opacity: 1;
+      }
+    }
+
     .chat-input-area {
       flex-shrink: 0;
       border-top: 1px solid #333;
       background: var(--bg-dark);
     }
-    
+
     .input-row {
       padding: 15px 20px;
       display: flex;
       align-items: center;
       gap: 12px;
     }
-    
+
     .expand-btn {
       width: 45px;
       height: 45px;
@@ -890,15 +1084,15 @@
       box-shadow: var(--shadow);
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .expand-btn:hover {
       transform: scale(1.1);
     }
-    
+
     .expand-btn.active {
       transform: rotate(45deg) scale(1.1);
     }
-    
+
     .message-input {
       flex: 1;
       background: var(--system-bg);
@@ -910,16 +1104,18 @@
       font-family: 'DotGothic16', monospace;
       outline: none;
       transition: all 0.3s ease;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
-    
+
     .message-input:focus {
       box-shadow: 0 0 0 2px rgba(223, 19, 23, 0.3);
     }
-    
+
     .message-input::placeholder {
       color: var(--gray);
     }
-    
+
     .send-button {
       background: var(--accent-gradient);
       border: none;
@@ -936,12 +1132,11 @@
       box-shadow: var(--shadow);
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .send-button:hover {
       transform: scale(1.1);
     }
-    
-    /* ===== EXPANDABLE OPTIONS ===== */
+
     .expand-options {
       display: flex;
       justify-content: space-around;
@@ -951,13 +1146,13 @@
       padding: 0 20px;
       border-bottom: 1px solid transparent;
     }
-    
+
     .expand-options.visible {
       max-height: 120px;
       padding: 15px 20px;
       border-bottom: 1px solid #333;
     }
-    
+
     .expand-option-btn {
       display: flex;
       flex-direction: column;
@@ -971,7 +1166,7 @@
       color: var(--gray);
       transition: all 0.3s ease;
     }
-    
+
     .expand-option-btn .icon {
       width: 60px;
       height: 60px;
@@ -984,22 +1179,21 @@
       color: var(--text-dark);
       transition: all 0.3s ease;
     }
-    
+
     .expand-option-btn .icon.gradient-border {
       background: var(--system-bg);
     }
-    
+
     .expand-option-btn:hover .icon {
       background: var(--accent-gradient);
       color: white;
       transform: scale(1.1);
     }
-    
+
     .expand-option-btn:hover {
       color: var(--accent);
     }
-    
-    /* ===== FEATURE PANELS ===== */
+
     .feature-panel {
       background: var(--bg-dark);
       padding: 0;
@@ -1009,12 +1203,12 @@
       overflow: hidden;
       transition: max-height 0.3s ease-in-out;
     }
-    
+
     .feature-panel.visible {
       max-height: 300px;
       border-top: 1px solid #333;
     }
-    
+
     .feature-panel-header {
       display: flex;
       align-items: center;
@@ -1022,7 +1216,7 @@
       border-bottom: 1px solid #333;
       flex-shrink: 0;
     }
-    
+
     .feature-panel-title {
       flex-grow: 1;
       font-weight: 600;
@@ -1030,7 +1224,7 @@
       font-size: 16px;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .feature-panel-close-btn {
       width: 32px;
       height: 32px;
@@ -1046,22 +1240,22 @@
       justify-content: center;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .feature-panel-close-btn.gradient-border {
       background: var(--system-bg);
     }
-    
+
     .feature-panel-close-btn:hover {
       background: var(--accent-gradient);
       color: white;
     }
-    
+
     .feature-panel-content {
       padding: 20px;
       overflow-y: auto;
       flex-grow: 1;
     }
-    
+
     .feature-search-bar {
       width: 100%;
       padding: 12px 16px;
@@ -1075,21 +1269,21 @@
       color: var(--text-dark);
       transition: all 0.3s ease;
     }
-    
+
     .feature-search-bar.gradient-border {
       background: var(--system-bg);
     }
-    
+
     .feature-search-bar:focus {
       box-shadow: 0 0 0 2px rgba(223, 19, 23, 0.3);
     }
-    
+
     #stickerGrid, #gif-results-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
       gap: 10px;
     }
-    
+
     .sticker-item, .gif-item {
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -1102,26 +1296,26 @@
       transition: all 0.3s ease;
       overflow: hidden;
     }
-    
+
     .sticker-item.gradient-border, .gif-item.gradient-border {
       background: var(--system-bg);
     }
-    
+
     .sticker-item:hover, .gif-item:hover {
       transform: scale(1.1);
       box-shadow: var(--shadow);
     }
-    
+
     .sticker-item img, .gif-item img {
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
-    
+
     #audioList {
       list-style: none;
     }
-    
+
     .audio-item {
       display: flex;
       align-items: center;
@@ -1132,18 +1326,18 @@
       background: var(--system-bg);
       transition: all 0.3s ease;
     }
-    
+
     .audio-item.gradient-border {
       background: var(--system-bg);
     }
-    
+
     .audio-item:hover {
       background: var(--accent-gradient);
       color: white;
       transform: translateY(-2px);
       box-shadow: var(--shadow);
     }
-    
+
     .audio-item .play-btn {
       width: 40px;
       height: 40px;
@@ -1158,17 +1352,17 @@
       transition: all 0.3s ease;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .audio-item .play-btn:hover {
       transform: scale(1.1);
     }
-    
+
     .audio-item .audio-name {
       font-size: 14px;
       font-weight: 500;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .chat-audio-play-btn {
       width: 32px;
       height: 32px;
@@ -1182,12 +1376,11 @@
       transition: all 0.3s ease;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .chat-audio-play-btn:hover {
       transform: scale(1.1);
     }
-    
-    /* ===== MODAL STYLING ===== */
+
     .room-modal {
       position: fixed;
       top: 0;
@@ -1203,12 +1396,12 @@
       visibility: hidden;
       transition: all 0.3s ease;
     }
-    
+
     .room-modal.show {
       opacity: 1;
       visibility: visible;
     }
-    
+
     .room-modal-content {
       background: var(--bg-dark);
       border-radius: 20px;
@@ -1220,20 +1413,20 @@
       transition: transform 0.3s ease;
       box-shadow: var(--card-hover);
     }
-    
+
     .room-modal-content.gradient-border {
       background: var(--bg-dark);
     }
-    
+
     .room-modal.show .room-modal-content {
       transform: scale(1);
     }
-    
+
     .room-modal-header {
       text-align: center;
       margin-bottom: 24px;
     }
-    
+
     .room-modal-title {
       font-size: 20px;
       font-weight: 600;
@@ -1245,13 +1438,13 @@
       margin-bottom: 8px;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .room-modal-description {
       font-size: 14px;
       color: var(--gray);
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .room-modal-close {
       position: absolute;
       top: 15px;
@@ -1270,22 +1463,22 @@
       transition: all 0.3s ease;
       font-family: 'DotGothic16', monospace;
     }
-    
+
     .room-modal-close.gradient-border {
       background: var(--system-bg);
     }
-    
+
     .room-modal-close:hover {
       background: var(--accent-gradient);
       color: white;
     }
-    
+
     .room-buttons {
       display: flex;
       gap: 12px;
       margin-top: 20px;
     }
-    
+
     .btn-room {
       flex: 1;
       padding: 14px;
@@ -1300,28 +1493,27 @@
       color: var(--text-dark);
       transition: all 0.3s ease;
     }
-    
+
     .btn-room.gradient-border {
       background: var(--system-bg);
     }
-    
+
     .btn-room:hover {
       background: var(--accent-gradient);
       color: white;
       transform: translateY(-2px);
     }
-    
+
     .btn-room.primary {
       background: var(--accent-gradient);
       color: white;
     }
-    
+
     .btn-room.primary:hover {
       transform: translateY(-2px);
       box-shadow: var(--card-hover);
     }
-    
-    /* ===== LOADING SPINNER ===== */
+
     .loader {
       margin: 40px auto;
       border: 4px solid #333;
@@ -1331,19 +1523,18 @@
       height: 40px;
       animation: spin 1s linear infinite;
     }
-    
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    
-    /* ===== MOBILE RESPONSIVENESS ===== */
+
     @media (max-width: 480px) {
       html {
         height: 100%;
         height: -webkit-fill-available;
       }
-      
+
       body {
         height: 100%;
         height: -webkit-fill-available;
@@ -1351,14 +1542,14 @@
         position: fixed;
         width: 100%;
       }
-      
+
       .app-container {
         height: 100%;
         height: -webkit-fill-available;
         padding: 0;
         align-items: stretch;
       }
-      
+
       .main-container {
         width: 100%;
         height: 100%;
@@ -1367,7 +1558,7 @@
         border: none;
         max-width: none;
       }
-      
+
       #chatsView:not(.hidden) {
         display: flex !important;
         flex-direction: column;
@@ -1375,21 +1566,21 @@
         height: -webkit-fill-available;
         position: relative;
       }
-      
+
       .chat-header {
         flex-shrink: 0;
         position: sticky;
         top: 0;
         z-index: 100;
       }
-      
+
       #messageList {
         flex: 1;
         overflow-y: auto;
         min-height: 0;
         padding-bottom: 20px;
       }
-      
+
       .chat-input-area {
         flex-shrink: 0;
         position: sticky;
@@ -1397,45 +1588,44 @@
         z-index: 100;
         transition: transform 0.3s ease;
       }
-      
+
       body.keyboard-visible .chat-input-area {
         transform: translateY(0);
       }
-      
+
       body.keyboard-visible #messageList {
         padding-bottom: 80px;
       }
-      
+
       .find-menu-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 12px;
         padding: 15px;
       }
-      
+
       .find-menu-btn {
         min-height: 100px;
         padding: 20px 10px;
       }
-      
+
       .app-header {
         padding: 25px 15px;
       }
-      
+
       .section-header {
         padding: 15px;
         margin-bottom: 30px;
       }
-      
+
       .section-title {
         font-size: 22px;
       }
-      
+
       .app-title {
         font-size: 28px;
       }
     }
-    
-    /* iOS Safari specific fixes */
+
     @supports (-webkit-touch-callout: none) {
       @media (max-width: 480px) {
         body {
@@ -1462,13 +1652,11 @@
             <img src="your-icon.jpg" alt="Gappkar Logo" class="logo-image" onerror="this.style.display='none'; this.parentNode.innerHTML='G';">
           </div>
           <h1 class="app-title">gappkar</h1>
-          
         </div>
       </div>
-      
+
       <div id="joinView" class="view active">
         <div class="section-header">
-          
           <h2 class="section-title">Join the Chat</h2>
           <p class="section-description">Enter your info to start your gapping adventure</p>
         </div>
@@ -1490,7 +1678,7 @@
         <button type="button" class="btn btn-success gradient-border" id="joinButton">🚀 Start Gapping</button>
         <div id="locationStatus"></div>
       </div>
-      
+
       <div id="chatsView" class="view hidden">
         <div class="chat-header">
           <button class="back-button gradient-border" id="backButton">←</button>
@@ -1516,158 +1704,145 @@
             <img src="create-join room.png" alt="Create/Join Room" style="width: 20px; height: 20px;" onerror="this.innerHTML='🏠'">
           </button>
         </div>
+
         <div id="messageList"></div>
-        
-        <!-- Enhanced Chat Input Area -->
+
         <div class="chat-input-area">
-            <!-- Sticker Panel -->
-            <div id="stickerPanel" class="feature-panel">
-                <div class="feature-panel-header">
-                    <div class="feature-panel-title">Stickers</div>
-                    <button class="feature-panel-close-btn gradient-border" data-panel="stickerPanel">×</button>
-                </div>
-                <div class="feature-panel-content">
-                    <input type="text" id="sticker-search-input" class="feature-search-bar gradient-border" placeholder="Search stickers...">
-                    <div id="stickerGrid"></div>
-                </div>
+          <div id="replyPreview" class="reply-preview">
+            <div class="reply-preview-header">
+              <span class="reply-preview-title">Replying to <span id="replyToUser"></span></span>
+              <button class="reply-preview-close" id="cancelReply">×</button>
             </div>
+            <div class="reply-preview-content" id="replyPreviewText"></div>
+          </div>
 
-            <!-- Audio Panel -->
-            <div id="audioPanel" class="feature-panel">
-                <div class="feature-panel-header">
-                    <div class="feature-panel-title">Sounds</div>
-                    <button class="feature-panel-close-btn gradient-border" data-panel="audioPanel">×</button>
-                </div>
-                <div class="feature-panel-content">
-                    <input type="text" class="feature-search-bar gradient-border" placeholder="Search sounds...">
-                    <ul id="audioList"></ul>
-                </div>
+          <div id="stickerPanel" class="feature-panel">
+            <div class="feature-panel-header">
+              <div class="feature-panel-title">Stickers</div>
+              <button class="feature-panel-close-btn gradient-border" data-panel="stickerPanel">×</button>
             </div>
-
-            <!-- GIF Panel -->
-            <div id="gifPanel" class="feature-panel">
-                 <div class="feature-panel-header">
-                    <div class="feature-panel-title">GIFs</div>
-                    <button class="feature-panel-close-btn gradient-border" data-panel="gifPanel">×</button>
-                </div>
-                <div class="feature-panel-content">
-                    <input type="text" id="gif-search-input" class="feature-search-bar gradient-border" placeholder="Search for GIFs...">
-                    <div id="gif-results-grid"></div>
-                </div>
+            <div class="feature-panel-content">
+              <input type="text" id="sticker-search-input" class="feature-search-bar gradient-border" placeholder="Search stickers...">
+              <div id="stickerGrid"></div>
             </div>
+          </div>
 
-            <!-- Expandable Options Menu -->
-            <div id="expandOptions" class="expand-options">
-                <button class="expand-option-btn" id="gifOptionBtn">
-                  <span class="icon gradient-border">
-                    <img src="gifs icon.png" alt="GIFs" style="width: 28px; height: 28px;" onerror="this.innerHTML='🎬'">
-                  </span> 
-                  GIF
-                </button>
-
-                <button class="expand-option-btn" id="audioOptionBtn">
-                  <span class="icon gradient-border">
-                    <img src="audio sound icon.png" alt="Audio" style="width: 28px; height: 28px;" onerror="this.innerHTML='🔊'">
-                  </span> 
-                  Sounds
-                </button>
-
-                <button class="expand-option-btn" id="stickerOptionBtn">
-                  <span class="icon gradient-border">
-                    <img src="sticker icon.png" alt="Stickers" style="width: 28px; height: 28px;" onerror="this.innerHTML='😀'">
-                  </span> 
-                  Sticker
-                </button>
+          <div id="audioPanel" class="feature-panel">
+            <div class="feature-panel-header">
+              <div class="feature-panel-title">Sounds</div>
+              <button class="feature-panel-close-btn gradient-border" data-panel="audioPanel">×</button>
             </div>
-
-            <!-- Main Input Row -->
-            <div class="input-row">
-                <button class="expand-btn" id="expandBtn">+</button>
-                <input type="text" class="message-input" id="messageInput" placeholder="Type a message..." autocomplete="off">
-                <button class="send-button" id="sendButton">➤</button>
+            <div class="feature-panel-content">
+              <input type="text" class="feature-search-bar gradient-border" placeholder="Search sounds...">
+              <ul id="audioList"></ul>
             </div>
+          </div>
+
+          <div id="gifPanel" class="feature-panel">
+            <div class="feature-panel-header">
+              <div class="feature-panel-title">GIFs</div>
+              <button class="feature-panel-close-btn gradient-border" data-panel="gifPanel">×</button>
+            </div>
+            <div class="feature-panel-content">
+              <input type="text" id="gif-search-input" class="feature-search-bar gradient-border" placeholder="Search for GIFs...">
+              <div id="gif-results-grid"></div>
+            </div>
+          </div>
+
+          <div id="expandOptions" class="expand-options">
+            <button class="expand-option-btn" id="gifOptionBtn">
+              <span class="icon gradient-border">
+                <img src="gifs icon.png" alt="GIFs" style="width: 28px; height: 28px;" onerror="this.innerHTML='🎬'">
+              </span>
+              GIF
+            </button>
+
+            <button class="expand-option-btn" id="audioOptionBtn">
+              <span class="icon gradient-border">
+                <img src="audio sound icon.png" alt="Audio" style="width: 28px; height: 28px;" onerror="this.innerHTML='🔊'">
+              </span>
+              Sounds
+            </button>
+
+            <button class="expand-option-btn" id="stickerOptionBtn">
+              <span class="icon gradient-border">
+                <img src="sticker icon.png" alt="Stickers" style="width: 28px; height: 28px;" onerror="this.innerHTML='😀'">
+              </span>
+              Sticker
+            </button>
+          </div>
+
+          <div class="input-row">
+            <button class="expand-btn" id="expandBtn">+</button>
+            <input type="text" class="message-input" id="messageInput" placeholder="Type a message..." autocomplete="off">
+            <button class="send-button" id="sendButton">➤</button>
+          </div>
         </div>
       </div>
 
-      <!-- Find Menu View -->
       <div id="findMenuView" class="view find-view hidden">
         <div class="chat-header">
           <button class="back-button gradient-border" id="findMenuBackBtn">←</button>
           <div class="chat-header-info">
-              <div class="header-app-name">Find Users</div>
+            <div class="header-app-name">Find Users</div>
           </div>
         </div>
         <div style="padding: 24px;">
-            <h2 style="text-align: center; margin-bottom: 10px; color: var(--text-dark); font-family: 'DotGothic16', monospace;">Find Connections</h2>
-            <p style="text-align: center; color: var(--gray); margin-bottom: 30px; font-family: 'DotGothic16', monospace;">Discover new people on Gappkar</p>
-            
-            <!-- Grid Layout for Find Buttons -->
-            <div class="find-menu-grid">
-              <button class="find-menu-btn primary" id="findAccountsBtn">
-                  <span class="find-menu-icon">
-                      <!-- Replaced emoji with the 'person' icon -->
-                      <i class="search pearson.png">person</i>
-                  </span>
-                  <span class="search pearson.png">Find gappars</span>
-              </button>
-              <button class="find-menu-btn gradient-border" id="nearbyBtn">
-                  <span class="find-menu-icon">
-                      <!-- Replaced emoji with the 'location_on' icon -->
-                      <i class="nearby location.png">location_on</i>
-                  </span>
-                  <span class="nearby location.png">Nearby</span>
-              </button>
+          <h2 style="text-align: center; margin-bottom: 10px; color: var(--text-dark); font-family: 'DotGothic16', monospace;">Find Connections</h2>
+          <p style="text-align: center; color: var(--gray); margin-bottom: 30px; font-family: 'DotGothic16', monospace;">Discover new people on Gappkar</p>
+
+          <div class="find-menu-grid">
+            <button class="find-menu-btn primary" id="findAccountsBtn">
+              <span class="find-menu-icon"><i class="search pearson.png">person</i></span>
+              <span class="search pearson.png">Find gappars</span>
+            </button>
+            <button class="find-menu-btn gradient-border" id="nearbyBtn">
+              <span class="find-menu-icon"><i class="nearby location.png">location_on</i></span>
+              <span class="nearby location.png">Nearby</span>
+            </button>
           </div>
-            
+
           <div class="promo-buttons">
-              <a href="https://docs.google.com/forms/d/e/1FAIpQLSfhbGAJCorfqYU62U-I96TUH1de9rkKJGBXq6UnzqySgwrQKw/viewform?usp=header" class="promo-btn" target="_blank" rel="noopener noreferrer">Feedback</a>
-              
-              
-              <a href="https://holisticcoachabhi.my.canva.site/gappkar"class="promo-btn" target="_blank" rel="noopener noreferrer">Update app</a>
-            </div>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfhbGAJCorfqYU62U-I96TUH1de9rkKJGBXq6UnzqySgwrQKw/viewform?usp=header" class="promo-btn" target="_blank" rel="noopener noreferrer">Feedback</a>
+            <a href="https://holisticcoachabhi.my.canva.site/gappkar" class="promo-btn" target="_blank" rel="noopener noreferrer">Update app</a>
+          </div>
         </div>
       </div>
 
-      <!-- Nearby Users View -->
       <div id="nearbyView" class="view find-view hidden">
         <div class="chat-header">
           <button class="back-button gradient-border" id="nearbyBackBtn">←</button>
           <div class="chat-header-info">
-              <div class="header-app-name">Nearby gappars</div>
+            <div class="header-app-name">Nearby gappars</div>
           </div>
         </div>
         <div style="padding-top: 24px;">
-            <div style="text-align: center; margin-bottom: 20px; padding: 0 24px;">
-                <h2 style="color: var(--text-dark); font-family: 'DotGothic16', monospace;">Recommendations</h2>
-            </div>
-            <input type="text" class="search-bar gradient-border" id="nearbySearchInput" placeholder="Filter by name...">
-            <ul class="user-list" id="nearbyUserList">
-                <!-- JS will populate this list -->
-            </ul>
+          <div style="text-align: center; margin-bottom: 20px; padding: 0 24px;">
+            <h2 style="color: var(--text-dark); font-family: 'DotGothic16', monospace;">Recommendations</h2>
+          </div>
+          <input type="text" class="search-bar gradient-border" id="nearbySearchInput" placeholder="Filter by name...">
+          <ul class="user-list" id="nearbyUserList"></ul>
         </div>
       </div>
 
-      <!-- Search Accounts View -->
       <div id="searchView" class="view find-view hidden">
         <div class="chat-header">
           <button class="back-button gradient-border" id="searchBackBtn">←</button>
           <div class="chat-header-info">
-              <div class="header-app-name">Search Accounts</div>
+            <div class="header-app-name">Search Accounts</div>
           </div>
         </div>
         <div style="padding-top: 24px;">
-             <div style="text-align: center; margin-bottom: 20px; padding: 0 24px;">
-                <h2 style="color: var(--text-dark); font-family: 'DotGothic16', monospace;">Search gappars</h2>
-            </div>
-            <input type="text" class="search-bar gradient-border" id="accountSearchInput" placeholder="Search by name or location...">
-            <ul class="user-list" id="userResultsList">
-                <!-- JS will populate this list -->
-            </ul>
+          <div style="text-align: center; margin-bottom: 20px; padding: 0 24px;">
+            <h2 style="color: var(--text-dark); font-family: 'DotGothic16', monospace;">Search gappars</h2>
+          </div>
+          <input type="text" class="search-bar gradient-border" id="accountSearchInput" placeholder="Search by name or location...">
+          <ul class="user-list" id="userResultsList"></ul>
         </div>
       </div>
     </div>
   </div>
-  
+
   <div class="room-modal" id="roomModal">
     <div class="room-modal-content gradient-border">
       <button class="room-modal-close gradient-border" id="roomModalClose">×</button>
@@ -1689,14 +1864,13 @@
     </div>
   </div>
 
-  <!-- Your existing scripts remain exactly the same -->
   <script>
     function setupMobileKeyboardHandling() {
       if (!('ontouchstart' in window)) return;
       const messageInput = document.getElementById('messageInput');
       const messageList = document.getElementById('messageList');
       let initialViewportHeight = window.innerHeight;
-      
+
       function handleKeyboardShow() {
         document.body.classList.add('keyboard-visible');
         setTimeout(() => {
@@ -1705,11 +1879,11 @@
           }
         }, 300);
       }
-      
+
       function handleKeyboardHide() {
         document.body.classList.remove('keyboard-visible');
       }
-      
+
       if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
         if (messageInput) {
           messageInput.addEventListener('focus', () => {
@@ -1719,7 +1893,7 @@
             setTimeout(handleKeyboardHide, 100);
           });
         }
-        
+
         window.addEventListener('resize', () => {
           const currentHeight = window.innerHeight;
           if (currentHeight < initialViewportHeight * 0.7) {
@@ -1745,7 +1919,7 @@
           resizeObserver.observe(document.body);
         }
       }
-      
+
       window.scrollBottom = () => {
         if (messageList) {
           messageList.scrollTop = messageList.scrollHeight;
@@ -1757,7 +1931,7 @@
         }
       };
     }
-    
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', setupMobileKeyboardHandling);
     } else {
@@ -1769,7 +1943,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
     import { getFirestore, addDoc, collection, doc, setDoc, onSnapshot, orderBy, query, serverTimestamp, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-    
+
     const firebaseConfig = {
       apiKey: "AIzaSyCOmLxxqPesNaBr4Z9fVIU6K2BLW6OsED0",
       authDomain: "gappkar-v1-b3afe.firebaseapp.com",
@@ -1780,11 +1954,11 @@
       appId: "1:726018257415:web:12142708abdf47952af0a2",
       measurementId: "G-EWK4436NRB"
     };
-    
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
-    
+
     let currentUser = null;
     let currentUsername = "";
     let currentUserAge = 0;
@@ -1797,10 +1971,11 @@
     let presenceTimer = null;
     let onlineListener = null;
     let currentView = 'joinView';
-    
+    let lastMessageGroup = null;
+    let replyingTo = null;
+
     const $ = (id) => document.getElementById(id);
-    
-    // Get DOM elements safely
+
     const allViews = document.querySelectorAll('.view');
     const joinView = $("joinView");
     const chatsView = $("chatsView");
@@ -1822,17 +1997,6 @@
     const createRoomBtnM = $("createRoomBtnModal");
     const leaveRoomBtn = $("leaveRoomBtn");
     const roomIndicator = $("roomIndicator");
-
-    // Find/Search Elements
-    const findBtn = $("findBtn");
-    const findAccountsBtn = $("findAccountsBtn");
-    const nearbyBtn = $("nearbyBtn");
-    const nearbyUserList = $("nearbyUserList");
-    const userResultsList = $("userResultsList");
-    const accountSearchInput = $("accountSearchInput");
-    const nearbySearchInput = $("nearbySearchInput");
-
-    // Enhanced Chat Input Elements
     const expandBtn = $('expandBtn');
     const expandOptions = $('expandOptions');
     const gifOptionBtn = $('gifOptionBtn');
@@ -1841,11 +2005,22 @@
     const stickerPanel = $('stickerPanel');
     const audioPanel = $('audioPanel');
     const gifPanel = $('gifPanel');
+    const findBtn = $('findBtn');
+    const findAccountsBtn = $('findAccountsBtn');
+    const nearbyBtn = $('nearbyBtn');
+    const nearbyUserList = $('nearbyUserList');
+    const accountSearchInput = $('accountSearchInput');
+    const userResultsList = $('userResultsList');
+    const replyPreview = $('replyPreview');
+    const replyToUser = $('replyToUser');
+    const replyPreviewText = $('replyPreviewText');
+    const cancelReply = $('cancelReply');
+
     const allFeaturePanels = [stickerPanel, audioPanel, gifPanel].filter(Boolean);
     let currentAudio = null;
-    
+
     const roomMessagesRef = (room) => collection(db, "rooms", room, "messages");
-    
+
     const timeStr = (ts) => {
       const d = ts?.toDate ? ts.toDate() : (ts || new Date());
       let h = d.getHours();
@@ -1854,7 +2029,7 @@
       h = h % 12 || 12;
       return `${h}:${m} ${a}`;
     };
-    
+
     const scrollBottom = () => {
       if (messageList) {
         messageList.scrollTop = messageList.scrollHeight;
@@ -1866,46 +2041,46 @@
       }
     };
 
-    // View Management
     function showView(viewId) {
       currentView = viewId;
       allViews.forEach(v => v.classList.add('hidden'));
       const targetView = $(viewId);
-      if (targetView) {
-        targetView.classList.remove('hidden');
-      }
-      
+      if (targetView) targetView.classList.remove('hidden');
+
       const appHeader = document.querySelector('.app-header');
       if (appHeader) {
         appHeader.style.display = viewId === 'joinView' ? 'block' : 'none';
       }
     }
-    
+
     const updateRoomUI = () => {
       if (!roomIndicator) return;
       roomIndicator.textContent = currentRoom === "global" ? "Global" : currentRoom;
       roomIndicator.style.background = currentRoom === "global" ? "var(--accent-gradient)" : "linear-gradient(135deg, #28a745, #20c997)";
     };
-    
+
     const addSystemMsg = (txt) => {
       if (!messageList) return;
-      const div = document.createElement("div");
-      div.className = "message system";
-      div.innerHTML = `<div class="message-bubble">${txt}</div>`;
-      messageList.appendChild(div);
+      const groupDiv = document.createElement("div");
+      groupDiv.className = "message-group system";
+      const bubbleDiv = document.createElement("div");
+      bubbleDiv.className = "message-bubble system";
+      bubbleDiv.textContent = txt;
+      groupDiv.appendChild(bubbleDiv);
+      messageList.appendChild(groupDiv);
       scrollBottom();
     };
-    
+
     function trackPresence() {
       if (!currentUser || !currentUsername) return;
       const ref = doc(db, "presence", currentUser.uid);
       const data = {
-        userId: currentUser.uid, 
-        username: currentUsername, 
+        userId: currentUser.uid,
+        username: currentUsername,
         location: currentUserLocation,
-        age: currentUserAge, 
-        room: currentRoom, 
-        lastSeen: serverTimestamp(), 
+        age: currentUserAge,
+        room: currentRoom,
+        lastSeen: serverTimestamp(),
         isOnline: true
       };
       setDoc(ref, data, { merge: true }).catch(console.error);
@@ -1914,14 +2089,14 @@
         setDoc(ref, { room: currentRoom, lastSeen: serverTimestamp() }, { merge: true }).catch(console.error);
       }, 30000);
     }
-    
+
     function listenOnlineUsers() {
       if (onlineListener) onlineListener();
       onlineListener = onSnapshot(collection(db, "presence"), (snap) => {
         const fiveAgo = Date.now() - 5 * 60 * 1000;
         let roomCnt = 0;
-        snap.forEach(doc => {
-          const d = doc.data();
+        snap.forEach(docu => {
+          const d = docu.data();
           if (d.lastSeen?.toDate && d.lastSeen.toDate().getTime() > fiveAgo && d.room === currentRoom) {
             roomCnt++;
           }
@@ -1932,55 +2107,178 @@
       }, console.error);
     }
 
-    // Find/Search Logic
-    function createUserCard(user) {
-      if (user.userId === currentUser?.uid) return '';
-      return `
-          <li class="user-card gradient-border">
-              <img src="https://i.pravatar.cc/150?u=${user.userId}" alt="${user.username}" class="profile-pic">
-              <div class="user-info">
-                  <h3>${user.username} (${user.age})</h3>
-                  <p>📍 ${user.location || 'Unknown'}</p>
-              </div>
-          </li>
-      `;
+    function shouldGroupMessage(messageData) {
+      if (!lastMessageGroup) return false;
+      const msgType = messageData.user === currentUsername ? 'sent' : 'received';
+      if (lastMessageGroup.username !== messageData.user) return false;
+      if (lastMessageGroup.type !== msgType) return false;
+      const timeDiff = Date.now() - lastMessageGroup.timestamp;
+      return timeDiff < 120000;
     }
 
-    function renderUserList(targetList, users) {
-      if (!targetList) return;
-      if (!users || users.length === 0) {
-          targetList.innerHTML = '<p style="text-align:center; color: var(--gray); padding: 20px; font-family: DotGothic16, monospace;">No users found.</p>';
-          return;
+    function createMessageGroup(messageData, isGrouped = false) {
+      const groupDiv = document.createElement("div");
+      const messageType = messageData.user === currentUsername ? 'sent' : 'received';
+      groupDiv.className = `message-group ${messageType}`;
+
+      if (!isGrouped && messageType === 'received') {
+        const userInfoDiv = document.createElement("div");
+        userInfoDiv.className = `message-user-info ${messageType}`;
+
+        const senderNameDiv = document.createElement("div");
+        senderNameDiv.className = "sender-name";
+        senderNameDiv.textContent = `${messageData.user}${messageData.age ? ` (${messageData.age})` : ""}`;
+        userInfoDiv.appendChild(senderNameDiv);
+
+        if (messageData.location) {
+          const locationDiv = document.createElement("div");
+          locationDiv.className = "message-location";
+          locationDiv.textContent = `📍 ${messageData.location}`;
+          userInfoDiv.appendChild(locationDiv);
+        }
+        groupDiv.appendChild(userInfoDiv);
       }
-      targetList.innerHTML = users.filter(u => u.userId !== currentUser?.uid).map(createUserCard).join('');
+      return groupDiv;
     }
 
-    async function fetchAllOnlineUsers() {
-      const fiveAgo = new Date(Date.now() - 5 * 60 * 1000);
-      const q = query(collection(db, "presence"), where("lastSeen", ">", fiveAgo));
-      try {
-          const snapshot = await getDocs(q);
-          return snapshot.docs.map(doc => doc.data());
-      } catch (error) {
-          console.error("Error fetching users:", error);
-          return [];
+    function cancelReplyMode() {
+      replyingTo = null;
+      if (replyPreview) replyPreview.classList.remove('visible');
+    }
+
+    function startReply(messageData) {
+      replyingTo = {
+        id: messageData.id || Date.now(),
+        user: messageData.user,
+        message: messageData.message,
+        isGif: messageData.isGif,
+        isSticker: messageData.isSticker,
+        isAudio: messageData.isAudio,
+        audioName: messageData.audioName,
+        timestamp: messageData.timestamp
+      };
+      if (replyToUser) replyToUser.textContent = messageData.user || '';
+      if (replyPreviewText) {
+        const text = messageData.isGif ? '[GIF]' :
+                     messageData.isSticker ? '[Sticker]' :
+                     messageData.isAudio ? (messageData.audioName ? `[Audio] ${messageData.audioName}` : '[Audio]') :
+                     (messageData.message || '');
+        replyPreviewText.textContent = text;
       }
+      if (replyPreview) replyPreview.classList.add('visible');
+      if (messageInput) messageInput.focus();
     }
 
-    // Enhanced Multimedia Message Function  
+    function createMessageBubble(messageData, isGrouped = false) {
+      const bubbleDiv = document.createElement("div");
+      const messageType = messageData.user === currentUsername ? 'sent' : 'received';
+      bubbleDiv.className = `message-bubble ${messageType} ${isGrouped ? 'grouped' : ''}`;
+
+      if (messageData.id) bubbleDiv.id = `msg-${messageData.id}`;
+
+      if (messageData.replyTo) {
+        const ctx = document.createElement('div');
+        ctx.className = `reply-context ${messageType}`;
+        ctx.setAttribute('role', 'button');
+        if (messageData.replyTo.id) {
+          ctx.dataset.replyTarget = messageData.replyTo.id;
+        }
+
+        const rail = document.createElement('div');
+        rail.className = 'reply-rail';
+        ctx.appendChild(rail);
+
+        const inner = document.createElement('div');
+        inner.className = 'reply-context-inner';
+
+        const author = document.createElement('div');
+        author.className = 'reply-author';
+        author.textContent = messageData.replyTo.user || 'Unknown';
+
+        let snippet = messageData.replyTo.message || '';
+        if (!snippet && messageData.replyTo.isGif) snippet = '[GIF]';
+        if (!snippet && messageData.replyTo.isSticker) snippet = '[Sticker]';
+        if (!snippet && messageData.replyTo.isAudio) snippet = messageData.replyTo.audioName ? `[Audio] ${messageData.replyTo.audioName}` : '[Audio]';
+
+        const text = document.createElement('div');
+        text.className = 'reply-text';
+        text.textContent = snippet;
+
+        inner.appendChild(author);
+        inner.appendChild(text);
+        ctx.appendChild(inner);
+        bubbleDiv.appendChild(ctx);
+      }
+
+      let messageContent = '';
+      if (messageData.isGif && messageData.gifUrl) {
+        messageContent = `<img src="${messageData.gifUrl}" style="max-width: 250px; border-radius: 16px;" alt="GIF">`;
+      } else if (messageData.isSticker && messageData.stickerUrl) {
+        messageContent = `<img src="${messageData.stickerUrl}" style="max-width: 150px; border-radius: 16px;" alt="Sticker">`;
+      } else if (messageData.isAudio && messageData.audioUrl) {
+        messageContent = `
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button class="chat-audio-play-btn" data-src="${messageData.audioUrl}">▶</button>
+            <span>${messageData.audioName || 'Audio'}</span>
+          </div>
+        `;
+      } else {
+        messageContent = (messageData.message || '').toString();
+      }
+
+      const contentDiv = document.createElement("div");
+      contentDiv.innerHTML = messageContent;
+      bubbleDiv.appendChild(contentDiv);
+
+      const replyIcon = document.createElement('div');
+      replyIcon.className = 'reply-icon';
+      replyIcon.textContent = '↩';
+      replyIcon.dataset.messageData = JSON.stringify({
+        id: messageData.id || Date.now(),
+        user: messageData.user,
+        message: messageData.message || '',
+        isGif: !!messageData.isGif,
+        isSticker: !!messageData.isSticker,
+        isAudio: !!messageData.isAudio,
+        audioName: messageData.audioName || '',
+        timestamp: messageData.timestamp || null
+      });
+      bubbleDiv.appendChild(replyIcon);
+
+      const timeDiv = document.createElement("div");
+      timeDiv.className = "message-time";
+      timeDiv.textContent = timeStr(messageData.timestamp);
+      bubbleDiv.appendChild(timeDiv);
+
+      return bubbleDiv;
+    }
+
     async function sendMultimediaMessage(content, type) {
       if (!isJoined || !currentUser) return;
-      
       try {
         const messageData = {
-          user: currentUsername, 
+          user: currentUsername,
           timestamp: serverTimestamp(),
-          location: currentUserLocation, 
-          age: currentUserAge, 
+          location: currentUserLocation,
+          age: currentUserAge,
           userId: currentUser.uid
         };
 
-        switch(type) {
+        if (replyingTo) {
+          messageData.replyTo = {
+            id: replyingTo.id,
+            user: replyingTo.user,
+            message: replyingTo.message || '',
+            isGif: !!replyingTo.isGif,
+            isSticker: !!replyingTo.isSticker,
+            isAudio: !!replyingTo.isAudio,
+            audioName: replyingTo.audioName || '',
+            timestamp: replyingTo.timestamp || null
+          };
+          cancelReplyMode();
+        }
+
+        switch (type) {
           case 'gif':
             messageData.message = '[GIF]';
             messageData.gifUrl = content;
@@ -1992,7 +2290,7 @@
             messageData.isSticker = true;
             break;
           case 'audio':
-            messageData.message = `[Audio] ${content.name}`;
+            messageData.message = `[Audio] ${content.name || ''}`.trim();
             messageData.audioUrl = content.url;
             messageData.audioName = content.name;
             messageData.isAudio = true;
@@ -2005,37 +2303,37 @@
         addSystemMsg('Failed to send message');
       }
     }
-    
+
     async function getUserLocation() {
       const statusDiv = $("locationStatus");
       if (!statusDiv) return;
-      
+
       if (!navigator.geolocation) {
         statusDiv.textContent = "Geolocation is not supported.";
         statusDiv.className = "error";
         return;
       }
-      
+
       statusDiv.textContent = "Getting your location...";
       statusDiv.className = "";
-      
+
       try {
         const position = await new Promise((resolve, reject) => {
           navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
         });
-        
+
         userLatitude = position.coords.latitude;
         userLongitude = position.coords.longitude;
-        
+
         try {
           const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${userLatitude}&longitude=${userLongitude}&localityLanguage=en`);
           const data = await response.json();
-          const locationName = data.city;
+          const locationName = data.city || data.locality || data.principalSubdivision || '';
           currentUserLocation = locationName || `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
         } catch (e) {
           currentUserLocation = `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
         }
-        
+
         statusDiv.textContent = `Location found: ${currentUserLocation}`;
         statusDiv.className = "success";
         if (locationInput) {
@@ -2046,18 +2344,18 @@
         statusDiv.className = "error";
       }
     }
-    
+
     function showModal() {
       if (roomModal) roomModal.classList.add("show");
     }
-    
+
     function hideModal() {
       if (roomModal) roomModal.classList.remove("show");
       if (roomKeyInput) roomKeyInput.value = "";
     }
-    
+
     async function joinRoom(key) {
-      const k = key.trim().toLowerCase();
+      const k = (key || '').trim().toLowerCase();
       if (!k) {
         alert("Enter a room key");
         return;
@@ -2066,76 +2364,72 @@
         hideModal();
         return;
       }
-      
+
       if (messagesListener) messagesListener();
       currentRoom = k;
       localStorage.setItem("gappkar_current_room", currentRoom);
       updateRoomUI();
       if (messageList) messageList.innerHTML = "";
+      lastMessageGroup = null;
       addSystemMsg(`Joined room: ${currentRoom}`);
       listenMessages();
       trackPresence();
       hideModal();
     }
-    
+
     function leaveRoom() {
       if (currentRoom === "global") {
         hideModal();
         return;
       }
-      
       if (messagesListener) messagesListener();
       currentRoom = "global";
       localStorage.removeItem("gappkar_current_room");
       updateRoomUI();
       if (messageList) messageList.innerHTML = "";
+      lastMessageGroup = null;
       addSystemMsg("Left room, back to global chat");
       listenMessages();
       trackPresence();
       hideModal();
     }
-    
-    function displayMsg(d) {
+
+    function displayMsg(messageData) {
       if (!messageList) return;
-      
-      const mine = d.user === currentUsername;
-      const div = document.createElement("div");
-      div.className = `message ${mine ? "sent" : "received"}`;
-      const time = timeStr(d.timestamp);
 
-      let messageContent = '';
+      const isGrouped = shouldGroupMessage(messageData);
+      const messageType = messageData.user === currentUsername ? 'sent' : 'received';
 
-      if (d.isGif && d.gifUrl) {
-        messageContent = `<img src="${d.gifUrl}" style="max-width: 250px; border-radius: 16px;">`;
-      } else if (d.isSticker && d.stickerUrl) {
-        messageContent = `<img src="${d.stickerUrl}" style="max-width: 150px; border-radius: 16px;">`;
-      } else if (d.isAudio && d.audioUrl) {
-        messageContent = `
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <button class="chat-audio-play-btn" data-src="${d.audioUrl}">▶</button>
-            <span>${d.audioName || 'Audio'}</span>
-          </div>
-        `;
+      let groupDiv;
+      if (isGrouped && lastMessageGroup?.element) {
+        groupDiv = lastMessageGroup.element;
       } else {
-        messageContent = d.message || '';
+        groupDiv = createMessageGroup(messageData, false);
+        messageList.appendChild(groupDiv);
       }
 
-      div.innerHTML = mine
-        ? `<div class="message-bubble">${messageContent}<div class="message-time">${time}</div></div>`
-        : `<div class="message-info"><div class="sender-name">${d.user}${d.age ? ` (${d.age})` : ""}</div><div class="message-bubble">${messageContent}<div class="message-time">${time}</div></div>${d.location ? `<div class="message-location">📍 ${d.location}</div>` : ""}</div>`;
-      
-      messageList.appendChild(div);
+      const bubbleDiv = createMessageBubble(messageData, isGrouped);
+      groupDiv.appendChild(bubbleDiv);
+
+      lastMessageGroup = {
+        username: messageData.user,
+        type: messageType,
+        timestamp: Date.now(),
+        element: groupDiv
+      };
     }
-    
+
     function listenMessages() {
       if (messagesListener) messagesListener();
-      const q = query(roomMessagesRef(currentRoom), orderBy("timestamp", "asc"));
-      messagesListener = onSnapshot(q, (snapshot) => {
+      const qy = query(roomMessagesRef(currentRoom), orderBy("timestamp", "asc"));
+      messagesListener = onSnapshot(qy, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
           if (change.type === "added") {
             const temp = messageList?.querySelector('[data-temp="true"]');
             if (temp) temp.remove();
-            displayMsg(change.doc.data());
+            const d = change.doc.data();
+            d.id = change.doc.id;
+            displayMsg(d);
           }
         });
         scrollBottom();
@@ -2144,29 +2438,53 @@
 
     async function sendMessage() {
       if (!messageInput || !messageList) return;
-      
+
       const txt = messageInput.value.trim();
       if (!txt || !isJoined || !currentUser) return;
-      
+
       messageInput.value = "";
       const tempId = `temp_${Date.now()}`;
-      const div = document.createElement("div");
-      div.className = "message sent";
-      div.id = tempId;
-      div.dataset.temp = "true";
-      div.innerHTML = `<div class="message-bubble">${txt}<div class="message-time" style="opacity: 0.5;">sending...</div></div>`;
-      messageList.appendChild(div);
+
+      const tempGroupDiv = document.createElement("div");
+      tempGroupDiv.className = "message-group sent";
+      tempGroupDiv.id = tempId;
+      tempGroupDiv.dataset.temp = "true";
+
+      const tempBubbleDiv = document.createElement("div");
+      tempBubbleDiv.className = "message-bubble sent";
+      tempBubbleDiv.innerHTML = `${txt}<div class="message-time" style="opacity: 0.5;">sending...</div>`;
+
+      tempGroupDiv.appendChild(tempBubbleDiv);
+      messageList.appendChild(tempGroupDiv);
       scrollBottom();
-      
+
       try {
-        await addDoc(roomMessagesRef(currentRoom), {
-          user: currentUsername, 
-          message: txt, 
+        const data = {
+          user: currentUsername,
+          message: txt,
           timestamp: serverTimestamp(),
-          location: currentUserLocation, 
-          age: currentUserAge, 
+          location: currentUserLocation,
+          age: currentUserAge,
           userId: currentUser.uid
-        });
+        };
+
+        if (replyingTo) {
+          data.replyTo = {
+            id: replyingTo.id,
+            user: replyingTo.user,
+            message: replyingTo.message || '',
+            isGif: !!replyingTo.isGif,
+            isSticker: !!replyingTo.isSticker,
+            isAudio: !!replyingTo.isAudio,
+            audioName: replyingTo.audioName || '',
+            timestamp: replyingTo.timestamp || null
+          };
+        }
+
+        replyingTo = null;
+        if (replyPreview) replyPreview.classList.remove('visible');
+
+        await addDoc(roomMessagesRef(currentRoom), data);
       } catch (e) {
         console.error("Send failed:", e);
         const failedNode = document.getElementById(tempId);
@@ -2178,7 +2496,7 @@
         }
       }
     }
-    
+
     async function joinChat(name, age, loc) {
       if (!name.trim()) {
         alert("Enter name");
@@ -2193,27 +2511,28 @@
         return;
       }
       if (isJoined) return;
-      
+
       try {
         await signInAnonymously(auth);
         currentUsername = name.trim();
         currentUserAge = parseInt(age, 10);
         currentUserLocation = loc.trim();
         isJoined = true;
-        
+
         const savedRoom = localStorage.getItem("gappkar_current_room");
         if (savedRoom) currentRoom = savedRoom;
-        
+
         showView('chatsView');
         document.body.classList.add("chat-active");
         updateRoomUI();
         if (messageList) messageList.innerHTML = "";
+        lastMessageGroup = null;
         addSystemMsg(`Welcome ${currentUsername}!`);
-        
+
         listenMessages();
         trackPresence();
         listenOnlineUsers();
-        
+
         localStorage.setItem("gappkar_username", currentUsername);
         localStorage.setItem("gappkar_age", currentUserAge.toString());
         localStorage.setItem("gappkar_location", currentUserLocation);
@@ -2223,32 +2542,33 @@
         alert("Failed to join chat. Please try again.");
       }
     }
-    
+
     onAuthStateChanged(auth, (u) => {
       currentUser = u || null;
     });
-    
+
     async function logout() {
       if (presenceTimer) clearInterval(presenceTimer);
       if (onlineListener) onlineListener();
       if (messagesListener) messagesListener();
-      
+
       if (currentUser) {
-        try { 
-          await deleteDoc(doc(db, "presence", currentUser.uid)); 
-        } catch(e) { 
+        try {
+          await deleteDoc(doc(db, "presence", currentUser.uid));
+        } catch (e) {
           console.error("Presence cleanup failed:", e);
         }
       }
-      
-      try { 
-        await signOut(auth); 
+
+      try {
+        await signOut(auth);
       } catch (e) {
         console.error("Sign out failed:", e);
       }
-      
+
       isJoined = false;
       currentRoom = "global";
+      lastMessageGroup = null;
       localStorage.clear();
       showView('joinView');
       document.body.classList.remove("chat-active");
@@ -2262,10 +2582,6 @@
       }
     }
 
-    function handleFindBack() {
-      showView('chatsView');
-    }
-
     const sounds = [
       { name: 'Deepak Kalal Foundation', url: 'https://file.garden/aJ-bbmBvGxKiA5vP/Deepak%20kalal%20foundation' },
       { name: 'Thala Ajithkumar', url: 'https://file.garden/aJ-bbmBvGxKiA5vP/Thala%20Ajithkumar.mp3' },
@@ -2275,41 +2591,42 @@
     ];
 
     const togglePanel = (panelToShow) => {
-        if (!panelToShow) return;
-        const isVisible = panelToShow.classList.contains('visible');
-        allFeaturePanels.forEach(p => p && p.classList.remove('visible'));
-        if (!isVisible) {
-            panelToShow.classList.add('visible');
-        }
+      if (!panelToShow) return;
+      const isVisible = panelToShow.classList.contains('visible');
+      allFeaturePanels.forEach(p => p && p.classList.remove('visible'));
+      if (!isVisible) {
+        panelToShow.classList.add('visible');
+      }
     };
 
     const audioList = $('audioList');
     if (audioList) {
+      let currentPreviewAudio = null;
       sounds.forEach(sound => {
-          const li = document.createElement('li');
-          li.className = 'audio-item gradient-border';
-          li.innerHTML = `<button class="play-btn">▶</button><span class="audio-name">${sound.name}</span>`;
-          li.addEventListener('click', (e) => {
-              if (e.target.tagName !== 'BUTTON') {
-                  sendMultimediaMessage(sound, 'audio');
-                  togglePanel(audioPanel);
-              }
-          });
-          const playBtn = li.querySelector('.play-btn');
-          if (playBtn) {
-            playBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (currentAudio) {
-                    currentAudio.pause();
-                    currentAudio.currentTime = 0;
-                }
-                if (sound.url) {
-                    currentAudio = new Audio(sound.url);
-                    currentAudio.play().catch(console.error);
-                }
-            });
+        const li = document.createElement('li');
+        li.className = 'audio-item gradient-border';
+        li.innerHTML = `<button class="play-btn">▶</button><span class="audio-name">${sound.name}</span>`;
+        li.addEventListener('click', (e) => {
+          if (e.target.tagName !== 'BUTTON') {
+            sendMultimediaMessage(sound, 'audio');
+            togglePanel(audioPanel);
           }
-          audioList.appendChild(li);
+        });
+        const playBtn = li.querySelector('.play-btn');
+        if (playBtn) {
+          playBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (currentPreviewAudio) {
+              currentPreviewAudio.pause();
+              currentPreviewAudio.currentTime = 0;
+            }
+            if (sound.url) {
+              currentPreviewAudio = new Audio(sound.url);
+              currentPreviewAudio.play().catch(console.error);
+            }
+          });
+        }
+        audioList.appendChild(li);
       });
     }
 
@@ -2317,45 +2634,93 @@
     let debounceTimer;
 
     function setupGiphyPanel(type, searchInputId, resultsGridId) {
-        const searchInput = $(searchInputId);
-        const resultsGrid = $(resultsGridId);
-        if (!searchInput || !resultsGrid) return;
-        
-        const endpoint = type === 'stickers' ? 'stickers' : 'gifs';
+      const searchInput = $(searchInputId);
+      const resultsGrid = $(resultsGridId);
+      if (!searchInput || !resultsGrid) return;
 
-        async function fetchItems(searchTerm = '') {
-            resultsGrid.innerHTML = '<div class="loader"></div>';
-            const url = searchTerm ?
-                `https://api.giphy.com/v1/${endpoint}/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(searchTerm)}&limit=24` :
-                `https://api.giphy.com/v1/${endpoint}/trending?api_key=${GIPHY_API_KEY}&limit=24`;
-            try {
-                const res = await fetch(url);
-                const { data } = await res.json();
-                resultsGrid.innerHTML = '';
-                data.forEach(item => {
-                    const itemEl = document.createElement('div');
-                    itemEl.className = `${type === 'stickers' ? 'sticker-item' : 'gif-item'} gradient-border`;
-                    itemEl.innerHTML = `<img src="${item.images.fixed_width.url}" alt="${item.title}">`;
-                    itemEl.onclick = () => {
-                        sendMultimediaMessage(item.images.original.url, type === 'stickers' ? 'sticker' : 'gif');
-                        togglePanel($(type === 'stickers' ? 'stickerPanel' : 'gifPanel'));
-                    };
-                    resultsGrid.appendChild(itemEl);
-                });
-            } catch (e) {
-                console.error('Failed to fetch items:', e);
-                resultsGrid.innerHTML = `<div>Failed to load ${type}.</div>`;
-            }
+      const endpoint = type === 'stickers' ? 'stickers' : 'gifs';
+
+      async function fetchItems(searchTerm = '') {
+        resultsGrid.innerHTML = '<div class="loader"></div>';
+        const url = searchTerm
+          ? `https://api.giphy.com/v1/${endpoint}/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(searchTerm)}&limit=24`
+          : `https://api.giphy.com/v1/${endpoint}/trending?api_key=${GIPHY_API_KEY}&limit=24`;
+        try {
+          const res = await fetch(url);
+          const { data } = await res.json();
+          resultsGrid.innerHTML = '';
+          data.forEach(item => {
+            const itemEl = document.createElement('div');
+            itemEl.className = `${type === 'stickers' ? 'sticker-item' : 'gif-item'} gradient-border`;
+            itemEl.innerHTML = `<img src="${item.images.fixed_width.url}" alt="${item.title}">`;
+            itemEl.onclick = () => {
+              sendMultimediaMessage(item.images.original.url, type === 'stickers' ? 'sticker' : 'gif');
+              togglePanel($(type === 'stickers' ? 'stickerPanel' : 'gifPanel'));
+            };
+            resultsGrid.appendChild(itemEl);
+          });
+        } catch (e) {
+          console.error('Failed to fetch items:', e);
+          resultsGrid.innerHTML = `<div>Failed to load ${type}.</div>`;
         }
+      }
 
-        searchInput.addEventListener('input', () => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(() => fetchItems(searchInput.value), 500);
-        });
-        
-        fetchItems();
+      searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => fetchItems(searchInput.value), 500);
+      });
+
+      fetchItems();
     }
-    
+
+    async function fetchAllOnlineUsers() {
+      const fiveAgo = new Date(Date.now() - 5 * 60 * 1000);
+      const qy = query(collection(db, "presence"), where("lastSeen", ">", fiveAgo));
+      try {
+        const snapshot = await getDocs(qy);
+        return snapshot.docs.map(docu => docu.data());
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        return [];
+      }
+    }
+
+    function createUserCard(user) {
+      if (user.userId === currentUser?.uid) return '';
+      const safeName = (user.username || 'Unknown').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const safeLoc = (user.location || 'Unknown').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const ageStr = user.age ? ` (${user.age})` : '';
+      const avatarSrc = `https://i.pravatar.cc/150?u=${encodeURIComponent(user.userId || safeName)}`;
+
+      return `
+        <li class="user-card gradient-border" data-user='${JSON.stringify({
+          userId: user.userId,
+          username: user.username,
+          age: user.age,
+          location: user.location
+        }).replace(/'/g, '&#39;')}'>
+          <img src="${avatarSrc}" alt="${safeName}" class="profile-pic" onerror="this.src='your-icon.jpg'">
+          <div class="user-info">
+            <h3>${safeName}${ageStr}</h3>
+            <p>📍 ${safeLoc}</p>
+          </div>
+          <button class="header-btn gradient-border" style="margin-left:auto" title="Quick mention">↩</button>
+        </li>
+      `;
+    }
+
+    function renderUserList(targetList, users) {
+      if (!targetList) return;
+      if (!users || users.length === 0) {
+        targetList.innerHTML = '<p style="text-align:center; color: var(--gray); padding: 20px; font-family: DotGothic16, monospace;">No users found.</p>';
+        return;
+      }
+      targetList.innerHTML = users
+        .filter(u => u.userId !== currentUser?.uid)
+        .map(createUserCard)
+        .join('');
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       if (localStorage.getItem("gappkar_joined") === "true") {
         const username = localStorage.getItem("gappkar_username") || "";
@@ -2365,7 +2730,7 @@
           joinChat(username, age, location);
         }
       }
-      
+
       if (getLocationBtn) getLocationBtn.addEventListener("click", getUserLocation);
       if (joinButton) joinButton.addEventListener("click", () => {
         const username = usernameInput ? usernameInput.value : "";
@@ -2375,11 +2740,11 @@
       });
       if (sendButton) sendButton.addEventListener("click", sendMessage);
       if (messageInput) {
-        messageInput.addEventListener("keydown", e => { 
-          if (e.key === "Enter" && !e.shiftKey) { 
-            e.preventDefault(); 
-            sendMessage(); 
-          } 
+        messageInput.addEventListener("keydown", e => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
         });
       }
       if (backButton) backButton.addEventListener("click", handleMainBack);
@@ -2394,17 +2759,17 @@
         joinRoom(key);
       });
       if (leaveRoomBtn) leaveRoomBtn.addEventListener("click", leaveRoom);
-      if (roomModal) roomModal.addEventListener("click", e => { 
-        if (e.target === roomModal) hideModal(); 
+      if (roomModal) roomModal.addEventListener("click", e => {
+        if (e.target === roomModal) hideModal();
       });
 
       if (findBtn) findBtn.addEventListener('click', () => showView('findMenuView'));
-      
+
       const findMenuBackBtn = $("findMenuBackBtn");
       const nearbyBackBtn = $("nearbyBackBtn");
       const searchBackBtn = $("searchBackBtn");
-      
-      if (findMenuBackBtn) findMenuBackBtn.addEventListener("click", handleFindBack);
+
+      if (findMenuBackBtn) findMenuBackBtn.addEventListener("click", () => showView('chatsView'));
       if (nearbyBackBtn) nearbyBackBtn.addEventListener("click", () => showView('findMenuView'));
       if (searchBackBtn) searchBackBtn.addEventListener("click", () => showView('findMenuView'));
 
@@ -2414,7 +2779,7 @@
           if (nearbyUserList) {
             nearbyUserList.innerHTML = '<p style="text-align:center; color: var(--gray); padding: 20px; font-family: DotGothic16, monospace;">Loading users...</p>';
             const allOnlineUsers = await fetchAllOnlineUsers();
-            const nearbyUsers = allOnlineUsers.filter(u => u.location && u.location.toLowerCase() === currentUserLocation.toLowerCase());
+            const nearbyUsers = allOnlineUsers.filter(u => u.location && u.location.toLowerCase() === (currentUserLocation || '').toLowerCase());
             renderUserList(nearbyUserList, nearbyUsers.length > 1 ? nearbyUsers : allOnlineUsers);
           }
         });
@@ -2423,43 +2788,43 @@
       if (findAccountsBtn) {
         findAccountsBtn.addEventListener('click', () => {
           showView('searchView');
-          renderUserList(userResultsList, []);
+          if (userResultsList) renderUserList(userResultsList, []);
         });
       }
 
       if (accountSearchInput) {
         accountSearchInput.addEventListener('input', async (e) => {
-          const searchTerm = e.target.value.toLowerCase();
+          const searchTerm = (e.target.value || '').toLowerCase();
           if (!searchTerm) {
-            renderUserList(userResultsList, []);
+            if (userResultsList) renderUserList(userResultsList, []);
             return;
           }
           const allOnlineUsers = await fetchAllOnlineUsers();
-          const results = allOnlineUsers.filter(user => 
+          const results = allOnlineUsers.filter(user =>
             (user.username && user.username.toLowerCase().includes(searchTerm)) ||
             (user.location && user.location.toLowerCase().includes(searchTerm))
           );
-          renderUserList(userResultsList, results);
+          if (userResultsList) renderUserList(userResultsList, results);
         });
       }
 
       if (expandBtn && expandOptions) {
         expandBtn.addEventListener('click', () => {
-            expandBtn.classList.toggle('active');
-            expandOptions.classList.toggle('visible');
-            if (!expandOptions.classList.contains('visible')) {
-                allFeaturePanels.forEach(p => p && p.classList.remove('visible'));
-            }
+          expandBtn.classList.toggle('active');
+          expandOptions.classList.toggle('visible');
+          if (!expandOptions.classList.contains('visible')) {
+            allFeaturePanels.forEach(p => p && p.classList.remove('visible'));
+          }
         });
       }
 
       const setupOptionButton = (btn, panel) => {
-          if (!btn || !panel) return;
-          btn.addEventListener('click', () => {
-               togglePanel(panel);
-               if (expandOptions) expandOptions.classList.remove('visible');
-               if (expandBtn) expandBtn.classList.remove('active');
-          });
+        if (!btn || !panel) return;
+        btn.addEventListener('click', () => {
+          togglePanel(panel);
+          if (expandOptions) expandOptions.classList.remove('visible');
+          if (expandBtn) expandBtn.classList.remove('active');
+        });
       };
 
       setupOptionButton(stickerOptionBtn, stickerPanel);
@@ -2467,30 +2832,76 @@
       setupOptionButton(gifOptionBtn, gifPanel);
 
       document.querySelectorAll('.feature-panel-close-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-              const panelId = btn.getAttribute('data-panel');
-              const panel = $(panelId);
-              if (panel) panel.classList.remove('visible');
-          });
+        btn.addEventListener('click', () => {
+          const panelId = btn.getAttribute('data-panel');
+          const panel = $(panelId);
+          if (panel) panel.classList.remove('visible');
+        });
       });
 
       if (messageList) {
         messageList.addEventListener('click', (e) => {
-            if (e.target.classList.contains('chat-audio-play-btn')) {
-                const audioSrc = e.target.dataset.src;
-                if (audioSrc) {
-                    if (currentAudio) {
-                        currentAudio.pause();
-                    }
-                    currentAudio = new Audio(audioSrc);
-                    currentAudio.play().catch(console.error);
-                }
+          if (e.target.classList.contains('chat-audio-play-btn')) {
+            const audioSrc = e.target.dataset.src;
+            if (audioSrc) {
+              if (currentAudio) currentAudio.pause();
+              currentAudio = new Audio(audioSrc);
+              currentAudio.play().catch(console.error);
             }
+          }
+
+          const ctxEl = e.target.closest('.reply-context');
+          if (ctxEl) {
+            const target = ctxEl?.dataset?.replyTarget;
+            if (target) {
+              const node = document.getElementById(`msg-${target}`);
+              if (node) {
+                node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                node.animate([
+                  { boxShadow: '0 0 0px rgba(223,19,23,0)' },
+                  { boxShadow: '0 0 20px rgba(223,19,23,0.8)' },
+                  { boxShadow: '0 0 0px rgba(223,19,23,0)' }
+                ], { duration: 800 });
+              }
+            }
+            return;
+          }
+
+          if (e.target.classList.contains('reply-icon')) {
+            const raw = e.target.dataset.messageData;
+            if (raw) {
+              try {
+                const data = JSON.parse(raw);
+                startReply(data);
+              } catch (err) {
+                console.error('Reply parse failed', err);
+              }
+            }
+          }
         });
       }
 
+      document.addEventListener('click', (e) => {
+        const li = e.target.closest('li.user-card');
+        if (!li) return;
+        if (e.target.closest('button')) {
+          try {
+            const data = JSON.parse(li.getAttribute('data-user') || '{}');
+            if (messageInput && data.username) {
+              messageInput.value = `@${data.username} `;
+              messageInput.focus();
+            }
+          } catch (_) {}
+          return;
+        }
+      });
+
       setupGiphyPanel('gifs', 'gif-search-input', 'gif-results-grid');
       setupGiphyPanel('stickers', 'sticker-search-input', 'stickerGrid');
+
+      if (cancelReply) {
+        cancelReply.addEventListener('click', cancelReplyMode);
+      }
     });
   </script>
 
@@ -2498,7 +2909,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       const themeToggle = document.getElementById('themeToggle');
       const themeIcon = document.getElementById('themeIcon');
-      
+
       function toggleTheme() {
         const body = document.body;
         if (body.getAttribute('data-theme') === 'dark') {
@@ -2509,11 +2920,23 @@
           if (themeIcon) themeIcon.textContent = '☀️';
         }
       }
-      
-      if (themeToggle) { 
-        themeToggle.addEventListener('click', toggleTheme); 
+
+      if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
       }
     });
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js').then(function(registration) {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, function(err) {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
   </script>
 </body>
 </html>
