@@ -1,2942 +1,357 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Gappkar Online</title>
-  <link rel="icon" type="image/jpeg" href="your-icon.jpg">
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#000000">
-  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-gradient: linear-gradient(180deg, #000000 0%, #1a0000 50%, #000000 100%);
-      --bg-dark: #000000;
-      --bg-light: #111111;
-      --text-dark: #ffffff;
-      --text-light: #000000;
-      --accent: #df1317;
-      --accent-light: #e63946;
-      --accent-gradient: linear-gradient(135deg, #df1317 0%, #e63946 50%, #ff6b6b 100%);
-      --border-gradient: linear-gradient(180deg, #df1317 0%, #e63946 50%, #000000 100%);
-      --gray: #888888;
-      --border-radius: 15px;
-      --border-thin: 2px solid;
-      --system-bg: #222222;
-      --system-text: #aaaaaa;
-      --modal-bg: rgba(0, 0, 0, 0.9);
-      --shadow: 0 4px 15px rgba(223, 19, 23, 0.3);
-      --card-hover: 0 6px 20px rgba(223, 19, 23, 0.4);
-    }
-
-    [data-theme="dark"] {
-      --bg-gradient: linear-gradient(180deg, #ffffff 0%, #f0f0f0 50%, #ffffff 100%);
-      --bg-dark: #ffffff;
-      --bg-light: #f5f5f5;
-      --text-dark: #000000;
-      --text-light: #ffffff;
-      --border-gradient: linear-gradient(180deg, #df1317 0%, #e63946 50%, #ffffff 100%);
-      --system-bg: #f0f0f0;
-      --system-text: #666666;
-      --modal-bg: rgba(255, 255, 255, 0.9);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      transition: all 0.3s ease;
-    }
-
-    body {
-      font-family: 'DotGothic16', monospace;
-      background: var(--bg-gradient);
-      color: var(--text-dark);
-      letter-spacing: 0.5px;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-
-    .app-container {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      padding: 0;
-    }
-
-    .main-container {
-      width: 100%;
-      max-width: 400px;
-      background: var(--bg-gradient);
-      overflow: hidden;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    .gradient-border {
-      position: relative;
-    }
-
-    .gradient-border::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      border-radius: inherit;
-      padding: 2px;
-      background: var(--border-gradient);
-      -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      mask-composite: exclude;
-      pointer-events: none;
-    }
-
-    .app-header {
-      background: var(--bg-dark);
-      padding: 30px 20px;
-      text-align: center;
-      position: relative;
-      border-bottom: 1px solid #333;
-    }
-
-    .chat-active .app-header {
-      display: none !important;
-    }
-
-    .theme-toggle {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background: transparent;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-dark);
-      transition: all 0.3s ease;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .theme-toggle.gradient-border {
-      border: none;
-    }
-
-    .theme-toggle:hover {
-      background: var(--accent-gradient);
-      color: white;
-      transform: scale(1.1);
-      box-shadow: var(--shadow);
-    }
-
-    .logo-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      margin-top: 10px;
-    }
-
-    .logo-icon {
-      width: 70px;
-      height: 70px;
-      border-radius: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--accent-gradient);
-      font-weight: 700;
-      font-size: 36px;
-      color: white;
-      overflow: hidden;
-      box-shadow: var(--card-hover);
-      position: relative;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .logo-icon::after {
-      content: "";
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-      transform: rotate(45deg);
-      animation: shine 3s infinite;
-    }
-
-    @keyframes shine {
-      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-      50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-      100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-    }
-
-    .logo-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 23px;
-    }
-
-    .app-title {
-      font-size: 32px;
-      font-weight: 700;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-shadow: 0 0 30px rgba(223, 19, 23, 0.5);
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .app-subtitle {
-      font-size: 16px;
-      color: var(--gray);
-      font-weight: 300;
-      letter-spacing: 1px;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .view {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .view.hidden {
-      display: none !important;
-    }
-
-    #joinView {
-      padding: 30px 24px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: var(--bg-gradient);
-    }
-
-    .section-header {
-      text-align: center;
-      margin-bottom: 40px;
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(223, 19, 23, 0.1), rgba(230, 57, 70, 0.05));
-      border-radius: 20px;
-      border: 1px solid rgba(223, 19, 23, 0.2);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .section-header::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 2px;
-      background: var(--accent-gradient);
-      animation: slideIn 2s infinite;
-    }
-
-    @keyframes slideIn {
-      0% { left: -100%; }
-      50% { left: 100%; }
-      100% { left: -100%; }
-    }
-
-    .section-icon {
-      font-size: 40px;
-      margin-bottom: 15px;
-      animation: bounce 2s infinite;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(-10px); }
-      60% { transform: translateY(-5px); }
-    }
-
-    .section-title {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: 2px;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .section-description {
-      color: var(--gray);
-      font-size: 16px;
-      font-weight: 400;
-      letter-spacing: 0.5px;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .form-group {
-      margin-bottom: 25px;
-    }
-
-    .form-label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 10px;
-      font-size: 15px;
-      color: var(--text-dark);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 16px 20px;
-      border: none;
-      border-radius: 20px;
-      font-size: 16px;
-      font-family: 'DotGothic16', monospace;
-      background: var(--system-bg);
-      color: var(--text-dark);
-      outline: none;
-      transition: all 0.3s ease;
-      font-weight: 500;
-    }
-
-    .form-input.gradient-border {
-      background: var(--system-bg);
-    }
-
-    .form-input:focus {
-      box-shadow: 0 0 0 4px rgba(223, 19, 23, 0.2);
-      transform: translateY(-2px);
-      background: #333333;
-    }
-
-    .form-input::placeholder {
-      color: var(--gray);
-      font-weight: 400;
-    }
-
-    .location-options {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    #locationStatus {
-      padding: 15px;
-      border-radius: 15px;
-      text-align: center;
-      margin-top: 15px;
-      font-size: 13px;
-      border: 2px solid transparent;
-      font-weight: 500;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    #locationStatus.success {
-      background: linear-gradient(135deg, rgba(40, 167, 69, 0.2), rgba(32, 201, 151, 0.1));
-      color: #20c997;
-      border-color: rgba(32, 201, 151, 0.3);
-    }
-
-    #locationStatus.error {
-      background: linear-gradient(135deg, rgba(220, 53, 69, 0.2), rgba(255, 193, 203, 0.1));
-      color: #ff6b6b;
-      border-color: rgba(220, 53, 69, 0.3);
-    }
-
-    .btn {
-      width: 100%;
-      padding: 16px 18px;
-      border-radius: 25px;
-      font-size: 14px;
-      font-weight: 700;
-      text-transform: uppercase;
-      cursor: pointer;
-      border: none;
-      font-family: 'DotGothic16', monospace;
-      transition: all 0.4s ease;
-      position: relative;
-      overflow: hidden;
-      letter-spacing: 1px;
-    }
-
-    .btn::before {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      background: rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      transition: all 0.5s ease;
-    }
-
-    .btn:hover::before {
-      width: 300px;
-      height: 300px;
-    }
-
-    .btn-location, .btn-success {
-      background: var(--system-bg);
-      color: var(--text-dark);
-      box-shadow: var(--shadow);
-      position: relative;
-      z-index: 1;
-    }
-
-    .btn-location.gradient-border, .btn-success.gradient-border {
-      background: var(--system-bg);
-    }
-
-    .btn-location:hover, .btn-success:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--card-hover);
-      background: var(--accent-gradient);
-      color: white;
-    }
-
-    .btn-location:active, .btn-success:active {
-      transform: translateY(-1px);
-    }
-
-    .btn-success {
-      animation: pulse-glow 3s infinite;
-    }
-
-    @keyframes pulse-glow {
-      0% { box-shadow: var(--shadow); }
-      50% { box-shadow: 0 0 20px rgba(223, 19, 23, 0.6); }
-      100% { box-shadow: var(--shadow); }
-    }
-
-    #chatsView {
-      display: none;
-      flex-direction: column;
-      background: var(--bg-gradient);
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    #chatsView:not(.hidden) {
-      display: flex !important;
-    }
-
-    .chat-header {
-      background: var(--bg-dark);
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border-bottom: 1px solid #333;
-      flex-shrink: 0;
-    }
-
-    .back-button, .header-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--system-bg);
-      font-size: 16px;
-      color: var(--text-dark);
-      transition: all 0.3s ease;
-      border: none;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .back-button.gradient-border, .header-btn.gradient-border {
-      background: var(--system-bg);
-    }
-
-    .back-button:hover, .header-btn:hover {
-      background: var(--accent-gradient);
-      color: white;
-      transform: scale(1.1);
-    }
-
-    .chat-header-info {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .header-logo-section {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex: 1;
-    }
-
-    .header-logo-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--accent-gradient);
-      font-weight: 600;
-      font-size: 16px;
-      color: white;
-      flex-shrink: 0;
-      overflow: hidden;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .header-logo-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-
-    .header-app-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .header-app-name {
-      font-size: 14px;
-      font-weight: 700;
-      text-transform: uppercase;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: 1px;
-      line-height: 1.2;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .header-room-info {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      color: var(--gray);
-      margin-top: 2px;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .room-indicator {
-      background: var(--accent-gradient);
-      color: white;
-      padding: 3px 8px;
-      border-radius: 8px;
-      font-size: 9px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .online-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    .find-view {
-      display: flex;
-      flex-direction: column;
-      padding: 0;
-      flex-grow: 1;
-      background: var(--bg-gradient);
-    }
-
-    #findMenuView {
-      align-items: stretch;
-      justify-content: flex-start;
-      text-align: left;
-    }
-
-    .find-menu-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .find-menu-btn {
-      position: relative;
-      background: var(--system-bg);
-      border-radius: var(--border-radius);
-      padding: 25px 15px;
-      text-align: center;
-      color: var(--text-dark);
-      text-decoration: none;
-      transition: all 0.3s ease;
-      min-height: 120px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-      border: none;
-      overflow: hidden;
-      cursor: pointer;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .find-menu-btn.gradient-border {
-      background: var(--system-bg);
-    }
-
-    .find-menu-btn:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--card-hover);
-    }
-
-    .find-menu-btn.primary {
-      background: var(--accent-gradient);
-      color: white;
-    }
-
-    .find-menu-btn.primary::before {
-      display: none;
-    }
-
-    .find-menu-icon {
-      font-size: 32px;
-      margin-bottom: 5px;
-      position: relative;
-      z-index: 1;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .find-menu-text {
-      font-size: 14px;
-      font-weight: 600;
-      position: relative;
-      z-index: 1;
-      text-transform: uppercase;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .promo-buttons {
-      display: flex;
-      justify-content: space-around;
-      padding: 0 20px 20px;
-      gap: 10px;
-    }
-
-    .promo-btn {
-      flex: 1;
-      padding: 10px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      text-align: center;
-      color: white;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      background: var(--accent-gradient);
-      box-shadow: var(--shadow);
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .promo-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--card-hover);
-    }
-
-    .user-list {
-      list-style: none;
-      overflow-y: auto;
-      flex-grow: 1;
-      padding: 0 20px;
-    }
-
-    .user-card {
-      display: flex;
-      align-items: center;
-      background: var(--system-bg);
-      padding: 15px;
-      border-radius: var(--border-radius);
-      margin-bottom: 12px;
-      transition: all 0.3s ease;
-    }
-
-    .user-card.gradient-border {
-      background: var(--system-bg);
-    }
-
-    .user-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-
-    .profile-pic {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-right: 15px;
-      border: 2px solid var(--accent);
-    }
-
-    .user-info h3 {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text-dark);
-      margin-bottom: 4px;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .user-info p {
-      font-size: 12px;
-      color: var(--gray);
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .search-bar {
-      width: calc(100% - 40px);
-      margin: 0 20px 20px;
-      padding: 12px 20px;
-      font-size: 14px;
-      border-radius: 25px;
-      border: none;
-      background: var(--system-bg);
-      outline: none;
-      font-family: 'DotGothic16', monospace;
-      color: var(--text-dark);
-      transition: all 0.3s ease;
-    }
-
-    .search-bar.gradient-border {
-      background: var(--system-bg);
-    }
-
-    .search-bar:focus {
-      box-shadow: 0 0 0 3px rgba(223, 19, 23, 0.2);
-      transform: translateY(-1px);
-    }
-
-    #messageList {
-      flex: 1;
-      padding: 16px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      background: transparent;
-      scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
-    }
-
-    .message-group {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      margin-bottom: 12px;
-      animation: messageSlideIn 0.3s ease;
-    }
-
-    .message-group.sent {
-      align-items: flex-end;
-    }
-
-    .message-group.received {
-      align-items: flex-start;
-    }
-
-    .message-group.system {
-      align-items: center;
-    }
-
-    @keyframes messageSlideIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .message-user-info {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 4px;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .message-user-info.sent {
-      align-items: flex-end;
-    }
-
-    .message-user-info.received {
-      align-items: flex-start;
-    }
-
-    .sender-name {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--accent);
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .message-location {
-      font-size: 10px;
-      opacity: 0.7;
-      margin-top: 2px;
-      font-family: 'DotGothic16', monospace;
-      color: var(--gray);
-    }
-
-    .message-bubble {
-      border-radius: 18px;
-      padding: 12px 16px;
-      font-size: 12px;
-      max-width: 75%;
-      position: relative;
-      line-height: 1.4;
-      font-family: 'DotGothic16', monospace;
-      margin-bottom: 2px;
-      word-wrap: break-word;
-      word-break: break-word;
-      overflow-wrap: break-word;
-      white-space: pre-wrap;
-      hyphens: auto;
-      -webkit-hyphens: auto;
-      -ms-hyphens: auto;
-    }
-
-    .message-bubble.sent {
-      background: var(--accent-gradient);
-      color: white;
-      align-self: flex-end;
-    }
-
-    .message-bubble.received {
-      background: var(--system-bg);
-      color: var(--text-dark);
-      align-self: flex-start;
-    }
-
-    .message-bubble.system {
-      background: var(--system-bg);
-      color: var(--gray);
-      border: 1px dashed var(--gray);
-      font-size: 12px;
-      max-width: 90%;
-      text-align: center;
-      align-self: center;
-    }
-
-    .message-bubble.grouped {
-      margin-top: 1px;
-    }
-
-    .message-bubble.grouped.sent {
-      border-top-right-radius: 8px;
-    }
-
-    .message-bubble.grouped.received {
-      border-top-left-radius: 8px;
-    }
-
-    .message-time {
-      font-size: 10px;
-      opacity: 0.7;
-      margin-top: 4px;
-      font-family: 'DotGothic16', monospace;
-      text-align: right;
-    }
-
-    .message-bubble.received .message-time {
-      text-align: left;
-    }
-
-    .reply-context {
-      display: grid;
-      grid-template-columns: 4px 1fr;
-      gap: 10px;
-      align-items: stretch;
-      padding: 0;
-      margin: 0 0 8px 0;
-      border-radius: 10px;
-      overflow: hidden;
-      background: rgba(255,255,255,0.06);
-    }
-
-    .reply-context .reply-rail {
-      background: var(--accent);
-    }
-
-    .message-bubble.sent .reply-context {
-      background: rgba(0,0,0,0.18);
-    }
-
-    .reply-context-inner {
-      padding: 8px 10px;
-      min-width: 0;
-    }
-
-    .reply-author {
-      font-weight: 700;
-      font-size: 11px;
-      line-height: 1.2;
-      color: var(--accent);
-      margin-bottom: 4px;
-    }
-
-    .message-bubble.sent .reply-author {
-      color: #fff;
-      opacity: 0.9;
-    }
-
-    .reply-text {
-      font-size: 11px;
-      line-height: 1.3;
-      color: var(--text-dark);
-      opacity: 0.85;
-      max-height: 42px;
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-      word-break: break-word;
-    }
-
-    .message-bubble.sent .reply-text {
-      color: #fff;
-      opacity: 0.9;
-    }
-
-    .reply-meta {
-      font-size: 10px;
-      opacity: 0.7;
-      margin-top: 4px;
-    }
-
-    .reply-context[role="button"] {
-      cursor: pointer;
-    }
-
-    .reply-icon {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 24px;
-      height: 24px;
-      background: rgba(0, 0, 0, 0.6);
-      border-radius: 50%;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 12px;
-      color: white;
-      transition: all 0.2s ease;
-      z-index: 10;
-      user-select: none;
-    }
-
-    .message-bubble:hover .reply-icon {
-      display: flex;
-    }
-
-    .reply-icon:hover {
-      background: var(--accent);
-      transform: scale(1.1);
-    }
-
-    .message-bubble.sent .reply-icon {
-      background: rgba(255, 255, 255, 0.3);
-      color: #000;
-    }
-
-    .message-bubble.sent:hover .reply-icon {
-      background: rgba(255, 255, 255, 0.6);
-    }
-
-    .reply-preview {
-      background: var(--system-bg);
-      border: 1px solid var(--accent);
-      border-radius: 12px;
-      padding: 12px 16px;
-      margin: 12px 20px 0;
-      display: none;
-      position: relative;
-    }
-
-    .reply-preview.visible {
-      display: block;
-    }
-
-    .reply-preview-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .reply-preview-title {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--accent);
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .reply-preview-close {
-      background: none;
-      border: none;
-      font-size: 16px;
-      color: var(--gray);
-      cursor: pointer;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      transition: all 0.2s ease;
-    }
-
-    .reply-preview-close:hover {
-      background: var(--accent);
-      color: white;
-    }
-
-    .reply-preview-content {
-      font-size: 11px;
-      color: var(--text-dark);
-      opacity: 0.85;
-      max-height: 40px;
-      overflow: hidden;
-      line-height: 1.3;
-      font-family: 'DotGothic16', monospace;
-      word-break: break-word;
-    }
-
-    @media (max-width: 480px) {
-      .reply-icon {
-        display: flex;
-        opacity: 0.85;
-      }
-      .message-bubble:hover .reply-icon {
-        opacity: 1;
-      }
-    }
-
-    .chat-input-area {
-      flex-shrink: 0;
-      border-top: 1px solid #333;
-      background: var(--bg-dark);
-    }
-
-    .input-row {
-      padding: 15px 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .expand-btn {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      border: none;
-      background: var(--accent-gradient);
-      cursor: pointer;
-      font-size: 20px;
-      color: white;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      box-shadow: var(--shadow);
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .expand-btn:hover {
-      transform: scale(1.1);
-    }
-
-    .expand-btn.active {
-      transform: rotate(45deg) scale(1.1);
-    }
-
-    .message-input {
-      flex: 1;
-      background: var(--system-bg);
-      border: none;
-      border-radius: 25px;
-      padding: 12px 20px;
-      color: var(--text-dark);
-      font-size: 12px;
-      font-family: 'DotGothic16', monospace;
-      outline: none;
-      transition: all 0.3s ease;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-    }
-
-    .message-input:focus {
-      box-shadow: 0 0 0 2px rgba(223, 19, 23, 0.3);
-    }
-
-    .message-input::placeholder {
-      color: var(--gray);
-    }
-
-    .send-button {
-      background: var(--accent-gradient);
-      border: none;
-      border-radius: 50%;
-      width: 45px;
-      height: 45px;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      box-shadow: var(--shadow);
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .send-button:hover {
-      transform: scale(1.1);
-    }
-
-    .expand-options {
-      display: flex;
-      justify-content: space-around;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out;
-      padding: 0 20px;
-      border-bottom: 1px solid transparent;
-    }
-
-    .expand-options.visible {
-      max-height: 120px;
-      padding: 15px 20px;
-      border-bottom: 1px solid #333;
-    }
-
-    .expand-option-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-family: 'DotGothic16', monospace;
-      font-size: 12px;
-      color: var(--gray);
-      transition: all 0.3s ease;
-    }
-
-    .expand-option-btn .icon {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: var(--system-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      color: var(--text-dark);
-      transition: all 0.3s ease;
-    }
-
-    .expand-option-btn .icon.gradient-border {
-      background: var(--system-bg);
-    }
-
-    .expand-option-btn:hover .icon {
-      background: var(--accent-gradient);
-      color: white;
-      transform: scale(1.1);
-    }
-
-    .expand-option-btn:hover {
-      color: var(--accent);
-    }
-
-    .feature-panel {
-      background: var(--bg-dark);
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-in-out;
-    }
-
-    .feature-panel.visible {
-      max-height: 300px;
-      border-top: 1px solid #333;
-    }
-
-    .feature-panel-header {
-      display: flex;
-      align-items: center;
-      padding: 15px 20px;
-      border-bottom: 1px solid #333;
-      flex-shrink: 0;
-    }
-
-    .feature-panel-title {
-      flex-grow: 1;
-      font-weight: 600;
-      color: var(--text-dark);
-      font-size: 16px;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .feature-panel-close-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: none;
-      background: var(--system-bg);
-      color: var(--text-dark);
-      cursor: pointer;
-      font-size: 16px;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .feature-panel-close-btn.gradient-border {
-      background: var(--system-bg);
-    }
-
-    .feature-panel-close-btn:hover {
-      background: var(--accent-gradient);
-      color: white;
-    }
-
-    .feature-panel-content {
-      padding: 20px;
-      overflow-y: auto;
-      flex-grow: 1;
-    }
-
-    .feature-search-bar {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 20px;
-      border: none;
-      background: var(--system-bg);
-      font-size: 14px;
-      font-family: 'DotGothic16', monospace;
-      margin-bottom: 16px;
-      outline: none;
-      color: var(--text-dark);
-      transition: all 0.3s ease;
-    }
-
-    .feature-search-bar.gradient-border {
-      background: var(--system-bg);
-    }
-
-    .feature-search-bar:focus {
-      box-shadow: 0 0 0 2px rgba(223, 19, 23, 0.3);
-    }
-
-    #stickerGrid, #gif-results-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-      gap: 10px;
-    }
-
-    .sticker-item, .gif-item {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background: var(--system-bg);
-      border-radius: 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      overflow: hidden;
-    }
-
-    .sticker-item.gradient-border, .gif-item.gradient-border {
-      background: var(--system-bg);
-    }
-
-    .sticker-item:hover, .gif-item:hover {
-      transform: scale(1.1);
-      box-shadow: var(--shadow);
-    }
-
-    .sticker-item img, .gif-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    #audioList {
-      list-style: none;
-    }
-
-    .audio-item {
-      display: flex;
-      align-items: center;
-      padding: 12px;
-      border-radius: 12px;
-      cursor: pointer;
-      margin-bottom: 8px;
-      background: var(--system-bg);
-      transition: all 0.3s ease;
-    }
-
-    .audio-item.gradient-border {
-      background: var(--system-bg);
-    }
-
-    .audio-item:hover {
-      background: var(--accent-gradient);
-      color: white;
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-
-    .audio-item .play-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      border: none;
-      background: var(--accent-gradient);
-      color: white;
-      font-size: 14px;
-      margin-right: 12px;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: all 0.3s ease;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .audio-item .play-btn:hover {
-      transform: scale(1.1);
-    }
-
-    .audio-item .audio-name {
-      font-size: 14px;
-      font-weight: 500;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .chat-audio-play-btn {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: none;
-      background: var(--accent-gradient);
-      color: white;
-      cursor: pointer;
-      font-size: 12px;
-      flex-shrink: 0;
-      transition: all 0.3s ease;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .chat-audio-play-btn:hover {
-      transform: scale(1.1);
-    }
-
-    .room-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: var(--modal-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-    }
-
-    .room-modal.show {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .room-modal-content {
-      background: var(--bg-dark);
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 350px;
-      width: 90%;
-      position: relative;
-      transform: scale(0.9);
-      transition: transform 0.3s ease;
-      box-shadow: var(--card-hover);
-    }
-
-    .room-modal-content.gradient-border {
-      background: var(--bg-dark);
-    }
-
-    .room-modal.show .room-modal-content {
-      transform: scale(1);
-    }
-
-    .room-modal-header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .room-modal-title {
-      font-size: 20px;
-      font-weight: 600;
-      text-transform: uppercase;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 8px;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .room-modal-description {
-      font-size: 14px;
-      color: var(--gray);
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .room-modal-close {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: var(--system-bg);
-      border: none;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      color: var(--text-dark);
-      transition: all 0.3s ease;
-      font-family: 'DotGothic16', monospace;
-    }
-
-    .room-modal-close.gradient-border {
-      background: var(--system-bg);
-    }
-
-    .room-modal-close:hover {
-      background: var(--accent-gradient);
-      color: white;
-    }
-
-    .room-buttons {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-    }
-
-    .btn-room {
-      flex: 1;
-      padding: 14px;
-      border-radius: 15px;
-      font-size: 14px;
-      font-weight: 600;
-      text-transform: uppercase;
-      cursor: pointer;
-      border: none;
-      font-family: 'DotGothic16', monospace;
-      background: var(--system-bg);
-      color: var(--text-dark);
-      transition: all 0.3s ease;
-    }
-
-    .btn-room.gradient-border {
-      background: var(--system-bg);
-    }
-
-    .btn-room:hover {
-      background: var(--accent-gradient);
-      color: white;
-      transform: translateY(-2px);
-    }
-
-    .btn-room.primary {
-      background: var(--accent-gradient);
-      color: white;
-    }
-
-    .btn-room.primary:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--card-hover);
-    }
-
-    .loader {
-      margin: 40px auto;
-      border: 4px solid #333;
-      border-top: 4px solid var(--accent);
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    @media (max-width: 480px) {
-      html {
-        height: 100%;
-        height: -webkit-fill-available;
-      }
-
-      body {
-        height: 100%;
-        height: -webkit-fill-available;
-        overflow: hidden;
-        position: fixed;
-        width: 100%;
-      }
-
-      .app-container {
-        height: 100%;
-        height: -webkit-fill-available;
-        padding: 0;
-        align-items: stretch;
-      }
-
-      .main-container {
-        width: 100%;
-        height: 100%;
-        height: -webkit-fill-available;
-        border-radius: 0;
-        border: none;
-        max-width: none;
-      }
-
-      #chatsView:not(.hidden) {
-        display: flex !important;
-        flex-direction: column;
-        height: 100%;
-        height: -webkit-fill-available;
-        position: relative;
-      }
-
-      .chat-header {
-        flex-shrink: 0;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-      }
-
-      #messageList {
-        flex: 1;
-        overflow-y: auto;
-        min-height: 0;
-        padding-bottom: 20px;
-      }
-
-      .chat-input-area {
-        flex-shrink: 0;
-        position: sticky;
-        bottom: 0;
-        z-index: 100;
-        transition: transform 0.3s ease;
-      }
-
-      body.keyboard-visible .chat-input-area {
-        transform: translateY(0);
-      }
-
-      body.keyboard-visible #messageList {
-        padding-bottom: 80px;
-      }
-
-      .find-menu-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-        padding: 15px;
-      }
-
-      .find-menu-btn {
-        min-height: 100px;
-        padding: 20px 10px;
-      }
-
-      .app-header {
-        padding: 25px 15px;
-      }
-
-      .section-header {
-        padding: 15px;
-        margin-bottom: 30px;
-      }
-
-      .section-title {
-        font-size: 22px;
-      }
-
-      .app-title {
-        font-size: 28px;
-      }
-    }
-
-    @supports (-webkit-touch-callout: none) {
-      @media (max-width: 480px) {
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Information</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
         body {
-          height: -webkit-fill-available;
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
         }
-        .app-container,
-        .main-container,
-        #chatsView:not(.hidden) {
-          height: -webkit-fill-available;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border-radius: 0.5rem;
+            overflow: hidden;
         }
-      }
-    }
-  </style>
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        th {
+            background-color: #0156d2;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        tbody tr:hover {
+            background-color: #eff6ff;
+        }
+        .highlight {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            font-weight: 700;
+            text-align: center;
+        }
+        .ok {
+            background-color: #dcfce7;
+            color: #166534;
+            font-weight: 700;
+            text-align: center;
+        }
+    </style>
 </head>
-<body>
-  <div class="app-container">
-    <div class="main-container" id="mainContainer">
-      <div class="app-header">
-        <button class="theme-toggle gradient-border" id="themeToggle" aria-label="Toggle theme">
-          <span id="themeIcon">DIM</span>
-        </button>
-        <div class="logo-section">
-          <div class="logo-icon">
-            <img src="your-icon.jpg" alt="Gappkar Logo" class="logo-image" onerror="this.style.display='none'; this.parentNode.innerHTML='G';">
-          </div>
-          <h1 class="app-title">gappkar</h1>
-        </div>
-      </div>
+<body class="text-gray-800">
 
-      <div id="joinView" class="view active">
-        <div class="section-header">
-          <h2 class="section-title">Join the Chat</h2>
-          <p class="section-description">Enter your info to start your gapping adventure</p>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="usernameInput">👤 Name</label>
-          <input type="text" id="usernameInput" class="form-input gradient-border" placeholder="Enter your display name" maxlength="30" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="ageInput">🎂 Age</label>
-          <input type="number" id="ageInput" class="form-input gradient-border" placeholder="Enter your age" min="13" max="99" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label">📍 Location</label>
-          <div class="location-options">
-            <button type="button" class="btn btn-location gradient-border" id="getLocationBtn">📍 Get My Area</button>
-            <input type="text" id="locationInput" class="form-input gradient-border" placeholder="Or enter your city manually" style="margin-top: 15px;">
-          </div>
-        </div>
-        <button type="button" class="btn btn-success gradient-border" id="joinButton">🚀 Start Gapping</button>
-        <div id="locationStatus"></div>
-      </div>
+    <!-- Header Section -->
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-lg font-semibold text-gray-700 hover:text-[#0156d2] transition-colors duration-300">Home</a>
+        </nav>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 py-12">
+        <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
 
-      <div id="chatsView" class="view hidden">
-        <div class="chat-header">
-          <button class="back-button gradient-border" id="backButton">←</button>
-          <div class="chat-header-info">
-            <div class="header-logo-section">
-              <div class="header-logo-icon">
-                <img src="your-icon.jpg" alt="Gappkar Logo" class="header-logo-image" onerror="this.style.display='none'; this.parentNode.innerHTML='G';">
-              </div>
-              <div class="header-app-info">
-                <div class="header-app-name">gappkar</div>
-                <div class="header-room-info">
-                  <span class="room-indicator" id="roomIndicator">Local Chat</span>
-                  <span class="online-dot"></span>
-                  <span id="peopleCount">connecting...</span>
+            <h1 class="text-3xl md:text-4xl font-bold text-[#0156d2] mb-4">SRM AP Academic Dashboard</h1>
+            
+            <h2 class="text-xl md:text-2xl font-semibold mt-8 mb-4 border-b-2 border-[#f4811f] pb-2 text-gray-700">Today's Timetable</h2>
+            
+            <!-- New Vertical Timetable -->
+            <div id="vertical-timetable" class="space-y-4">
+                <!-- Timetable will be dynamically generated here -->
+                <p class="text-gray-500">Loading today's schedule...</p>
+            </div>
+
+            <!-- Collapsible Subjects Section -->
+            <div id="subjects-section" class="mt-8">
+                <h2 id="toggle-subjects" class="text-xl md:text-2xl font-semibold mb-4 border-b-2 border-[#f4811f] pb-2 text-gray-700 cursor-pointer flex justify-between items-center select-none">
+                    <span>Subjects, Faculty, and Classrooms</span>
+                    <svg id="subjects-arrow" class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </h2>
+                <div id="subjects-content" class="overflow-x-auto hidden transition-all duration-500">
+                    <div class="pt-4">
+                        <!-- Content remains the same -->
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code</th><th>Subject</th><th>L-T-P-C</th><th>Faculty(s)</th><th>Classroom(s)</th>
+                                </tr>
+                            </thead>
+                           <tbody>
+                                <tr>
+                                    <td>AEC 108</td><td>Problem Solving Skills</td><td>1-0-1-2</td><td>Mr. ISCP00005 (V00005)</td><td>S 606</td>
+                                </tr>
+                                <tr>
+                                    <td>CSC 201</td><td>Object Oriented Programming with C++</td><td>3-0-1-4</td><td>Dr. Asit Kumar Das, Dr. Prasant Kumar Mohanty</td><td>C 801, S 606</td>
+                                </tr>
+                                <tr>
+                                    <td>CSC 202</td><td>Digital Electronics</td><td>3-0-1-4</td><td>Dr. Jyotibhusan Padhi, Dr. Manoj Kumar Yadav, Dr. Ayoub Sofi</td><td>S 606, X 201</td>
+                                </tr>
+                                <tr>
+                                    <td>CSC 203</td><td>Design and Analysis of Algorithms</td><td>3-0-1-4</td><td>Dr. Asit Kumar Das, Dr. Niladri Sett</td><td>S 603, S 606</td>
+                                </tr>
+                                <tr>
+                                    <td>MGT 286</td><td>Sales and Relationship Marketing</td><td>3-0-0-3</td><td>Dr. Md Faiz Ahmad</td><td>C 608</td>
+                                </tr>
+                                <tr>
+                                    <td>SEC 102</td><td>Digital Literacy</td><td>1-0-2-2</td><td>Dr. Chinmoy Das</td><td>S 414</td>
+                                </tr>
+                                <tr>
+                                    <td>VAC 104</td><td>Community Service and Social Responsibility</td><td>0-0-2-0</td><td>-</td><td>-</td>
+                                </tr>
+                           </tbody>
+                        </table>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
-          <button class="header-btn gradient-border" id="findBtn" title="Find Users">
-            <img src="find user icon.png" alt="Find User" style="width: 20px; height: 20px;" onerror="this.innerHTML='👤'">
-          </button>
-          <button class="header-btn gradient-border" id="createRoomBtn" title="Create/Join Room">
-            <img src="create-join room.png" alt="Create/Join Room" style="width: 20px; height: 20px;" onerror="this.innerHTML='🏠'">
-          </button>
-        </div>
-
-        <div id="messageList"></div>
-
-        <div class="chat-input-area">
-          <div id="replyPreview" class="reply-preview">
-            <div class="reply-preview-header">
-              <span class="reply-preview-title">Replying to <span id="replyToUser"></span></span>
-              <button class="reply-preview-close" id="cancelReply">×</button>
+            
+            <h2 class="text-xl md:text-2xl font-semibold mt-8 mb-4 border-b-2 border-[#f4811f] pb-2 text-gray-700">Attendance Record (Live)</h2>
+            <div class="max-w-2xl mx-auto">
+                <div class="overflow-x-auto">
+                    <table id="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Classes</th>
+                                <th>Present</th>
+                                <th>Absent</th>
+                                <th>Attendance %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendance-tbody">
+                            <!-- Attendance data will be dynamically rendered here -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="reply-preview-content" id="replyPreviewText"></div>
-          </div>
-
-          <div id="stickerPanel" class="feature-panel">
-            <div class="feature-panel-header">
-              <div class="feature-panel-title">Stickers</div>
-              <button class="feature-panel-close-btn gradient-border" data-panel="stickerPanel">×</button>
+            <div class="mt-4 p-4 bg-gray-50 rounded-lg border max-w-2xl mx-auto">
+                <p>
+                    <strong>Note:</strong> Values highlighted in <span class="text-[#b91c1c] font-semibold">red</span> indicate subjects with attendance below 75%. Values highlighted in <span class="text-[#166534] font-semibold">green</span> indicate attendance of 75% or above.
+                </p>
             </div>
-            <div class="feature-panel-content">
-              <input type="text" id="sticker-search-input" class="feature-search-bar gradient-border" placeholder="Search stickers...">
-              <div id="stickerGrid"></div>
-            </div>
-          </div>
-
-          <div id="audioPanel" class="feature-panel">
-            <div class="feature-panel-header">
-              <div class="feature-panel-title">Sounds</div>
-              <button class="feature-panel-close-btn gradient-border" data-panel="audioPanel">×</button>
-            </div>
-            <div class="feature-panel-content">
-              <input type="text" class="feature-search-bar gradient-border" placeholder="Search sounds...">
-              <ul id="audioList"></ul>
-            </div>
-          </div>
-
-          <div id="gifPanel" class="feature-panel">
-            <div class="feature-panel-header">
-              <div class="feature-panel-title">GIFs</div>
-              <button class="feature-panel-close-btn gradient-border" data-panel="gifPanel">×</button>
-            </div>
-            <div class="feature-panel-content">
-              <input type="text" id="gif-search-input" class="feature-search-bar gradient-border" placeholder="Search for GIFs...">
-              <div id="gif-results-grid"></div>
-            </div>
-          </div>
-
-          <div id="expandOptions" class="expand-options">
-            <button class="expand-option-btn" id="gifOptionBtn">
-              <span class="icon gradient-border">
-                <img src="gifs icon.png" alt="GIFs" style="width: 28px; height: 28px;" onerror="this.innerHTML='🎬'">
-              </span>
-              GIF
-            </button>
-
-            <button class="expand-option-btn" id="audioOptionBtn">
-              <span class="icon gradient-border">
-                <img src="audio sound icon.png" alt="Audio" style="width: 28px; height: 28px;" onerror="this.innerHTML='🔊'">
-              </span>
-              Sounds
-            </button>
-
-            <button class="expand-option-btn" id="stickerOptionBtn">
-              <span class="icon gradient-border">
-                <img src="sticker icon.png" alt="Stickers" style="width: 28px; height: 28px;" onerror="this.innerHTML='😀'">
-              </span>
-              Sticker
-            </button>
-          </div>
-
-          <div class="input-row">
-            <button class="expand-btn" id="expandBtn">+</button>
-            <input type="text" class="message-input" id="messageInput" placeholder="Type a message..." autocomplete="off">
-            <button class="send-button" id="sendButton">➤</button>
-          </div>
         </div>
-      </div>
+    </main>
 
-      <div id="findMenuView" class="view find-view hidden">
-        <div class="chat-header">
-          <button class="back-button gradient-border" id="findMenuBackBtn">←</button>
-          <div class="chat-header-info">
-            <div class="header-app-name">Find Users</div>
-          </div>
-        </div>
-        <div style="padding: 24px;">
-          <h2 style="text-align: center; margin-bottom: 10px; color: var(--text-dark); font-family: 'DotGothic16', monospace;">Find Connections</h2>
-          <p style="text-align: center; color: var(--gray); margin-bottom: 30px; font-family: 'DotGothic16', monospace;">Discover new people on Gappkar</p>
+    <footer class="mt-12 py-6">
+        <div class="container mx-auto px-6 text-center text-gray-500"></div>
+    </footer>
 
-          <div class="find-menu-grid">
-            <button class="find-menu-btn primary" id="findAccountsBtn">
-              <span class="find-menu-icon"><i class="search pearson.png">person</i></span>
-              <span class="search pearson.png">Find gappars</span>
-            </button>
-            <button class="find-menu-btn gradient-border" id="nearbyBtn">
-              <span class="find-menu-icon"><i class="nearby location.png">location_on</i></span>
-              <span class="nearby location.png">Nearby</span>
-            </button>
-          </div>
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-          <div class="promo-buttons">
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfhbGAJCorfqYU62U-I96TUH1de9rkKJGBXq6UnzqySgwrQKw/viewform?usp=header" class="promo-btn" target="_blank" rel="noopener noreferrer">Feedback</a>
-            <a href="https://holisticcoachabhi.my.canva.site/gappkar" class="promo-btn" target="_blank" rel="noopener noreferrer">Update app</a>
-          </div>
-        </div>
-      </div>
-
-      <div id="nearbyView" class="view find-view hidden">
-        <div class="chat-header">
-          <button class="back-button gradient-border" id="nearbyBackBtn">←</button>
-          <div class="chat-header-info">
-            <div class="header-app-name">Nearby gappars</div>
-          </div>
-        </div>
-        <div style="padding-top: 24px;">
-          <div style="text-align: center; margin-bottom: 20px; padding: 0 24px;">
-            <h2 style="color: var(--text-dark); font-family: 'DotGothic16', monospace;">Recommendations</h2>
-          </div>
-          <input type="text" class="search-bar gradient-border" id="nearbySearchInput" placeholder="Filter by name...">
-          <ul class="user-list" id="nearbyUserList"></ul>
-        </div>
-      </div>
-
-      <div id="searchView" class="view find-view hidden">
-        <div class="chat-header">
-          <button class="back-button gradient-border" id="searchBackBtn">←</button>
-          <div class="chat-header-info">
-            <div class="header-app-name">Search Accounts</div>
-          </div>
-        </div>
-        <div style="padding-top: 24px;">
-          <div style="text-align: center; margin-bottom: 20px; padding: 0 24px;">
-            <h2 style="color: var(--text-dark); font-family: 'DotGothic16', monospace;">Search gappars</h2>
-          </div>
-          <input type="text" class="search-bar gradient-border" id="accountSearchInput" placeholder="Search by name or location...">
-          <ul class="user-list" id="userResultsList"></ul>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="room-modal" id="roomModal">
-    <div class="room-modal-content gradient-border">
-      <button class="room-modal-close gradient-border" id="roomModalClose">×</button>
-      <div class="room-modal-header">
-        <h3 class="room-modal-title">Room Manager</h3>
-        <p class="room-modal-description">Create or join a private room</p>
-      </div>
-      <div class="form-group">
-        <label class="form-label" for="roomKeyInput">Room Key</label>
-        <input type="text" id="roomKeyInput" class="form-input gradient-border" placeholder="Enter room key ( e.g Room123)" maxlength="50">
-      </div>
-      <div class="room-buttons">
-        <button class="btn-room gradient-border" id="joinRoomBtn">Join Room</button>
-        <button class="btn-room primary" id="createRoomBtnModal">Create Room</button>
-      </div>
-      <div class="room-buttons" style="margin-top: 10px;">
-        <button class="btn-room gradient-border" id="leaveRoomBtn" style="width: 100%;">Leave Current Room</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    function setupMobileKeyboardHandling() {
-      if (!('ontouchstart' in window)) return;
-      const messageInput = document.getElementById('messageInput');
-      const messageList = document.getElementById('messageList');
-      let initialViewportHeight = window.innerHeight;
-
-      function handleKeyboardShow() {
-        document.body.classList.add('keyboard-visible');
-        setTimeout(() => {
-          if (messageList) {
-            messageList.scrollTop = messageList.scrollHeight;
-          }
-        }, 300);
-      }
-
-      function handleKeyboardHide() {
-        document.body.classList.remove('keyboard-visible');
-      }
-
-      if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-        if (messageInput) {
-          messageInput.addEventListener('focus', () => {
-            setTimeout(handleKeyboardShow, 300);
-          });
-          messageInput.addEventListener('blur', () => {
-            setTimeout(handleKeyboardHide, 100);
-          });
-        }
-
-        window.addEventListener('resize', () => {
-          const currentHeight = window.innerHeight;
-          if (currentHeight < initialViewportHeight * 0.7) {
-            handleKeyboardShow();
-          } else if (currentHeight > initialViewportHeight * 0.9) {
-            handleKeyboardHide();
-            initialViewportHeight = currentHeight;
-          }
-        });
-      } else {
-        let lastHeight = window.innerHeight;
-        const resizeObserver = new ResizeObserver(() => {
-          const currentHeight = window.innerHeight;
-          const heightDiff = lastHeight - currentHeight;
-          if (heightDiff > 150) {
-            handleKeyboardShow();
-          } else if (heightDiff < -150) {
-            handleKeyboardHide();
-          }
-          lastHeight = currentHeight;
-        });
-        if (document.body) {
-          resizeObserver.observe(document.body);
-        }
-      }
-
-      window.scrollBottom = () => {
-        if (messageList) {
-          messageList.scrollTop = messageList.scrollHeight;
-          if (document.body.classList.contains('keyboard-visible')) {
-            setTimeout(() => {
-              messageList.scrollTop = messageList.scrollHeight;
-            }, 100);
-          }
-        }
-      };
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', setupMobileKeyboardHandling);
-    } else {
-      setupMobileKeyboardHandling();
-    }
-  </script>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-    import { getFirestore, addDoc, collection, doc, setDoc, onSnapshot, orderBy, query, serverTimestamp, deleteDoc, getDocs, where } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCOmLxxqPesNaBr4Z9fVIU6K2BLW6OsED0",
-      authDomain: "gappkar-v1-b3afe.firebaseapp.com",
-      databaseURL: "https://gappkar-v1-b3afe-default-rtdb.firebaseio.com",
-      projectId: "gappkar-v1-b3afe",
-      storageBucket: "gappkar-v1-b3afe.appspot.com",
-      messagingSenderId: "726018257415",
-      appId: "1:726018257415:web:12142708abdf47952af0a2",
-      measurementId: "G-EWK4436NRB"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-
-    let currentUser = null;
-    let currentUsername = "";
-    let currentUserAge = 0;
-    let currentUserLocation = "";
-    let userLatitude = null;
-    let userLongitude = null;
-    let isJoined = false;
-    let currentRoom = "global";
-    let messagesListener = null;
-    let presenceTimer = null;
-    let onlineListener = null;
-    let currentView = 'joinView';
-    let lastMessageGroup = null;
-    let replyingTo = null;
-
-    const $ = (id) => document.getElementById(id);
-
-    const allViews = document.querySelectorAll('.view');
-    const joinView = $("joinView");
-    const chatsView = $("chatsView");
-    const messageList = $("messageList");
-    const messageInput = $("messageInput");
-    const sendButton = $("sendButton");
-    const backButton = $("backButton");
-    const usernameInput = $("usernameInput");
-    const ageInput = $("ageInput");
-    const locationInput = $("locationInput");
-    const joinButton = $("joinButton");
-    const getLocationBtn = $("getLocationBtn");
-    const peopleCount = $("peopleCount");
-    const createRoomBtnH = $("createRoomBtn");
-    const roomModal = $("roomModal");
-    const roomModalClose = $("roomModalClose");
-    const roomKeyInput = $("roomKeyInput");
-    const joinRoomBtn = $("joinRoomBtn");
-    const createRoomBtnM = $("createRoomBtnModal");
-    const leaveRoomBtn = $("leaveRoomBtn");
-    const roomIndicator = $("roomIndicator");
-    const expandBtn = $('expandBtn');
-    const expandOptions = $('expandOptions');
-    const gifOptionBtn = $('gifOptionBtn');
-    const audioOptionBtn = $('audioOptionBtn');
-    const stickerOptionBtn = $('stickerOptionBtn');
-    const stickerPanel = $('stickerPanel');
-    const audioPanel = $('audioPanel');
-    const gifPanel = $('gifPanel');
-    const findBtn = $('findBtn');
-    const findAccountsBtn = $('findAccountsBtn');
-    const nearbyBtn = $('nearbyBtn');
-    const nearbyUserList = $('nearbyUserList');
-    const accountSearchInput = $('accountSearchInput');
-    const userResultsList = $('userResultsList');
-    const replyPreview = $('replyPreview');
-    const replyToUser = $('replyToUser');
-    const replyPreviewText = $('replyPreviewText');
-    const cancelReply = $('cancelReply');
-
-    const allFeaturePanels = [stickerPanel, audioPanel, gifPanel].filter(Boolean);
-    let currentAudio = null;
-
-    const roomMessagesRef = (room) => collection(db, "rooms", room, "messages");
-
-    const timeStr = (ts) => {
-      const d = ts?.toDate ? ts.toDate() : (ts || new Date());
-      let h = d.getHours();
-      const m = d.getMinutes().toString().padStart(2, "0");
-      const a = h >= 12 ? "PM" : "AM";
-      h = h % 12 || 12;
-      return `${h}:${m} ${a}`;
-    };
-
-    const scrollBottom = () => {
-      if (messageList) {
-        messageList.scrollTop = messageList.scrollHeight;
-        if (window.innerWidth <= 480 && document.body.classList.contains('keyboard-visible')) {
-          setTimeout(() => {
-            messageList.scrollTop = messageList.scrollHeight;
-          }, 100);
-        }
-      }
-    };
-
-    function showView(viewId) {
-      currentView = viewId;
-      allViews.forEach(v => v.classList.add('hidden'));
-      const targetView = $(viewId);
-      if (targetView) targetView.classList.remove('hidden');
-
-      const appHeader = document.querySelector('.app-header');
-      if (appHeader) {
-        appHeader.style.display = viewId === 'joinView' ? 'block' : 'none';
-      }
-    }
-
-    const updateRoomUI = () => {
-      if (!roomIndicator) return;
-      roomIndicator.textContent = currentRoom === "global" ? "Global" : currentRoom;
-      roomIndicator.style.background = currentRoom === "global" ? "var(--accent-gradient)" : "linear-gradient(135deg, #28a745, #20c997)";
-    };
-
-    const addSystemMsg = (txt) => {
-      if (!messageList) return;
-      const groupDiv = document.createElement("div");
-      groupDiv.className = "message-group system";
-      const bubbleDiv = document.createElement("div");
-      bubbleDiv.className = "message-bubble system";
-      bubbleDiv.textContent = txt;
-      groupDiv.appendChild(bubbleDiv);
-      messageList.appendChild(groupDiv);
-      scrollBottom();
-    };
-
-    function trackPresence() {
-      if (!currentUser || !currentUsername) return;
-      const ref = doc(db, "presence", currentUser.uid);
-      const data = {
-        userId: currentUser.uid,
-        username: currentUsername,
-        location: currentUserLocation,
-        age: currentUserAge,
-        room: currentRoom,
-        lastSeen: serverTimestamp(),
-        isOnline: true
-      };
-      setDoc(ref, data, { merge: true }).catch(console.error);
-      clearInterval(presenceTimer);
-      presenceTimer = setInterval(() => {
-        setDoc(ref, { room: currentRoom, lastSeen: serverTimestamp() }, { merge: true }).catch(console.error);
-      }, 30000);
-    }
-
-    function listenOnlineUsers() {
-      if (onlineListener) onlineListener();
-      onlineListener = onSnapshot(collection(db, "presence"), (snap) => {
-        const fiveAgo = Date.now() - 5 * 60 * 1000;
-        let roomCnt = 0;
-        snap.forEach(docu => {
-          const d = docu.data();
-          if (d.lastSeen?.toDate && d.lastSeen.toDate().getTime() > fiveAgo && d.room === currentRoom) {
-            roomCnt++;
-          }
-        });
-        if (peopleCount) {
-          peopleCount.textContent = `${roomCnt} people ${currentRoom === "global" ? "nearby" : "in " + currentRoom}`;
-        }
-      }, console.error);
-    }
-
-    function shouldGroupMessage(messageData) {
-      if (!lastMessageGroup) return false;
-      const msgType = messageData.user === currentUsername ? 'sent' : 'received';
-      if (lastMessageGroup.username !== messageData.user) return false;
-      if (lastMessageGroup.type !== msgType) return false;
-      const timeDiff = Date.now() - lastMessageGroup.timestamp;
-      return timeDiff < 120000;
-    }
-
-    function createMessageGroup(messageData, isGrouped = false) {
-      const groupDiv = document.createElement("div");
-      const messageType = messageData.user === currentUsername ? 'sent' : 'received';
-      groupDiv.className = `message-group ${messageType}`;
-
-      if (!isGrouped && messageType === 'received') {
-        const userInfoDiv = document.createElement("div");
-        userInfoDiv.className = `message-user-info ${messageType}`;
-
-        const senderNameDiv = document.createElement("div");
-        senderNameDiv.className = "sender-name";
-        senderNameDiv.textContent = `${messageData.user}${messageData.age ? ` (${messageData.age})` : ""}`;
-        userInfoDiv.appendChild(senderNameDiv);
-
-        if (messageData.location) {
-          const locationDiv = document.createElement("div");
-          locationDiv.className = "message-location";
-          locationDiv.textContent = `📍 ${messageData.location}`;
-          userInfoDiv.appendChild(locationDiv);
-        }
-        groupDiv.appendChild(userInfoDiv);
-      }
-      return groupDiv;
-    }
-
-    function cancelReplyMode() {
-      replyingTo = null;
-      if (replyPreview) replyPreview.classList.remove('visible');
-    }
-
-    function startReply(messageData) {
-      replyingTo = {
-        id: messageData.id || Date.now(),
-        user: messageData.user,
-        message: messageData.message,
-        isGif: messageData.isGif,
-        isSticker: messageData.isSticker,
-        isAudio: messageData.isAudio,
-        audioName: messageData.audioName,
-        timestamp: messageData.timestamp
-      };
-      if (replyToUser) replyToUser.textContent = messageData.user || '';
-      if (replyPreviewText) {
-        const text = messageData.isGif ? '[GIF]' :
-                     messageData.isSticker ? '[Sticker]' :
-                     messageData.isAudio ? (messageData.audioName ? `[Audio] ${messageData.audioName}` : '[Audio]') :
-                     (messageData.message || '');
-        replyPreviewText.textContent = text;
-      }
-      if (replyPreview) replyPreview.classList.add('visible');
-      if (messageInput) messageInput.focus();
-    }
-
-    function createMessageBubble(messageData, isGrouped = false) {
-      const bubbleDiv = document.createElement("div");
-      const messageType = messageData.user === currentUsername ? 'sent' : 'received';
-      bubbleDiv.className = `message-bubble ${messageType} ${isGrouped ? 'grouped' : ''}`;
-
-      if (messageData.id) bubbleDiv.id = `msg-${messageData.id}`;
-
-      if (messageData.replyTo) {
-        const ctx = document.createElement('div');
-        ctx.className = `reply-context ${messageType}`;
-        ctx.setAttribute('role', 'button');
-        if (messageData.replyTo.id) {
-          ctx.dataset.replyTarget = messageData.replyTo.id;
-        }
-
-        const rail = document.createElement('div');
-        rail.className = 'reply-rail';
-        ctx.appendChild(rail);
-
-        const inner = document.createElement('div');
-        inner.className = 'reply-context-inner';
-
-        const author = document.createElement('div');
-        author.className = 'reply-author';
-        author.textContent = messageData.replyTo.user || 'Unknown';
-
-        let snippet = messageData.replyTo.message || '';
-        if (!snippet && messageData.replyTo.isGif) snippet = '[GIF]';
-        if (!snippet && messageData.replyTo.isSticker) snippet = '[Sticker]';
-        if (!snippet && messageData.replyTo.isAudio) snippet = messageData.replyTo.audioName ? `[Audio] ${messageData.replyTo.audioName}` : '[Audio]';
-
-        const text = document.createElement('div');
-        text.className = 'reply-text';
-        text.textContent = snippet;
-
-        inner.appendChild(author);
-        inner.appendChild(text);
-        ctx.appendChild(inner);
-        bubbleDiv.appendChild(ctx);
-      }
-
-      let messageContent = '';
-      if (messageData.isGif && messageData.gifUrl) {
-        messageContent = `<img src="${messageData.gifUrl}" style="max-width: 250px; border-radius: 16px;" alt="GIF">`;
-      } else if (messageData.isSticker && messageData.stickerUrl) {
-        messageContent = `<img src="${messageData.stickerUrl}" style="max-width: 150px; border-radius: 16px;" alt="Sticker">`;
-      } else if (messageData.isAudio && messageData.audioUrl) {
-        messageContent = `
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <button class="chat-audio-play-btn" data-src="${messageData.audioUrl}">▶</button>
-            <span>${messageData.audioName || 'Audio'}</span>
-          </div>
-        `;
-      } else {
-        messageContent = (messageData.message || '').toString();
-      }
-
-      const contentDiv = document.createElement("div");
-      contentDiv.innerHTML = messageContent;
-      bubbleDiv.appendChild(contentDiv);
-
-      const replyIcon = document.createElement('div');
-      replyIcon.className = 'reply-icon';
-      replyIcon.textContent = '↩';
-      replyIcon.dataset.messageData = JSON.stringify({
-        id: messageData.id || Date.now(),
-        user: messageData.user,
-        message: messageData.message || '',
-        isGif: !!messageData.isGif,
-        isSticker: !!messageData.isSticker,
-        isAudio: !!messageData.isAudio,
-        audioName: messageData.audioName || '',
-        timestamp: messageData.timestamp || null
-      });
-      bubbleDiv.appendChild(replyIcon);
-
-      const timeDiv = document.createElement("div");
-      timeDiv.className = "message-time";
-      timeDiv.textContent = timeStr(messageData.timestamp);
-      bubbleDiv.appendChild(timeDiv);
-
-      return bubbleDiv;
-    }
-
-    async function sendMultimediaMessage(content, type) {
-      if (!isJoined || !currentUser) return;
-      try {
-        const messageData = {
-          user: currentUsername,
-          timestamp: serverTimestamp(),
-          location: currentUserLocation,
-          age: currentUserAge,
-          userId: currentUser.uid
+        // Your Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyDX8H-_OfG4LMbPMji9IJEgHJfanyedEGY",
+          authDomain: "goalist-a6573.firebaseapp.com",
+          projectId: "goalist-a6573",
+          storageBucket: "goalist-a6573.appspot.com",
+          messagingSenderId: "850792903925",
+          appId: "1:850792903925:web:8bdf55f3de7926b19e81bc",
+          measurementId: "G-HZQ897N97C"
         };
 
-        if (replyingTo) {
-          messageData.replyTo = {
-            id: replyingTo.id,
-            user: replyingTo.user,
-            message: replyingTo.message || '',
-            isGif: !!replyingTo.isGif,
-            isSticker: !!replyingTo.isSticker,
-            isAudio: !!replyingTo.isAudio,
-            audioName: replyingTo.audioName || '',
-            timestamp: replyingTo.timestamp || null
-          };
-          cancelReplyMode();
-        }
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        switch (type) {
-          case 'gif':
-            messageData.message = '[GIF]';
-            messageData.gifUrl = content;
-            messageData.isGif = true;
-            break;
-          case 'sticker':
-            messageData.message = '[Sticker]';
-            messageData.stickerUrl = content;
-            messageData.isSticker = true;
-            break;
-          case 'audio':
-            messageData.message = `[Audio] ${content.name || ''}`.trim();
-            messageData.audioUrl = content.url;
-            messageData.audioName = content.name;
-            messageData.isAudio = true;
-            break;
-        }
+        let userId = null;
 
-        await addDoc(roomMessagesRef(currentRoom), messageData);
-      } catch (e) {
-        console.error("Failed to send multimedia:", e);
-        addSystemMsg('Failed to send message');
-      }
-    }
-
-    async function getUserLocation() {
-      const statusDiv = $("locationStatus");
-      if (!statusDiv) return;
-
-      if (!navigator.geolocation) {
-        statusDiv.textContent = "Geolocation is not supported.";
-        statusDiv.className = "error";
-        return;
-      }
-
-      statusDiv.textContent = "Getting your location...";
-      statusDiv.className = "";
-
-      try {
-        const position = await new Promise((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 10000 });
-        });
-
-        userLatitude = position.coords.latitude;
-        userLongitude = position.coords.longitude;
-
-        try {
-          const response = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${userLatitude}&longitude=${userLongitude}&localityLanguage=en`);
-          const data = await response.json();
-          const locationName = data.city || data.locality || data.principalSubdivision || '';
-          currentUserLocation = locationName || `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
-        } catch (e) {
-          currentUserLocation = `${userLatitude.toFixed(2)}, ${userLongitude.toFixed(2)}`;
-        }
-
-        statusDiv.textContent = `Location found: ${currentUserLocation}`;
-        statusDiv.className = "success";
-        if (locationInput) {
-          locationInput.value = currentUserLocation;
-        }
-      } catch (error) {
-        statusDiv.textContent = "Could not get location. Enter manually.";
-        statusDiv.className = "error";
-      }
-    }
-
-    function showModal() {
-      if (roomModal) roomModal.classList.add("show");
-    }
-
-    function hideModal() {
-      if (roomModal) roomModal.classList.remove("show");
-      if (roomKeyInput) roomKeyInput.value = "";
-    }
-
-    async function joinRoom(key) {
-      const k = (key || '').trim().toLowerCase();
-      if (!k) {
-        alert("Enter a room key");
-        return;
-      }
-      if (k === currentRoom) {
-        hideModal();
-        return;
-      }
-
-      if (messagesListener) messagesListener();
-      currentRoom = k;
-      localStorage.setItem("gappkar_current_room", currentRoom);
-      updateRoomUI();
-      if (messageList) messageList.innerHTML = "";
-      lastMessageGroup = null;
-      addSystemMsg(`Joined room: ${currentRoom}`);
-      listenMessages();
-      trackPresence();
-      hideModal();
-    }
-
-    function leaveRoom() {
-      if (currentRoom === "global") {
-        hideModal();
-        return;
-      }
-      if (messagesListener) messagesListener();
-      currentRoom = "global";
-      localStorage.removeItem("gappkar_current_room");
-      updateRoomUI();
-      if (messageList) messageList.innerHTML = "";
-      lastMessageGroup = null;
-      addSystemMsg("Left room, back to global chat");
-      listenMessages();
-      trackPresence();
-      hideModal();
-    }
-
-    function displayMsg(messageData) {
-      if (!messageList) return;
-
-      const isGrouped = shouldGroupMessage(messageData);
-      const messageType = messageData.user === currentUsername ? 'sent' : 'received';
-
-      let groupDiv;
-      if (isGrouped && lastMessageGroup?.element) {
-        groupDiv = lastMessageGroup.element;
-      } else {
-        groupDiv = createMessageGroup(messageData, false);
-        messageList.appendChild(groupDiv);
-      }
-
-      const bubbleDiv = createMessageBubble(messageData, isGrouped);
-      groupDiv.appendChild(bubbleDiv);
-
-      lastMessageGroup = {
-        username: messageData.user,
-        type: messageType,
-        timestamp: Date.now(),
-        element: groupDiv
-      };
-    }
-
-    function listenMessages() {
-      if (messagesListener) messagesListener();
-      const qy = query(roomMessagesRef(currentRoom), orderBy("timestamp", "asc"));
-      messagesListener = onSnapshot(qy, (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          if (change.type === "added") {
-            const temp = messageList?.querySelector('[data-temp="true"]');
-            if (temp) temp.remove();
-            const d = change.doc.data();
-            d.id = change.doc.id;
-            displayMsg(d);
-          }
-        });
-        scrollBottom();
-      }, console.error);
-    }
-
-    async function sendMessage() {
-      if (!messageInput || !messageList) return;
-
-      const txt = messageInput.value.trim();
-      if (!txt || !isJoined || !currentUser) return;
-
-      messageInput.value = "";
-      const tempId = `temp_${Date.now()}`;
-
-      const tempGroupDiv = document.createElement("div");
-      tempGroupDiv.className = "message-group sent";
-      tempGroupDiv.id = tempId;
-      tempGroupDiv.dataset.temp = "true";
-
-      const tempBubbleDiv = document.createElement("div");
-      tempBubbleDiv.className = "message-bubble sent";
-      tempBubbleDiv.innerHTML = `${txt}<div class="message-time" style="opacity: 0.5;">sending...</div>`;
-
-      tempGroupDiv.appendChild(tempBubbleDiv);
-      messageList.appendChild(tempGroupDiv);
-      scrollBottom();
-
-      try {
-        const data = {
-          user: currentUsername,
-          message: txt,
-          timestamp: serverTimestamp(),
-          location: currentUserLocation,
-          age: currentUserAge,
-          userId: currentUser.uid
+        // --- DATA ---
+        const schedule = {
+            monday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "02:00-02:50", subject: "CSC 202", location: "S 606", code: "CSC202" }, { time: "03:00-03:50", subject: "AEC 108", location: "S 606", code: "AEC108" }, { time: "04:00-05:30", subject: "AEC 108", location: "S 606", code: "AEC108_2" },],
+            tuesday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "10:00-10:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "11:00-11:50", subject: "CSC 201", location: "S 606", code: "CSC201" }, { time: "01:00-01:50", subject: "CSC 203 Lab", location: "S 603", code: "CSC203L" }, { time: "02:00-02:50", subject: "CSC 203 Lab", location: "S 603", code: "CSC203L_2" },],
+            wednesday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "10:00-10:50", subject: "SEC 102", location: "S 414", code: "SEC102" }, { time: "11:00-11:50", subject: "SEC 102", location: "S 414", code: "SEC102_2" }, { time: "01:00-01:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "02:00-02:50", subject: "CSC 201", location: "S 606", code: "CSC201" }, { time: "03:00-03:50", subject: "CSC 201 Lab", location: "S 606", code: "CSC201L" }, { time: "04:00-05:30", subject: "VAC 104", location: "-", code: "VAC104" },],
+            thursday: [{ time: "09:00-09:50", subject: "AEC 108", location: "S 606", code: "AEC108" }, { time: "11:00-11:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "01:00-01:50", subject: "CSC 202 Lab", location: "X 201", code: "CSC202L" },],
+            friday: [{ time: "09:00-09:50", subject: "CSC 201 Lab", location: "C 801", code: "CSC201L" }, { time: "10:00-10:50", subject: "CSC 201 Lab", location: "C 801", code: "CSC201L_2" }, { time: "02:00-02:50", subject: "CSC 202", location: "S 606", code: "CSC202" },]
+        };
+        
+        const attendanceData = {
+            'AEC 108': { classes: 19, present: 12, absent: 7 },
+            'CSC 201': { classes: 34, present: 22, absent: 12 },
+            'CSC 202': { classes: 34, present: 27, absent: 7 },
+            'CSC 203': { classes: 34, present: 21, absent: 13 },
+            'MGT 286': { classes: 24, present: 13, absent: 11 },
+            'SEC 102': { classes: 8, present: 6, absent: 2 },
+            'VAC 104': { classes: 0, present: 0, absent: 0 },
         };
 
-        if (replyingTo) {
-          data.replyTo = {
-            id: replyingTo.id,
-            user: replyingTo.user,
-            message: replyingTo.message || '',
-            isGif: !!replyingTo.isGif,
-            isSticker: !!replyingTo.isSticker,
-            isAudio: !!replyingTo.isAudio,
-            audioName: replyingTo.audioName || '',
-            timestamp: replyingTo.timestamp || null
-          };
-        }
+        const codeToSubjectMap = {
+            'AEC108': 'AEC 108', 'AEC108_2': 'AEC 108', 'CSC201': 'CSC 201', 'CSC201L': 'CSC 201', 'CSC201L_2': 'CSC 201', 'CSC202': 'CSC 202', 'CSC202L': 'CSC 202', 'CSC203': 'CSC 203', 'CSC203L': 'CSC 203', 'CSC203L_2': 'CSC 203', 'MGT286': 'MGT 286', 'SEC102': 'SEC 102', 'SEC102_2': 'SEC 102', 'VAC104': 'VAC 104',
+        };
 
-        replyingTo = null;
-        if (replyPreview) replyPreview.classList.remove('visible');
+        // --- RENDERING FUNCTIONS ---
+        const renderAttendanceRecord = () => {
+            const tbody = document.getElementById('attendance-tbody');
+            tbody.innerHTML = ''; // Clear existing table
+            for (const code in attendanceData) {
+                const data = attendanceData[code];
+                const percentage = data.classes > 0 ? ((data.present / data.classes) * 100).toFixed(2) : '0.00';
+                const percentageClass = percentage >= 75 ? 'ok' : 'highlight';
 
-        await addDoc(roomMessagesRef(currentRoom), data);
-      } catch (e) {
-        console.error("Send failed:", e);
-        const failedNode = document.getElementById(tempId);
-        if (failedNode) {
-          const bubble = failedNode.querySelector('.message-bubble');
-          const timeEl = failedNode.querySelector('.message-time');
-          if (bubble) bubble.style.backgroundColor = '#d32f2f';
-          if (timeEl) timeEl.innerText = 'Failed to send!';
-        }
-      }
-    }
-
-    async function joinChat(name, age, loc) {
-      if (!name.trim()) {
-        alert("Enter name");
-        return;
-      }
-      if (age < 13 || age > 99) {
-        alert("Age 13-99 only");
-        return;
-      }
-      if (!loc.trim()) {
-        alert("Enter location");
-        return;
-      }
-      if (isJoined) return;
-
-      try {
-        await signInAnonymously(auth);
-        currentUsername = name.trim();
-        currentUserAge = parseInt(age, 10);
-        currentUserLocation = loc.trim();
-        isJoined = true;
-
-        const savedRoom = localStorage.getItem("gappkar_current_room");
-        if (savedRoom) currentRoom = savedRoom;
-
-        showView('chatsView');
-        document.body.classList.add("chat-active");
-        updateRoomUI();
-        if (messageList) messageList.innerHTML = "";
-        lastMessageGroup = null;
-        addSystemMsg(`Welcome ${currentUsername}!`);
-
-        listenMessages();
-        trackPresence();
-        listenOnlineUsers();
-
-        localStorage.setItem("gappkar_username", currentUsername);
-        localStorage.setItem("gappkar_age", currentUserAge.toString());
-        localStorage.setItem("gappkar_location", currentUserLocation);
-        localStorage.setItem("gappkar_joined", "true");
-      } catch (error) {
-        console.error("Failed to join chat:", error);
-        alert("Failed to join chat. Please try again.");
-      }
-    }
-
-    onAuthStateChanged(auth, (u) => {
-      currentUser = u || null;
-    });
-
-    async function logout() {
-      if (presenceTimer) clearInterval(presenceTimer);
-      if (onlineListener) onlineListener();
-      if (messagesListener) messagesListener();
-
-      if (currentUser) {
-        try {
-          await deleteDoc(doc(db, "presence", currentUser.uid));
-        } catch (e) {
-          console.error("Presence cleanup failed:", e);
-        }
-      }
-
-      try {
-        await signOut(auth);
-      } catch (e) {
-        console.error("Sign out failed:", e);
-      }
-
-      isJoined = false;
-      currentRoom = "global";
-      lastMessageGroup = null;
-      localStorage.clear();
-      showView('joinView');
-      document.body.classList.remove("chat-active");
-    }
-
-    function handleMainBack() {
-      if (['findMenuView', 'nearbyView', 'searchView'].includes(currentView)) {
-        showView('chatsView');
-      } else {
-        logout();
-      }
-    }
-
-    const sounds = [
-      { name: 'Deepak Kalal Foundation', url: 'https://file.garden/aJ-bbmBvGxKiA5vP/Deepak%20kalal%20foundation' },
-      { name: 'Thala Ajithkumar', url: 'https://file.garden/aJ-bbmBvGxKiA5vP/Thala%20Ajithkumar.mp3' },
-      { name: 'Rajinikanth Updating', url: 'https://file.garden/aJ-bbmBvGxKiA5vP/Rajinikanth%20updating.mp3' },
-      { name: 'Modern Bell', url: 'https://file.garden/aJ-bbmBvGxKiA5vP/modern%20Bell.mp3' },
-      { name: 'Insuperable Del Risita', url: 'https://file.garden/aJ-bbmBvGxKiA5vP/insuperable%20del%20Risita.mp3' },
-    ];
-
-    const togglePanel = (panelToShow) => {
-      if (!panelToShow) return;
-      const isVisible = panelToShow.classList.contains('visible');
-      allFeaturePanels.forEach(p => p && p.classList.remove('visible'));
-      if (!isVisible) {
-        panelToShow.classList.add('visible');
-      }
-    };
-
-    const audioList = $('audioList');
-    if (audioList) {
-      let currentPreviewAudio = null;
-      sounds.forEach(sound => {
-        const li = document.createElement('li');
-        li.className = 'audio-item gradient-border';
-        li.innerHTML = `<button class="play-btn">▶</button><span class="audio-name">${sound.name}</span>`;
-        li.addEventListener('click', (e) => {
-          if (e.target.tagName !== 'BUTTON') {
-            sendMultimediaMessage(sound, 'audio');
-            togglePanel(audioPanel);
-          }
-        });
-        const playBtn = li.querySelector('.play-btn');
-        if (playBtn) {
-          playBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (currentPreviewAudio) {
-              currentPreviewAudio.pause();
-              currentPreviewAudio.currentTime = 0;
+                const row = `
+                    <tr>
+                        <td class="font-semibold text-gray-800">${code}</td>
+                        <td>${data.classes}</td>
+                        <td>${data.present}</td>
+                        <td>${data.absent}</td>
+                        <td class="${percentageClass}">${percentage}</td>
+                    </tr>`;
+                tbody.innerHTML += row;
             }
-            if (sound.url) {
-              currentPreviewAudio = new Audio(sound.url);
-              currentPreviewAudio.play().catch(console.error);
+        };
+        
+        const renderTimetable = async (uid) => {
+            userId = uid;
+            const timetableContainer = document.getElementById('vertical-timetable');
+            const dayMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+            const today = new Date();
+            const todayString = dayMap[today.getDay()];
+            const dateString = today.toISOString().split('T')[0];
+
+            const todaysClasses = schedule[todayString] || [];
+            if (todaysClasses.length === 0) {
+                timetableContainer.innerHTML = `<p class="text-center font-semibold text-gray-500 py-8">No classes scheduled today.</p>`;
+                return;
             }
-          });
-        }
-        audioList.appendChild(li);
-      });
-    }
 
-    const GIPHY_API_KEY = 'GLutXRXDEL19PuG3ztekK0JNDr5oySTh';
-    let debounceTimer;
+            let html = '';
+            for (const cls of todaysClasses) {
+                const docRef = doc(db, "attendance", userId, dateString, cls.code);
+                const docSnap = await getDoc(docRef);
+                let status = 'unmarked';
+                if (docSnap.exists()) {
+                    status = docSnap.data().status;
+                }
 
-    function setupGiphyPanel(type, searchInputId, resultsGridId) {
-      const searchInput = $(searchInputId);
-      const resultsGrid = $(resultsGridId);
-      if (!searchInput || !resultsGrid) return;
+                let statusColorClass = 'border-gray-200';
+                if (status === 'attended') statusColorClass = 'border-green-500';
+                if (status === 'absent') statusColorClass = 'border-red-500';
 
-      const endpoint = type === 'stickers' ? 'stickers' : 'gifs';
-
-      async function fetchItems(searchTerm = '') {
-        resultsGrid.innerHTML = '<div class="loader"></div>';
-        const url = searchTerm
-          ? `https://api.giphy.com/v1/${endpoint}/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(searchTerm)}&limit=24`
-          : `https://api.giphy.com/v1/${endpoint}/trending?api_key=${GIPHY_API_KEY}&limit=24`;
-        try {
-          const res = await fetch(url);
-          const { data } = await res.json();
-          resultsGrid.innerHTML = '';
-          data.forEach(item => {
-            const itemEl = document.createElement('div');
-            itemEl.className = `${type === 'stickers' ? 'sticker-item' : 'gif-item'} gradient-border`;
-            itemEl.innerHTML = `<img src="${item.images.fixed_width.url}" alt="${item.title}">`;
-            itemEl.onclick = () => {
-              sendMultimediaMessage(item.images.original.url, type === 'stickers' ? 'sticker' : 'gif');
-              togglePanel($(type === 'stickers' ? 'stickerPanel' : 'gifPanel'));
-            };
-            resultsGrid.appendChild(itemEl);
-          });
-        } catch (e) {
-          console.error('Failed to fetch items:', e);
-          resultsGrid.innerHTML = `<div>Failed to load ${type}.</div>`;
-        }
-      }
-
-      searchInput.addEventListener('input', () => {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => fetchItems(searchInput.value), 500);
-      });
-
-      fetchItems();
-    }
-
-    async function fetchAllOnlineUsers() {
-      const fiveAgo = new Date(Date.now() - 5 * 60 * 1000);
-      const qy = query(collection(db, "presence"), where("lastSeen", ">", fiveAgo));
-      try {
-        const snapshot = await getDocs(qy);
-        return snapshot.docs.map(docu => docu.data());
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        return [];
-      }
-    }
-
-    function createUserCard(user) {
-      if (user.userId === currentUser?.uid) return '';
-      const safeName = (user.username || 'Unknown').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      const safeLoc = (user.location || 'Unknown').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      const ageStr = user.age ? ` (${user.age})` : '';
-      const avatarSrc = `https://i.pravatar.cc/150?u=${encodeURIComponent(user.userId || safeName)}`;
-
-      return `
-        <li class="user-card gradient-border" data-user='${JSON.stringify({
-          userId: user.userId,
-          username: user.username,
-          age: user.age,
-          location: user.location
-        }).replace(/'/g, '&#39;')}'>
-          <img src="${avatarSrc}" alt="${safeName}" class="profile-pic" onerror="this.src='your-icon.jpg'">
-          <div class="user-info">
-            <h3>${safeName}${ageStr}</h3>
-            <p>📍 ${safeLoc}</p>
-          </div>
-          <button class="header-btn gradient-border" style="margin-left:auto" title="Quick mention">↩</button>
-        </li>
-      `;
-    }
-
-    function renderUserList(targetList, users) {
-      if (!targetList) return;
-      if (!users || users.length === 0) {
-        targetList.innerHTML = '<p style="text-align:center; color: var(--gray); padding: 20px; font-family: DotGothic16, monospace;">No users found.</p>';
-        return;
-      }
-      targetList.innerHTML = users
-        .filter(u => u.userId !== currentUser?.uid)
-        .map(createUserCard)
-        .join('');
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      if (localStorage.getItem("gappkar_joined") === "true") {
-        const username = localStorage.getItem("gappkar_username") || "";
-        const age = parseInt(localStorage.getItem("gappkar_age") || "0", 10);
-        const location = localStorage.getItem("gappkar_location") || "";
-        if (username && age && location) {
-          joinChat(username, age, location);
-        }
-      }
-
-      if (getLocationBtn) getLocationBtn.addEventListener("click", getUserLocation);
-      if (joinButton) joinButton.addEventListener("click", () => {
-        const username = usernameInput ? usernameInput.value : "";
-        const age = ageInput ? ageInput.value : "";
-        const location = locationInput ? locationInput.value : "";
-        joinChat(username, age, location);
-      });
-      if (sendButton) sendButton.addEventListener("click", sendMessage);
-      if (messageInput) {
-        messageInput.addEventListener("keydown", e => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-          }
-        });
-      }
-      if (backButton) backButton.addEventListener("click", handleMainBack);
-      if (createRoomBtnH) createRoomBtnH.addEventListener("click", showModal);
-      if (roomModalClose) roomModalClose.addEventListener("click", hideModal);
-      if (joinRoomBtn) joinRoomBtn.addEventListener("click", () => {
-        const key = roomKeyInput ? roomKeyInput.value : "";
-        joinRoom(key);
-      });
-      if (createRoomBtnM) createRoomBtnM.addEventListener("click", () => {
-        const key = roomKeyInput ? roomKeyInput.value : "";
-        joinRoom(key);
-      });
-      if (leaveRoomBtn) leaveRoomBtn.addEventListener("click", leaveRoom);
-      if (roomModal) roomModal.addEventListener("click", e => {
-        if (e.target === roomModal) hideModal();
-      });
-
-      if (findBtn) findBtn.addEventListener('click', () => showView('findMenuView'));
-
-      const findMenuBackBtn = $("findMenuBackBtn");
-      const nearbyBackBtn = $("nearbyBackBtn");
-      const searchBackBtn = $("searchBackBtn");
-
-      if (findMenuBackBtn) findMenuBackBtn.addEventListener("click", () => showView('chatsView'));
-      if (nearbyBackBtn) nearbyBackBtn.addEventListener("click", () => showView('findMenuView'));
-      if (searchBackBtn) searchBackBtn.addEventListener("click", () => showView('findMenuView'));
-
-      if (nearbyBtn) {
-        nearbyBtn.addEventListener('click', async () => {
-          showView('nearbyView');
-          if (nearbyUserList) {
-            nearbyUserList.innerHTML = '<p style="text-align:center; color: var(--gray); padding: 20px; font-family: DotGothic16, monospace;">Loading users...</p>';
-            const allOnlineUsers = await fetchAllOnlineUsers();
-            const nearbyUsers = allOnlineUsers.filter(u => u.location && u.location.toLowerCase() === (currentUserLocation || '').toLowerCase());
-            renderUserList(nearbyUserList, nearbyUsers.length > 1 ? nearbyUsers : allOnlineUsers);
-          }
-        });
-      }
-
-      if (findAccountsBtn) {
-        findAccountsBtn.addEventListener('click', () => {
-          showView('searchView');
-          if (userResultsList) renderUserList(userResultsList, []);
-        });
-      }
-
-      if (accountSearchInput) {
-        accountSearchInput.addEventListener('input', async (e) => {
-          const searchTerm = (e.target.value || '').toLowerCase();
-          if (!searchTerm) {
-            if (userResultsList) renderUserList(userResultsList, []);
-            return;
-          }
-          const allOnlineUsers = await fetchAllOnlineUsers();
-          const results = allOnlineUsers.filter(user =>
-            (user.username && user.username.toLowerCase().includes(searchTerm)) ||
-            (user.location && user.location.toLowerCase().includes(searchTerm))
-          );
-          if (userResultsList) renderUserList(userResultsList, results);
-        });
-      }
-
-      if (expandBtn && expandOptions) {
-        expandBtn.addEventListener('click', () => {
-          expandBtn.classList.toggle('active');
-          expandOptions.classList.toggle('visible');
-          if (!expandOptions.classList.contains('visible')) {
-            allFeaturePanels.forEach(p => p && p.classList.remove('visible'));
-          }
-        });
-      }
-
-      const setupOptionButton = (btn, panel) => {
-        if (!btn || !panel) return;
-        btn.addEventListener('click', () => {
-          togglePanel(panel);
-          if (expandOptions) expandOptions.classList.remove('visible');
-          if (expandBtn) expandBtn.classList.remove('active');
-        });
-      };
-
-      setupOptionButton(stickerOptionBtn, stickerPanel);
-      setupOptionButton(audioOptionBtn, audioPanel);
-      setupOptionButton(gifOptionBtn, gifPanel);
-
-      document.querySelectorAll('.feature-panel-close-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const panelId = btn.getAttribute('data-panel');
-          const panel = $(panelId);
-          if (panel) panel.classList.remove('visible');
-        });
-      });
-
-      if (messageList) {
-        messageList.addEventListener('click', (e) => {
-          if (e.target.classList.contains('chat-audio-play-btn')) {
-            const audioSrc = e.target.dataset.src;
-            if (audioSrc) {
-              if (currentAudio) currentAudio.pause();
-              currentAudio = new Audio(audioSrc);
-              currentAudio.play().catch(console.error);
+                html += `
+                    <div id="class-${cls.code}" class="class-item p-4 border-l-4 ${statusColorClass} bg-gray-50 rounded-lg shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between" data-status="${status}">
+                        <div class="mb-4 sm:mb-0">
+                            <p class="font-bold text-lg text-[#0156d2]">${cls.subject}</p>
+                            <p class="text-gray-600">${cls.time} | Location: ${cls.location}</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="mark-btn text-sm font-medium py-2 px-4 rounded-md bg-gray-200 hover:bg-gray-300 transition-colors" data-code="${cls.code}">Mark</button>
+                            <div class="options hidden" data-code="${cls.code}">
+                                <button class="attended-btn text-sm font-medium py-2 px-3 rounded-md bg-green-100 text-green-800 hover:bg-green-200" data-code="${cls.code}">Attended</button>
+                                <button class="absent-btn text-sm font-medium py-2 px-3 rounded-md bg-red-100 text-red-800 hover:bg-red-200" data-code="${cls.code}">Absent</button>
+                            </div>
+                        </div>
+                    </div>`;
             }
-          }
+            timetableContainer.innerHTML = html;
+            addEventListeners();
+        };
 
-          const ctxEl = e.target.closest('.reply-context');
-          if (ctxEl) {
-            const target = ctxEl?.dataset?.replyTarget;
-            if (target) {
-              const node = document.getElementById(`msg-${target}`);
-              if (node) {
-                node.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                node.animate([
-                  { boxShadow: '0 0 0px rgba(223,19,23,0)' },
-                  { boxShadow: '0 0 20px rgba(223,19,23,0.8)' },
-                  { boxShadow: '0 0 0px rgba(223,19,23,0)' }
-                ], { duration: 800 });
-              }
-            }
-            return;
-          }
+        // --- LOGIC FUNCTIONS ---
+        const markAttendance = async (code, newStatus) => {
+            const today = new Date();
+            const dateString = today.toISOString().split('T')[0];
+            const docRef = doc(db, "attendance", userId, dateString, code);
+            const classItem = document.getElementById(`class-${code}`);
+            const previousStatus = classItem.dataset.status;
 
-          if (e.target.classList.contains('reply-icon')) {
-            const raw = e.target.dataset.messageData;
-            if (raw) {
-              try {
-                const data = JSON.parse(raw);
-                startReply(data);
-              } catch (err) {
-                console.error('Reply parse failed', err);
-              }
+            if (previousStatus === newStatus) return; // No change
+
+            // Update attendance data object
+            const subjectName = codeToSubjectMap[code];
+            if (subjectName && attendanceData[subjectName]) {
+                const record = attendanceData[subjectName];
+                
+                // Adjust counts based on status change
+                if (previousStatus === 'unmarked') {
+                    record.classes++;
+                    if (newStatus === 'attended') record.present++;
+                    else record.absent++;
+                } else if (previousStatus === 'attended' && newStatus === 'absent') {
+                    record.present--;
+                    record.absent++;
+                } else if (previousStatus === 'absent' && newStatus === 'attended') {
+                    record.absent--;
+                    record.present++;
+                }
             }
-          }
+
+            // Save to Firebase
+            try {
+                await setDoc(docRef, { status: newStatus, timestamp: new Date() });
+                classItem.dataset.status = newStatus; // Update status on the element
+                
+                // Update UI
+                classItem.classList.remove('border-gray-200', 'border-green-500', 'border-red-500');
+                if (newStatus === 'attended') classItem.classList.add('border-green-500');
+                else classItem.classList.add('border-red-500');
+                
+                document.querySelector(`.options[data-code="${code}"]`).classList.add('hidden');
+                document.querySelector(`.mark-btn[data-code="${code}"]`).classList.remove('hidden');
+
+                // Re-render the main attendance table
+                renderAttendanceRecord();
+
+            } catch (e) {
+                console.error("Error updating document: ", e);
+            }
+        };
+
+        const addEventListeners = () => {
+            document.querySelectorAll('.mark-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const code = e.target.dataset.code;
+                    e.target.classList.add('hidden');
+                    document.querySelector(`.options[data-code="${code}"]`).classList.remove('hidden');
+                });
+            });
+            document.querySelectorAll('.attended-btn').forEach(button => {
+                button.addEventListener('click', (e) => markAttendance(e.target.dataset.code, 'attended'));
+            });
+            document.querySelectorAll('.absent-btn').forEach(button => {
+                button.addEventListener('click', (e) => markAttendance(e.target.dataset.code, 'absent'));
+            });
+        };
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial render of attendance table from static data
+            renderAttendanceRecord();
+            
+            const toggleButton = document.getElementById('toggle-subjects');
+            const content = document.getElementById('subjects-content');
+            const arrow = document.getElementById('subjects-arrow');
+
+            toggleButton.addEventListener('click', () => {
+                content.classList.toggle('hidden');
+                arrow.classList.toggle('rotate-180');
+            });
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    renderTimetable(user.uid);
+                } else {
+                    signInAnonymously(auth).catch((error) => console.error("Anonymous sign-in failed:", error));
+                }
+            });
         });
-      }
-
-      document.addEventListener('click', (e) => {
-        const li = e.target.closest('li.user-card');
-        if (!li) return;
-        if (e.target.closest('button')) {
-          try {
-            const data = JSON.parse(li.getAttribute('data-user') || '{}');
-            if (messageInput && data.username) {
-              messageInput.value = `@${data.username} `;
-              messageInput.focus();
-            }
-          } catch (_) {}
-          return;
-        }
-      });
-
-      setupGiphyPanel('gifs', 'gif-search-input', 'gif-results-grid');
-      setupGiphyPanel('stickers', 'sticker-search-input', 'stickerGrid');
-
-      if (cancelReply) {
-        cancelReply.addEventListener('click', cancelReplyMode);
-      }
-    });
-  </script>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const themeToggle = document.getElementById('themeToggle');
-      const themeIcon = document.getElementById('themeIcon');
-
-      function toggleTheme() {
-        const body = document.body;
-        if (body.getAttribute('data-theme') === 'dark') {
-          body.removeAttribute('data-theme');
-          if (themeIcon) themeIcon.textContent = '🌙';
-        } else {
-          body.setAttribute('data-theme', 'dark');
-          if (themeIcon) themeIcon.textContent = '☀️';
-        }
-      }
-
-      if (themeToggle) {
-        themeToggle.addEventListener('click', toggleTheme);
-      }
-    });
-  </script>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('sw.js').then(function(registration) {
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        }, function(err) {
-          console.log('ServiceWorker registration failed: ', err);
-        });
-      });
-    }
-  </script>
+    </script>
 </body>
 </html>
+
