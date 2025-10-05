@@ -3,353 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Information</title>
+    <title>Home Page</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8;
+            background-color: #f0f4f8; /* Light gray background */
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            border-radius: 0.5rem;
-            overflow: hidden;
-        }
-        th, td {
-            border: 1px solid #e2e8f0;
-            padding: 1rem;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-        th {
-            background-color: #0156d2;
-            color: white;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        tbody tr:nth-child(even) {
-            background-color: #f8fafc;
-        }
-        tbody tr:hover {
-            background-color: #eff6ff;
-        }
-        .highlight {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            font-weight: 700;
-            text-align: center;
-        }
-        .ok {
-            background-color: #dcfce7;
-            color: #166534;
-            font-weight: 700;
-            text-align: center;
+        .quote-container {
+            touch-action: pan-y; /* Allows vertical scroll while capturing horizontal swipes */
         }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="bg-gray-100 text-gray-800">
 
-    <!-- Header Section -->
-    <header class="bg-white shadow-md sticky top-0 z-10">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="index.html" class="text-lg font-semibold text-gray-700 hover:text-[#0156d2] transition-colors duration-300">Home</a>
+    <!-- Header Section (Blank as requested) -->
+    <header class="bg-white shadow-md">
+        <nav class="container mx-auto px-6 py-8">
+            <!-- Header content can be added here later -->
         </nav>
     </header>
-    
+
     <!-- Main Content -->
-    <main class="container mx-auto px-4 sm:px-6 py-12">
-        <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
-
-            <h1 class="text-3xl md:text-4xl font-bold text-[#0156d2] mb-4">SRM AP Academic Dashboard</h1>
+    <main class="container mx-auto px-4 sm:px-6 py-12 flex flex-col items-center">
+        <div class="w-full max-w-2xl text-center">
             
-            <h2 class="text-xl md:text-2xl font-semibold mt-8 mb-4 border-b-2 border-[#f4811f] pb-2 text-gray-700">Today's Timetable</h2>
-            
-            <!-- New Vertical Timetable -->
-            <div id="vertical-timetable" class="space-y-4">
-                <!-- Timetable will be dynamically generated here -->
-                <p class="text-gray-500">Loading today's schedule...</p>
-            </div>
-
-            <!-- Collapsible Subjects Section -->
-            <div id="subjects-section" class="mt-8">
-                <h2 id="toggle-subjects" class="text-xl md:text-2xl font-semibold mb-4 border-b-2 border-[#f4811f] pb-2 text-gray-700 cursor-pointer flex justify-between items-center select-none">
-                    <span>Subjects, Faculty, and Classrooms</span>
-                    <svg id="subjects-arrow" class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </h2>
-                <div id="subjects-content" class="overflow-x-auto hidden transition-all duration-500">
-                    <div class="pt-4">
-                        <!-- Content remains the same -->
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Code</th><th>Subject</th><th>L-T-P-C</th><th>Faculty(s)</th><th>Classroom(s)</th>
-                                </tr>
-                            </thead>
-                           <tbody>
-                                <tr>
-                                    <td>AEC 108</td><td>Problem Solving Skills</td><td>1-0-1-2</td><td>Mr. ISCP00005 (V00005)</td><td>S 606</td>
-                                </tr>
-                                <tr>
-                                    <td>CSC 201</td><td>Object Oriented Programming with C++</td><td>3-0-1-4</td><td>Dr. Asit Kumar Das, Dr. Prasant Kumar Mohanty</td><td>C 801, S 606</td>
-                                </tr>
-                                <tr>
-                                    <td>CSC 202</td><td>Digital Electronics</td><td>3-0-1-4</td><td>Dr. Jyotibhusan Padhi, Dr. Manoj Kumar Yadav, Dr. Ayoub Sofi</td><td>S 606, X 201</td>
-                                </tr>
-                                <tr>
-                                    <td>CSC 203</td><td>Design and Analysis of Algorithms</td><td>3-0-1-4</td><td>Dr. Asit Kumar Das, Dr. Niladri Sett</td><td>S 603, S 606</td>
-                                </tr>
-                                <tr>
-                                    <td>MGT 286</td><td>Sales and Relationship Marketing</td><td>3-0-0-3</td><td>Dr. Md Faiz Ahmad</td><td>C 608</td>
-                                </tr>
-                                <tr>
-                                    <td>SEC 102</td><td>Digital Literacy</td><td>1-0-2-2</td><td>Dr. Chinmoy Das</td><td>S 414</td>
-                                </tr>
-                                <tr>
-                                    <td>VAC 104</td><td>Community Service and Social Responsibility</td><td>0-0-2-0</td><td>-</td><td>-</td>
-                                </tr>
-                           </tbody>
-                        </table>
-                    </div>
+            <!-- Swipeable Quote Container -->
+            <div class="relative w-full h-48 bg-white rounded-lg shadow-lg p-6 mb-8 overflow-hidden quote-container">
+                <!-- View Counter -->
+                <div id="view-counter" class="absolute top-3 left-3 bg-[#f4811f] text-white text-xs font-bold py-1 px-2 rounded-full">
+                    Seen: 0
                 </div>
-            </div>
-            
-            <h2 class="text-xl md:text-2xl font-semibold mt-8 mb-4 border-b-2 border-[#f4811f] pb-2 text-gray-700">Attendance Record (Live)</h2>
-            <div class="max-w-2xl mx-auto">
-                <div class="overflow-x-auto">
-                    <table id="attendance-table">
-                        <thead>
-                            <tr>
-                                <th>Code</th>
-                                <th>Classes</th>
-                                <th>Present</th>
-                                <th>Absent</th>
-                                <th>Attendance %</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendance-tbody">
-                            <!-- Attendance data will be dynamically rendered here -->
-                        </tbody>
-                    </table>
+                <!-- Quotes -->
+                <div id="quote-slider" class="flex transition-transform duration-500 ease-in-out h-full">
+                    <!-- Quotes will be injected here by JS -->
                 </div>
+                <!-- Navigation Buttons for Desktop -->
+                <button id="prev-btn" class="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 hidden md:block">
+                    <svg class="w-6 h-6 text-[#0156d2]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                </button>
+                <button id="next-btn" class="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 hidden md:block">
+                    <svg class="w-6 h-6 text-[#0156d2]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
             </div>
-            <div class="mt-4 p-4 bg-gray-50 rounded-lg border max-w-2xl mx-auto">
-                <p>
-                    <strong>Note:</strong> Values highlighted in <span class="text-[#b91c1c] font-semibold">red</span> indicate subjects with attendance below 75%. Values highlighted in <span class="text-[#166534] font-semibold">green</span> indicate attendance of 75% or above.
-                </p>
+
+            <!-- Page Buttons -->
+            <div class="mt-8 flex justify-center items-center space-x-4">
+                <a href="class.html" class="w-32 h-32 flex items-center justify-center text-center bg-[#0156d2] text-white shadow-md hover:bg-[#f4811f] rounded-[35px] text-base font-medium transition-colors duration-300 border-4 border-white">Class</a>
+                <a href="contact.html" class="w-32 h-32 flex items-center justify-center text-center bg-[#0156d2] text-white shadow-md rounded-[35px] text-base font-medium hover:bg-[#f4811f] transition-colors duration-300 border-4 border-white">farḍ</a>
             </div>
+        </div>
+
+        <!-- Circular Icon Link -->
+        <div class="mt-12">
+             <a href="contact.html" class="w-16 h-16 bg-[#0156d2] hover:bg-[#f4811f] text-white rounded-full flex items-center justify-center shadow-lg transition-colors duration-300">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            </a>
         </div>
     </main>
 
     <footer class="mt-12 py-6">
-        <div class="container mx-auto px-6 text-center text-gray-500"></div>
+        <div class="container mx-auto px-6 text-center text-gray-500">
+            <!-- Footer content is empty as requested -->
+        </div>
     </footer>
 
-    <script type="module">
-        // Firebase Imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        // Your Firebase configuration
-        const firebaseConfig = {
-          apiKey: "AIzaSyDX8H-_OfG4LMbPMji9IJEgHJfanyedEGY",
-          authDomain: "goalist-a6573.firebaseapp.com",
-          projectId: "goalist-a6573",
-          storageBucket: "goalist-a6573.appspot.com",
-          messagingSenderId: "850792903925",
-          appId: "1:850792903925:web:8bdf55f3de7926b19e81bc",
-          measurementId: "G-HZQ897N97C"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let userId = null;
-
-        // --- DATA ---
-        const schedule = {
-            monday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "02:00-02:50", subject: "CSC 202", location: "S 606", code: "CSC202" }, { time: "03:00-03:50", subject: "AEC 108", location: "S 606", code: "AEC108" }, { time: "04:00-05:30", subject: "AEC 108", location: "S 606", code: "AEC108_2" },],
-            tuesday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "10:00-10:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "11:00-11:50", subject: "CSC 201", location: "S 606", code: "CSC201" }, { time: "01:00-01:50", subject: "CSC 203 Lab", location: "S 603", code: "CSC203L" }, { time: "02:00-02:50", subject: "CSC 203 Lab", location: "S 603", code: "CSC203L_2" },],
-            wednesday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "10:00-10:50", subject: "SEC 102", location: "S 414", code: "SEC102" }, { time: "11:00-11:50", subject: "SEC 102", location: "S 414", code: "SEC102_2" }, { time: "01:00-01:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "02:00-02:50", subject: "CSC 201", location: "S 606", code: "CSC201" }, { time: "03:00-03:50", subject: "CSC 201 Lab", location: "S 606", code: "CSC201L" }, { time: "04:00-05:30", subject: "VAC 104", location: "-", code: "VAC104" },],
-            thursday: [{ time: "09:00-09:50", subject: "AEC 108", location: "S 606", code: "AEC108" }, { time: "11:00-11:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "01:00-01:50", subject: "CSC 202 Lab", location: "X 201", code: "CSC202L" },],
-            friday: [{ time: "09:00-09:50", subject: "CSC 201 Lab", location: "C 801", code: "CSC201L" }, { time: "10:00-10:50", subject: "CSC 201 Lab", location: "C 801", code: "CSC201L_2" }, { time: "02:00-02:50", subject: "CSC 202", location: "S 606", code: "CSC202" },]
-        };
-        
-        const attendanceData = {
-            'AEC 108': { classes: 19, present: 12, absent: 7 },
-            'CSC 201': { classes: 34, present: 22, absent: 12 },
-            'CSC 202': { classes: 34, present: 27, absent: 7 },
-            'CSC 203': { classes: 34, present: 21, absent: 13 },
-            'MGT 286': { classes: 24, present: 13, absent: 11 },
-            'SEC 102': { classes: 8, present: 6, absent: 2 },
-            'VAC 104': { classes: 0, present: 0, absent: 0 },
-        };
-
-        const codeToSubjectMap = {
-            'AEC108': 'AEC 108', 'AEC108_2': 'AEC 108', 'CSC201': 'CSC 201', 'CSC201L': 'CSC 201', 'CSC201L_2': 'CSC 201', 'CSC202': 'CSC 202', 'CSC202L': 'CSC 202', 'CSC203': 'CSC 203', 'CSC203L': 'CSC 203', 'CSC203L_2': 'CSC 203', 'MGT286': 'MGT 286', 'SEC102': 'SEC 102', 'SEC102_2': 'SEC 102', 'VAC104': 'VAC 104',
-        };
-
-        // --- RENDERING FUNCTIONS ---
-        const renderAttendanceRecord = () => {
-            const tbody = document.getElementById('attendance-tbody');
-            tbody.innerHTML = ''; // Clear existing table
-            for (const code in attendanceData) {
-                const data = attendanceData[code];
-                const percentage = data.classes > 0 ? ((data.present / data.classes) * 100).toFixed(2) : '0.00';
-                const percentageClass = percentage >= 75 ? 'ok' : 'highlight';
-
-                const row = `
-                    <tr>
-                        <td class="font-semibold text-gray-800">${code}</td>
-                        <td>${data.classes}</td>
-                        <td>${data.present}</td>
-                        <td>${data.absent}</td>
-                        <td class="${percentageClass}">${percentage}</td>
-                    </tr>`;
-                tbody.innerHTML += row;
-            }
-        };
-        
-        const renderTimetable = async (uid) => {
-            userId = uid;
-            const timetableContainer = document.getElementById('vertical-timetable');
-            const dayMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-            const today = new Date();
-            const todayString = dayMap[today.getDay()];
-            const dateString = today.toISOString().split('T')[0];
-
-            const todaysClasses = schedule[todayString] || [];
-            if (todaysClasses.length === 0) {
-                timetableContainer.innerHTML = `<p class="text-center font-semibold text-gray-500 py-8">No classes scheduled today.</p>`;
-                return;
-            }
-
-            let html = '';
-            for (const cls of todaysClasses) {
-                const docRef = doc(db, "attendance", userId, dateString, cls.code);
-                const docSnap = await getDoc(docRef);
-                let status = 'unmarked';
-                if (docSnap.exists()) {
-                    status = docSnap.data().status;
-                }
-
-                let statusColorClass = 'border-gray-200';
-                if (status === 'attended') statusColorClass = 'border-green-500';
-                if (status === 'absent') statusColorClass = 'border-red-500';
-
-                html += `
-                    <div id="class-${cls.code}" class="class-item p-4 border-l-4 ${statusColorClass} bg-gray-50 rounded-lg shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between" data-status="${status}">
-                        <div class="mb-4 sm:mb-0">
-                            <p class="font-bold text-lg text-[#0156d2]">${cls.subject}</p>
-                            <p class="text-gray-600">${cls.time} | Location: ${cls.location}</p>
-                        </div>
-                        <div class="flex items-center space-x-2">
-                            <button class="mark-btn text-sm font-medium py-2 px-4 rounded-md bg-gray-200 hover:bg-gray-300 transition-colors" data-code="${cls.code}">Mark</button>
-                            <div class="options hidden" data-code="${cls.code}">
-                                <button class="attended-btn text-sm font-medium py-2 px-3 rounded-md bg-green-100 text-green-800 hover:bg-green-200" data-code="${cls.code}">Attended</button>
-                                <button class="absent-btn text-sm font-medium py-2 px-3 rounded-md bg-red-100 text-red-800 hover:bg-red-200" data-code="${cls.code}">Absent</button>
-                            </div>
-                        </div>
-                    </div>`;
-            }
-            timetableContainer.innerHTML = html;
-            addEventListeners();
-        };
-
-        // --- LOGIC FUNCTIONS ---
-        const markAttendance = async (code, newStatus) => {
-            const today = new Date();
-            const dateString = today.toISOString().split('T')[0];
-            const docRef = doc(db, "attendance", userId, dateString, code);
-            const classItem = document.getElementById(`class-${code}`);
-            const previousStatus = classItem.dataset.status;
-
-            if (previousStatus === newStatus) return; // No change
-
-            // Update attendance data object
-            const subjectName = codeToSubjectMap[code];
-            if (subjectName && attendanceData[subjectName]) {
-                const record = attendanceData[subjectName];
-                
-                // Adjust counts based on status change
-                if (previousStatus === 'unmarked') {
-                    record.classes++;
-                    if (newStatus === 'attended') record.present++;
-                    else record.absent++;
-                } else if (previousStatus === 'attended' && newStatus === 'absent') {
-                    record.present--;
-                    record.absent++;
-                } else if (previousStatus === 'absent' && newStatus === 'attended') {
-                    record.absent--;
-                    record.present++;
-                }
-            }
-
-            // Save to Firebase
-            try {
-                await setDoc(docRef, { status: newStatus, timestamp: new Date() });
-                classItem.dataset.status = newStatus; // Update status on the element
-                
-                // Update UI
-                classItem.classList.remove('border-gray-200', 'border-green-500', 'border-red-500');
-                if (newStatus === 'attended') classItem.classList.add('border-green-500');
-                else classItem.classList.add('border-red-500');
-                
-                document.querySelector(`.options[data-code="${code}"]`).classList.add('hidden');
-                document.querySelector(`.mark-btn[data-code="${code}"]`).classList.remove('hidden');
-
-                // Re-render the main attendance table
-                renderAttendanceRecord();
-
-            } catch (e) {
-                console.error("Error updating document: ", e);
-            }
-        };
-
-        const addEventListeners = () => {
-            document.querySelectorAll('.mark-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const code = e.target.dataset.code;
-                    e.target.classList.add('hidden');
-                    document.querySelector(`.options[data-code="${code}"]`).classList.remove('hidden');
-                });
-            });
-            document.querySelectorAll('.attended-btn').forEach(button => {
-                button.addEventListener('click', (e) => markAttendance(e.target.dataset.code, 'attended'));
-            });
-            document.querySelectorAll('.absent-btn').forEach(button => {
-                button.addEventListener('click', (e) => markAttendance(e.target.dataset.code, 'absent'));
-            });
-        };
-
-        // --- INITIALIZATION ---
+    <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Initial render of attendance table from static data
-            renderAttendanceRecord();
+            const quotes = [
+                "The only way to do great work is to love what you do.",
+                "Innovation distinguishes between a leader and a follower.",
+                "Your time is limited, don't waste it living someone else's life.",
+                "Strive not to be a success, but rather to be of value.",
+                "The mind is everything. What you think you become.",
+                "The best way to predict the future is to create it.",
+                "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+                "Believe you can and you're halfway there.",
+                "The future belongs to those who believe in the beauty of their dreams.",
+                "It does not matter how slowly you go as long as you do not stop.",
+                "Everything you’ve ever wanted is on the other side of fear.",
+                "Hardships often prepare ordinary people for an extraordinary destiny.",
+                "The only impossible journey is the one you never begin."
+            ];
+
+            const quoteSlider = document.getElementById('quote-slider');
+            const viewCounterEl = document.getElementById('view-counter');
+            let currentIndex = 0;
+            let viewCounts = JSON.parse(localStorage.getItem('quoteViewCounts')) || new Array(quotes.length).fill(0);
+
+            // Populate slider
+            quotes.forEach(quote => {
+                const quoteEl = document.createElement('div');
+                quoteEl.className = 'w-full h-full flex-shrink-0 flex items-center justify-center';
+                quoteEl.innerHTML = `<p class="text-xl italic text-gray-700">"${quote}"</p>`;
+                quoteSlider.appendChild(quoteEl);
+            });
             
-            const toggleButton = document.getElementById('toggle-subjects');
-            const content = document.getElementById('subjects-content');
-            const arrow = document.getElementById('subjects-arrow');
+            const updateQuote = (index) => {
+                // Update transform
+                quoteSlider.style.transform = `translateX(-${index * 100}%)`;
 
-            toggleButton.addEventListener('click', () => {
-                content.classList.toggle('hidden');
-                arrow.classList.toggle('rotate-180');
+                // Update and display view count
+                viewCounts[index]++;
+                localStorage.setItem('quoteViewCounts', JSON.stringify(viewCounts));
+                viewCounterEl.textContent = `Seen: ${viewCounts[index]}`;
+                
+                currentIndex = index;
+            };
+
+            // Navigation
+            const nextBtn = document.getElementById('next-btn');
+            const prevBtn = document.getElementById('prev-btn');
+
+            nextBtn.addEventListener('click', () => {
+                const nextIndex = (currentIndex + 1) % quotes.length;
+                updateQuote(nextIndex);
+            });
+            
+            prevBtn.addEventListener('click', () => {
+                const prevIndex = (currentIndex - 1 + quotes.length) % quotes.length;
+                updateQuote(prevIndex);
             });
 
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    renderTimetable(user.uid);
-                } else {
-                    signInAnonymously(auth).catch((error) => console.error("Anonymous sign-in failed:", error));
+            // Swipe functionality
+            const quoteContainer = document.querySelector('.quote-container');
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            quoteContainer.addEventListener('touchstart', (event) => {
+                touchStartX = event.changedTouches[0].screenX;
+            }, { passive: true });
+
+            quoteContainer.addEventListener('touchend', (event) => {
+                touchEndX = event.changedTouches[0].screenX;
+                handleSwipe();
+            });
+
+            const handleSwipe = () => {
+                if (touchEndX < touchStartX - 50) { // Swiped left
+                    const nextIndex = (currentIndex + 1) % quotes.length;
+                    updateQuote(nextIndex);
                 }
-            });
+                if (touchEndX > touchStartX + 50) { // Swiped right
+                    const prevIndex = (currentIndex - 1 + quotes.length) % quotes.length;
+                    updateQuote(prevIndex);
+                }
+            };
+            
+            // Initialize first quote
+            updateQuote(0);
         });
     </script>
 </body>
