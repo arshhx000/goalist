@@ -3,156 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
+    <title>Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* Light gray background */
-        }
-        .quote-container {
-            touch-action: pan-y; /* Allows vertical scroll while capturing horizontal swipes */
+            background-color: #f0f4f8;
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="flex flex-col min-h-screen">
 
-    <!-- Header Section (Blank as requested) -->
-    <header class="bg-white shadow-md">
-        <nav class="container mx-auto px-6 py-8">
-            <!-- Header content can be added here later -->
-        </nav>
-    </header>
-
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 sm:px-6 py-12 flex flex-col items-center">
-        <div class="w-full max-w-2xl text-center">
-            
-            <!-- Swipeable Quote Container -->
-            <div class="relative w-full h-48 bg-white rounded-lg shadow-lg p-6 mb-8 overflow-hidden quote-container">
-                <!-- View Counter -->
-                <div id="view-counter" class="absolute top-3 left-3 bg-[#f4811f] text-white text-xs font-bold py-1 px-2 rounded-full">
-                    Seen: 0
+    <!-- Login Container -->
+    <div id="login-container" class="flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
+            <h2 class="text-3xl font-bold text-center text-[#0156d2] mb-6">Login</h2>
+            <form id="login-form">
+                <div class="mb-4">
+                    <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                    <input type="email" id="email" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                 </div>
-                <!-- Quotes -->
-                <div id="quote-slider" class="flex transition-transform duration-500 ease-in-out h-full">
-                    <!-- Quotes will be injected here by JS -->
+                <div class="mb-6">
+                    <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                    <input type="password" id="password" class="shadow appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" required>
                 </div>
-                <!-- Navigation Buttons for Desktop -->
-                <button id="prev-btn" class="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 hidden md:block">
-                    <svg class="w-6 h-6 text-[#0156d2]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                </button>
-                <button id="next-btn" class="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/50 hover:bg-white/80 rounded-full p-2 hidden md:block">
-                    <svg class="w-6 h-6 text-[#0156d2]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </button>
-            </div>
-
-            <!-- Page Buttons -->
-            <div class="mt-8 flex justify-center items-center space-x-4">
-                <a href="class.html" class="w-32 h-32 flex items-center justify-center text-center bg-[#0156d2] text-white shadow-md hover:bg-[#f4811f] rounded-[35px] text-base font-medium transition-colors duration-300 border-4 border-white">Class</a>
-                <a href="contact.html" class="w-32 h-32 flex items-center justify-center text-center bg-[#0156d2] text-white shadow-md rounded-[35px] text-base font-medium hover:bg-[#f4811f] transition-colors duration-300 border-4 border-white">farḍ</a>
-            </div>
+                <p id="error-message" class="text-red-500 text-xs italic mb-4 hidden"></p>
+                <div class="flex items-center justify-between">
+                    <button type="submit" class="w-full bg-[#0156d2] hover:bg-[#f4811f] text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-300">
+                        Sign In
+                    </button>
+                </div>
+            </form>
         </div>
+    </div>
+    
+    <script type="module">
+        // --- Firebase Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyDX8H-_OfG4LMbPMji9IJEgHJfanyedEGY",
+          authDomain: "goalist-a6573.firebaseapp.com",
+          projectId: "goalist-a6573",
+          storageBucket: "goalist-a6573.appspot.com",
+          messagingSenderId: "850792903925",
+          appId: "1:850792903925:web:8bdf55f3de7926b19e81bc",
+          measurementId: "G-HZQ897N97C"
+        };
+        
+        // --- Initialize Firebase ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-        <!-- Circular Icon Link -->
-        <div class="mt-12">
-             <a href="contact.html" class="w-16 h-16 bg-[#0156d2] hover:bg-[#f4811f] text-white rounded-full flex items-center justify-center shadow-lg transition-colors duration-300">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-            </a>
-        </div>
-    </main>
+        // --- Redirect if already logged in ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // If user is logged in, redirect to the user dashboard
+                window.location.href = 'user.html';
+            }
+        });
 
-    <footer class="mt-12 py-6">
-        <div class="container mx-auto px-6 text-center text-gray-500">
-            <!-- Footer content is empty as requested -->
-        </div>
-    </footer>
+        // --- DOM Elements ---
+        const loginForm = document.getElementById('login-form');
+        const errorMessage = document.getElementById('error-message');
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const quotes = [
-                "The only way to do great work is to love what you do.",
-                "Innovation distinguishes between a leader and a follower.",
-                "Your time is limited, don't waste it living someone else's life.",
-                "Strive not to be a success, but rather to be of value.",
-                "The mind is everything. What you think you become.",
-                "The best way to predict the future is to create it.",
-                "Success is not final, failure is not fatal: it is the courage to continue that counts.",
-                "Believe you can and you're halfway there.",
-                "The future belongs to those who believe in the beauty of their dreams.",
-                "It does not matter how slowly you go as long as you do not stop.",
-                "Everything you’ve ever wanted is on the other side of fear.",
-                "Hardships often prepare ordinary people for an extraordinary destiny.",
-                "The only impossible journey is the one you never begin."
-            ];
+        // --- Login Logic ---
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorMessage.classList.add('hidden');
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
 
-            const quoteSlider = document.getElementById('quote-slider');
-            const viewCounterEl = document.getElementById('view-counter');
-            let currentIndex = 0;
-            let viewCounts = JSON.parse(localStorage.getItem('quoteViewCounts')) || new Array(quotes.length).fill(0);
-
-            // Populate slider
-            quotes.forEach(quote => {
-                const quoteEl = document.createElement('div');
-                quoteEl.className = 'w-full h-full flex-shrink-0 flex items-center justify-center';
-                quoteEl.innerHTML = `<p class="text-xl italic text-gray-700">"${quote}"</p>`;
-                quoteSlider.appendChild(quoteEl);
-            });
-            
-            const updateQuote = (index) => {
-                // Update transform
-                quoteSlider.style.transform = `translateX(-${index * 100}%)`;
-
-                // Update and display view count
-                viewCounts[index]++;
-                localStorage.setItem('quoteViewCounts', JSON.stringify(viewCounts));
-                viewCounterEl.textContent = `Seen: ${viewCounts[index]}`;
-                
-                currentIndex = index;
-            };
-
-            // Navigation
-            const nextBtn = document.getElementById('next-btn');
-            const prevBtn = document.getElementById('prev-btn');
-
-            nextBtn.addEventListener('click', () => {
-                const nextIndex = (currentIndex + 1) % quotes.length;
-                updateQuote(nextIndex);
-            });
-            
-            prevBtn.addEventListener('click', () => {
-                const prevIndex = (currentIndex - 1 + quotes.length) % quotes.length;
-                updateQuote(prevIndex);
-            });
-
-            // Swipe functionality
-            const quoteContainer = document.querySelector('.quote-container');
-            let touchStartX = 0;
-            let touchEndX = 0;
-
-            quoteContainer.addEventListener('touchstart', (event) => {
-                touchStartX = event.changedTouches[0].screenX;
-            }, { passive: true });
-
-            quoteContainer.addEventListener('touchend', (event) => {
-                touchEndX = event.changedTouches[0].screenX;
-                handleSwipe();
-            });
-
-            const handleSwipe = () => {
-                if (touchEndX < touchStartX - 50) { // Swiped left
-                    const nextIndex = (currentIndex + 1) % quotes.length;
-                    updateQuote(nextIndex);
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // The onAuthStateChanged listener will handle the redirect to user.html
+            } catch (error) {
+                // On failed login:
+                let friendlyMessage = "Invalid email or password. Please try again.";
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                   // Keep the generic message
+                } else if (error.code === 'auth/invalid-email') {
+                    friendlyMessage = "Please enter a valid email address.";
                 }
-                if (touchEndX > touchStartX + 50) { // Swiped right
-                    const prevIndex = (currentIndex - 1 + quotes.length) % quotes.length;
-                    updateQuote(prevIndex);
-                }
-            };
-            
-            // Initialize first quote
-            updateQuote(0);
+                errorMessage.textContent = friendlyMessage;
+                errorMessage.classList.remove('hidden');
+            }
         });
     </script>
 </body>
