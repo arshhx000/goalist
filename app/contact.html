@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Tasks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .task-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .status-btn {
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Header Section -->
+    <header class="bg-white shadow-md sticky top-0 z-10">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="index.html" class="text-lg font-semibold text-gray-700 hover:text-[#0156d2] transition-colors duration-300">Home</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 py-12">
+        <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg max-w-2xl mx-auto">
+            
+            <div class="text-center mb-8">
+                <h1 class="text-3xl md:text-4xl font-bold text-[#0156d2]">Today's Tasks</h1>
+                <p id="current-date-heading" class="text-gray-500 mt-2"></p>
+            </div>
+
+            <!-- Current Time Info -->
+            <div class="bg-gray-50 border border-gray-300 rounded-full px-6 py-2 mb-8 text-center max-w-sm mx-auto">
+                <p class="font-semibold text-xs text-gray-500 uppercase tracking-wider">Current Time</p>
+                <p id="current-time" class="text-lg font-bold text-[#f4811f]"></p>
+            </div>
+
+            <!-- Task List -->
+            <div class="space-y-4" id="tasks-container">
+                <!-- Tasks will be dynamically inserted here -->
+            </div>
+
+             <div id="progress-recommendation-section" class="mt-8 text-center text-sm text-gray-500 p-4 bg-gray-50 rounded-lg">
+                <!-- Content is now dynamic: shows next task OR progress report -->
+             </div>
+
+        </div>
+    </main>
+
+    <footer class="mt-12 py-6">
+        <div class="container mx-auto px-6 text-center text-gray-500"></div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dailyTasks = [
+                { id: 'gym', name: 'Gym Session', startTime: '06:30 AM', endTime: '07:30 AM' },
+                { id: 'breakfast', name: 'Breakfast', startTime: '07:30 AM', endTime: '08:00 AM' },
+                { id: 'personal', name: 'Personal Work', startTime: '08:00 AM', endTime: '09:00 AM' },
+                { id: 'college', name: 'College', startTime: '09:00 AM', endTime: '05:00 PM' },
+            ];
+
+            const taskContainer = document.getElementById('tasks-container');
+            const dateHeadingEl = document.getElementById('current-date-heading');
+            const timeEl = document.getElementById('current-time');
+            const progressContainer = document.getElementById('progress-recommendation-section');
+            
+            const getTodaysDateKey = () => new Date().toISOString().split('T')[0];
+
+            const getTaskStatuses = () => {
+                const dateKey = getTodaysDateKey();
+                const statuses = JSON.parse(localStorage.getItem(dateKey)) || {};
+                dailyTasks.forEach(task => {
+                    if (!statuses[task.id]) {
+                        statuses[task.id] = 'unmarked';
+                    }
+                });
+                return statuses;
+            };
+
+            const saveTaskStatuses = (statuses) => {
+                localStorage.setItem(getTodaysDateKey(), JSON.stringify(statuses));
+            };
+            
+            const parseTime = (timeStr) => {
+                const now = new Date();
+                const [time, modifier] = timeStr.split(' ');
+                let [hours, minutes] = time.split(':');
+                if (hours === '12') hours = '00';
+                if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
+                return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
+            };
+
+            const updateDashboard = () => {
+                const now = new Date();
+                const statuses = getTaskStatuses();
+                
+                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                dateHeadingEl.textContent = now.toLocaleDateString('en-US', dateOptions);
+                timeEl.textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
+                taskContainer.innerHTML = ''; 
+                
+                let currentTaskIndex = -1;
+                dailyTasks.forEach((task, index) => {
+                    const startTime = parseTime(task.startTime);
+                    const endTime = parseTime(task.endTime);
+                    if (now >= startTime && now < endTime) {
+                        currentTaskIndex = index;
+                    }
+                });
+                
+                let nextTaskFound = false;
+                for (let i = 0; i < dailyTasks.length; i++) {
+                    const task = dailyTasks[i];
+                    const startTime = parseTime(task.startTime);
+                    if (now < startTime) {
+                        progressContainer.innerHTML = `
+                            <p>
+                                <strong class="text-[#0156d2]">Next Task:</strong>
+                                <span>${task.name} at ${task.startTime}</span>
+                            </p>`;
+                        nextTaskFound = true;
+                        break;
+                    }
+                }
+
+                if (!nextTaskFound) {
+                    const achievedTasks = Object.values(statuses).filter(s => s === 'achieved').length;
+                    const completionPercentage = (achievedTasks / dailyTasks.length) * 100;
+                    const recommendationPercentage = Math.min(100, Math.round(completionPercentage) + 5);
+                    progressContainer.innerHTML = `
+                        <div>
+                            <p class="font-bold text-gray-700">Today's Progress</p>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 my-2">
+                                <div class="bg-[#0156d2] h-2.5 rounded-full" style="width: ${completionPercentage}%"></div>
+                            </div>
+                            <p class="font-semibold text-[#f4811f]">${Math.round(completionPercentage)}% Complete</p>
+                            <p class="mt-2 text-sm text-gray-600">
+                                Great work today! Let's aim for <strong>${recommendationPercentage}%</strong> completion tomorrow.
+                            </p>
+                        </div>`;
+                }
+
+                dailyTasks.forEach((task, index) => {
+                    const status = statuses[task.id];
+                    let stateClass = 'bg-white';
+                    if (index === currentTaskIndex) stateClass = 'bg-blue-50';
+                    if (status === 'achieved') stateClass = 'bg-green-50';
+                    if (status === 'failed') stateClass = 'bg-red-50';
+
+                    const card = `
+                        <div class="task-card p-4 rounded-lg shadow-sm ${stateClass}">
+                            <div class="flex justify-between items-center">
+                                <p class="text-lg font-semibold text-gray-800">${task.name}</p>
+                                <p class="text-base font-medium text-gray-600">${task.startTime} - ${task.endTime}</p>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-gray-200 flex justify-end space-x-2">
+                                <button class="status-btn p-2 rounded-full flex items-center space-x-2 text-sm ${status === 'achieved' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-green-500 hover:text-white'}" data-task-id="${task.id}" data-status="achieved">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                                    <span>Achieved</span>
+                                </button>
+                                <button class="status-btn p-2 rounded-full flex items-center space-x-2 text-sm ${status === 'failed' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-red-500 hover:text-white'}" data-task-id="${task.id}" data-status="failed">
+                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.697a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                     <span>Failed</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    taskContainer.innerHTML += card;
+                });
+            };
+            
+            taskContainer.addEventListener('click', (e) => {
+                const button = e.target.closest('.status-btn');
+                if (!button) return;
+
+                const { taskId, status } = button.dataset;
+                const statuses = getTaskStatuses();
+                
+                // Toggle logic: if clicking the same status, set to unmarked
+                statuses[taskId] = statuses[taskId] === status ? 'unmarked' : status;
+                
+                saveTaskStatuses(statuses);
+                updateDashboard();
+            });
+
+            updateDashboard();
+            setInterval(updateDashboard, 5000); // Update every 5 seconds for live time
+        });
+    </script>
+</body>
+</html>
+
