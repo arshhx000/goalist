@@ -9,74 +9,77 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8;
+            background-color: #f1f5f9; /* Lighter gray background */
         }
-        table {
+        /* Custom styles for a cleaner table design */
+        .custom-table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            border-radius: 0.5rem;
-            overflow: hidden;
         }
-        th, td {
-            border: 1px solid #e2e8f0;
+        .custom-table th, .custom-table td {
             padding: 1rem;
             text-align: left;
             font-size: 0.9rem;
+            border-bottom: 1px solid #e2e8f0;
         }
-        th {
-            background-color: #0156d2;
-            color: white;
+        .custom-table th {
+            background-color: #f8fafc;
+            color: #475569;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-        tbody tr:nth-child(even) {
-            background-color: #f8fafc;
+         .custom-table thead th:first-child {
+            border-top-left-radius: 0.75rem;
         }
-        tbody tr:hover {
-            background-color: #eff6ff;
+        .custom-table thead th:last-child {
+            border-top-right-radius: 0.75rem;
         }
-        .highlight {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            font-weight: 700;
-            text-align: center;
+         .custom-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 0.75rem;
         }
-        .ok {
-            background-color: #dcfce7;
-            color: #166534;
-            font-weight: 700;
-            text-align: center;
+        .custom-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 0.75rem;
+        }
+        .custom-table tbody tr:hover {
+            background-color: #f1f5f9;
+        }
+        .highlight-text {
+            color: #ef4444;
+            font-weight: 600;
+        }
+        .ok-text {
+            color: #22c55e;
+            font-weight: 600;
         }
     </style>
 </head>
 <body class="text-gray-800">
 
     <!-- Header Section -->
-    <header class="bg-white shadow-md sticky top-0 z-10">
+    <header class="bg-white shadow-sm sticky top-0 z-10">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="index.html" class="text-lg font-semibold text-gray-700 hover:text-[#0156d2] transition-colors duration-300">Home</a>
+            <a href="index.html" class="text-lg font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-300">Home</a>
         </nav>
     </header>
     
     <!-- Main Content -->
     <main class="container mx-auto px-4 sm:px-6 py-12">
-        <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg">
+        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-lg">
             
-            <h2 class="text-xl md:text-2xl font-semibold mt-8 mb-4 border-b-2 border-[#f4811f] pb-2 text-gray-700">Today's Timetable</h2>
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Today's Timetable</h2>
             
-            <!-- New Vertical Timetable -->
-            <div id="vertical-timetable" class="space-y-6">
+            <div id="vertical-timetable" class="space-y-4">
                 <!-- Timetable will be dynamically generated here -->
                 <p class="text-gray-500">Loading today's schedule...</p>
             </div>
             
-            <h2 class="text-xl md:text-2xl font-semibold mt-8 mb-4 border-b-2 border-[#f4811f] pb-2 text-gray-700">Attendance Record (Live)</h2>
-            <div class="max-w-2xl mx-auto">
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mt-12 mb-6">Attendance Record</h2>
+            <div class="bg-gray-50 p-4 rounded-xl">
                 <div class="overflow-x-auto">
-                    <table id="attendance-table">
+                    <table id="attendance-table" class="custom-table">
                         <thead>
                             <tr>
                                 <th>Code</th>
@@ -86,7 +89,7 @@
                                 <th>Attendance %</th>
                             </tr>
                         </thead>
-                        <tbody id="attendance-tbody">
+                        <tbody id="attendance-tbody" class="bg-white">
                             <!-- Attendance data will be dynamically rendered here -->
                         </tbody>
                     </table>
@@ -94,15 +97,16 @@
             </div>
 
             <!-- Collapsible Subjects Section -->
-            <div id="subjects-section" class="mt-8">
-                <h2 id="toggle-subjects" class="text-lg md:text-xl font-semibold mb-4 border-b-2 border-[#f4811f] pb-2 text-[#0156d2] hover:underline cursor-pointer flex justify-between items-center select-none">
-                    <span>Subjects, Faculty, and Classrooms</span>
-                    <svg id="subjects-arrow" class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </h2>
-                <div id="subjects-content" class="overflow-x-auto hidden transition-all duration-500">
-                    <div class="pt-4">
-                        <!-- Content remains the same -->
-                        <table>
+            <div id="subjects-section" class="mt-10">
+                <div id="toggle-subjects" class="p-4 rounded-xl hover:bg-gray-50 cursor-pointer flex justify-between items-center select-none transition-colors">
+                    <h2 class="text-lg font-semibold text-blue-600">
+                        View Subjects, Faculty, and Classrooms
+                    </h2>
+                    <svg id="subjects-arrow" class="w-6 h-6 transform transition-transform text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
+                <div id="subjects-content" class="overflow-x-auto hidden transition-all duration-500 mt-4">
+                     <div class="bg-gray-50 p-4 rounded-xl">
+                        <table class="custom-table bg-white">
                             <thead>
                                 <tr>
                                     <th>Code</th><th>Subject</th><th>L-T-P-C</th><th>Faculty(s)</th><th>Classroom(s)</th>
@@ -196,15 +200,15 @@
             for (const code in attendanceData) {
                 const data = attendanceData[code];
                 const percentage = data.classes > 0 ? ((data.present / data.classes) * 100).toFixed(2) : '0.00';
-                const percentageClass = percentage >= 75 ? 'ok' : 'highlight';
+                const percentageClass = percentage >= 75 ? 'ok-text' : 'highlight-text';
 
                 const row = `
                     <tr>
-                        <td class="font-semibold text-gray-800">${code}</td>
+                        <td class="font-semibold text-gray-700">${code}</td>
                         <td>${data.classes}</td>
                         <td>${data.present}</td>
                         <td>${data.absent}</td>
-                        <td class="${percentageClass}">${percentage}</td>
+                        <td class="${percentageClass} text-center">${percentage}%</td>
                     </tr>`;
                 tbody.innerHTML += row;
             }
@@ -220,7 +224,7 @@
 
             const todaysClasses = schedule[todayString] || [];
             if (todaysClasses.length === 0) {
-                timetableContainer.innerHTML = `<div class="text-center bg-white rounded-lg shadow-md p-8"><p class="text-lg font-semibold text-gray-500">No classes scheduled today.</p></div>`;
+                timetableContainer.innerHTML = `<div class="text-center bg-gray-50 rounded-2xl p-8"><p class="text-lg font-semibold text-gray-500">No classes scheduled today.</p></div>`;
                 return;
             }
 
@@ -233,16 +237,16 @@
                     status = docSnap.data().status;
                 }
 
-                let statusColorClass = 'border-gray-300';
+                let statusColorClass = 'border-gray-200';
                 if (status === 'attended') statusColorClass = 'border-green-500';
                 if (status === 'absent') statusColorClass = 'border-red-500';
 
                 html += `
-                    <div id="class-${cls.code}" class="class-item bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300" data-status="${status}">
-                        <div class="p-5 border-t-4 ${statusColorClass}">
+                    <div id="class-${cls.code}" class="class-item bg-white rounded-2xl shadow-sm border-l-4 ${statusColorClass} overflow-hidden transition-all duration-300" data-status="${status}">
+                        <div class="p-5">
                             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start">
                                 <div>
-                                    <p class="font-bold text-xl text-[#0156d2]">${cls.subject}</p>
+                                    <p class="font-bold text-xl text-gray-800">${cls.subject}</p>
                                     <div class="flex items-center text-gray-500 mt-2 text-sm space-x-4">
                                         <span class="flex items-center">
                                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -255,10 +259,10 @@
                                     </div>
                                 </div>
                                 <div class="mt-4 sm:mt-0 flex items-center justify-end space-x-2 flex-shrink-0">
-                                    <button class="mark-btn text-sm font-medium py-2 px-4 rounded-md bg-[#0156d2] text-white hover:bg-opacity-90 transition-colors" data-code="${cls.code}">Mark</button>
+                                    <button class="mark-btn text-sm font-medium py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors" data-code="${cls.code}">Mark</button>
                                     <div class="options hidden" data-code="${cls.code}">
-                                        <button class="attended-btn text-sm font-medium py-2 px-3 rounded-md bg-green-500 text-white hover:bg-green-600 flex items-center" data-code="${cls.code}"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Attended</button>
-                                        <button class="absent-btn text-sm font-medium py-2 px-3 rounded-md bg-red-500 text-white hover:bg-red-600 flex items-center" data-code="${cls.code}"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>Absent</button>
+                                        <button class="attended-btn text-sm font-medium py-2 px-3 rounded-lg bg-green-500 text-white hover:bg-green-600 flex items-center" data-code="${cls.code}"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Attended</button>
+                                        <button class="absent-btn text-sm font-medium py-2 px-3 rounded-lg bg-red-500 text-white hover:bg-red-600 flex items-center" data-code="${cls.code}"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>Absent</button>
                                     </div>
                                 </div>
                             </div>
@@ -304,10 +308,9 @@
                 classItem.dataset.status = newStatus; // Update status on the element
                 
                 // Update UI
-                const borderDiv = classItem.querySelector('.border-t-4');
-                borderDiv.classList.remove('border-gray-300', 'border-green-500', 'border-red-500');
-                if (newStatus === 'attended') borderDiv.classList.add('border-green-500');
-                else borderDiv.classList.add('border-red-500');
+                classItem.classList.remove('border-gray-200', 'border-green-500', 'border-red-500');
+                if (newStatus === 'attended') classItem.classList.add('border-green-500');
+                else classItem.classList.add('border-red-500');
                 
                 document.querySelector(`.options[data-code="${code}"]`).classList.add('hidden');
                 document.querySelector(`.mark-btn[data-code="${code}"]`).classList.remove('hidden');
@@ -346,8 +349,20 @@
             const arrow = document.getElementById('subjects-arrow');
 
             toggleButton.addEventListener('click', () => {
-                content.classList.toggle('hidden');
-                arrow.classList.toggle('rotate-180');
+                const isHidden = content.classList.contains('hidden');
+                if(isHidden) {
+                    content.classList.remove('hidden');
+                    setTimeout(() => {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        arrow.classList.add('rotate-180');
+                    }, 10);
+                } else {
+                    content.style.maxHeight = '0px';
+                    arrow.classList.remove('rotate-180');
+                     setTimeout(() => {
+                        content.classList.add('hidden');
+                    }, 500);
+                }
             });
 
             onAuthStateChanged(auth, (user) => {
