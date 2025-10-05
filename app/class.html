@@ -69,7 +69,8 @@
     <main class="container mx-auto px-4 sm:px-6 py-12">
         <div class="bg-white p-6 md:p-8 rounded-3xl shadow-lg">
             
-            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Today's Timetable</h2>
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Today's Timetable</h2>
+            <p id="current-date" class="text-md text-gray-500 mb-6"></p>
             
             <div id="vertical-timetable" class="space-y-4">
                 <!-- Timetable will be dynamically generated here -->
@@ -83,6 +84,7 @@
                         <thead>
                             <tr>
                                 <th>Code</th>
+                                <th>Subject</th>
                                 <th>Classes</th>
                                 <th>Present</th>
                                 <th>Absent</th>
@@ -112,28 +114,8 @@
                                     <th>Code</th><th>Subject</th><th>L-T-P-C</th><th>Faculty(s)</th><th>Classroom(s)</th>
                                 </tr>
                             </thead>
-                           <tbody>
-                                <tr>
-                                    <td>AEC 108</td><td>Problem Solving Skills</td><td>1-0-1-2</td><td>Mr. ISCP00005 (V00005)</td><td>S 606</td>
-                                </tr>
-                                <tr>
-                                    <td>CSC 201</td><td>Object Oriented Programming with C++</td><td>3-0-1-4</td><td>Dr. Asit Kumar Das, Dr. Prasant Kumar Mohanty</td><td>C 801, S 606</td>
-                                </tr>
-                                <tr>
-                                    <td>CSC 202</td><td>Digital Electronics</td><td>3-0-1-4</td><td>Dr. Jyotibhusan Padhi, Dr. Manoj Kumar Yadav, Dr. Ayoub Sofi</td><td>S 606, X 201</td>
-                                </tr>
-                                <tr>
-                                    <td>CSC 203</td><td>Design and Analysis of Algorithms</td><td>3-0-1-4</td><td>Dr. Asit Kumar Das, Dr. Niladri Sett</td><td>S 603, S 606</td>
-                                </tr>
-                                <tr>
-                                    <td>MGT 286</td><td>Sales and Relationship Marketing</td><td>3-0-0-3</td><td>Dr. Md Faiz Ahmad</td><td>C 608</td>
-                                </tr>
-                                <tr>
-                                    <td>SEC 102</td><td>Digital Literacy</td><td>1-0-2-2</td><td>Dr. Chinmoy Das</td><td>S 414</td>
-                                </tr>
-                                <tr>
-                                    <td>VAC 104</td><td>Community Service and Social Responsibility</td><td>0-0-2-0</td><td>-</td><td>-</td>
-                                </tr>
+                           <tbody id="subjects-tbody">
+                                <!-- Subject details will be loaded here -->
                            </tbody>
                         </table>
                     </div>
@@ -150,7 +132,7 @@
         // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, writeBatch, getDocs, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // Your Firebase configuration
         const firebaseConfig = {
@@ -169,58 +151,113 @@
         const db = getFirestore(app);
 
         let userId = null;
+        let scheduleCache = null;
+        let attendanceCache = null;
 
-        // --- DATA ---
-        const schedule = {
-            monday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "02:00-02:50", subject: "CSC 202", location: "S 606", code: "CSC202" }, { time: "03:00-03:50", subject: "AEC 108", location: "S 606", code: "AEC108" }, { time: "04:00-05:30", subject: "AEC 108", location: "S 606", code: "AEC108_2" },],
-            tuesday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "10:00-10:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "11:00-11:50", subject: "CSC 201", location: "S 606", code: "CSC201" }, { time: "01:00-01:50", subject: "CSC 203 Lab", location: "S 603", code: "CSC203L" }, { time: "02:00-02:50", subject: "CSC 203 Lab", location: "S 603", code: "CSC203L_2" },],
-            wednesday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "10:00-10:50", subject: "SEC 102", location: "S 414", code: "SEC102" }, { time: "11:00-11:50", subject: "SEC 102", location: "S 414", code: "SEC102_2" }, { time: "01:00-01:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "02:00-02:50", subject: "CSC 201", location: "S 606", code: "CSC201" }, { time: "03:00-03:50", subject: "CSC 201 Lab", location: "S 606", code: "CSC201L" }, { time: "04:00-05:30", subject: "VAC 104", location: "-", code: "VAC104" },],
-            thursday: [{ time: "09:00-09:50", subject: "AEC 108", location: "S 606", code: "AEC108" }, { time: "11:00-11:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "01:00-01:50", subject: "CSC 202 Lab", location: "X 201", code: "CSC202L" },],
-            friday: [{ time: "09:00-09:50", subject: "CSC 201 Lab", location: "C 801", code: "CSC201L" }, { time: "10:00-10:50", subject: "CSC 201 Lab", location: "C 801", code: "CSC201L_2" }, { time: "02:00-02:50", subject: "CSC 202", location: "S 606", code: "CSC202" },]
-        };
-        
-        const attendanceData = {
-            'AEC 108': { classes: 19, present: 12, absent: 7 },
-            'CSC 201': { classes: 34, present: 22, absent: 12 },
-            'CSC 202': { classes: 34, present: 27, absent: 7 },
-            'CSC 203': { classes: 34, present: 21, absent: 13 },
-            'MGT 286': { classes: 24, present: 13, absent: 11 },
-            'SEC 102': { classes: 8, present: 6, absent: 2 },
-            'VAC 104': { classes: 0, present: 0, absent: 0 },
+        // --- DATA FUNCTIONS ---
+        const seedInitialData = async (uid) => {
+            const batch = writeBatch(db);
+            
+            // Seed Schedule
+            const scheduleRef = collection(db, "users", uid, "classSchedule");
+            const defaultSchedule = {
+                monday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "02:00-02:50", subject: "CSC 202", location: "S 606", code: "CSC202" }, { time: "03:00-03:50", subject: "AEC 108", location: "S 606", code: "AEC108" }, { time: "04:00-05:30", subject: "AEC 108", location: "S 606", code: "AEC108_2" }],
+                tuesday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "10:00-10:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "11:00-11:50", subject: "CSC 201", location: "S 606", code: "CSC201" }, { time: "01:00-01:50", subject: "CSC 203 Lab", location: "S 603", code: "CSC203L" }, { time: "02:00-02:50", subject: "CSC 203 Lab", location: "S 603", code: "CSC203L_2" }],
+                wednesday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "10:00-10:50", subject: "SEC 102", location: "S 414", code: "SEC102" }, { time: "11:00-11:50", subject: "SEC 102", location: "S 414", code: "SEC102_2" }, { time: "01:00-01:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "02:00-02:50", subject: "CSC 201", location: "S 606", code: "CSC201" }, { time: "03:00-03:50", subject: "CSC 201 Lab", location: "S 606", code: "CSC201L" }, { time: "04:00-05:30", subject: "VAC 104", location: "-", code: "VAC104" }],
+                thursday: [{ time: "09:00-09:50", subject: "AEC 108", location: "S 606", code: "AEC108" }, { time: "11:00-11:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "01:00-01:50", subject: "CSC 202 Lab", location: "X 201", code: "CSC202L" }],
+                friday: [{ time: "09:00-09:50", subject: "CSC 201 Lab", location: "C 801", code: "CSC201L" }, { time: "10:00-10:50", subject: "CSC 201 Lab", location: "C 801", code: "CSC201L_2" }, { time: "02:00-02:50", subject: "CSC 202", location: "S 606", code: "CSC202" }]
+            };
+            batch.set(doc(scheduleRef, "weekly"), defaultSchedule);
+
+            // Seed Subject Info
+            const subjectsRef = collection(db, "users", uid, "subjects");
+            const subjectDetails = [
+                { id: "AEC108", code: "AEC 108", subject: "Problem Solving Skills", ltpc: "1-0-1-2", faculty: "Mr. ISCP00005 (V00005)", rooms: "S 606" },
+                { id: "CSC201", code: "CSC 201", subject: "Object Oriented Programming with C++", ltpc: "3-0-1-4", faculty: "Dr. Asit Kumar Das, Dr. Prasant Kumar Mohanty", rooms: "C 801, S 606" },
+                { id: "CSC202", code: "CSC 202", subject: "Digital Electronics", ltpc: "3-0-1-4", faculty: "Dr. Jyotibhusan Padhi, Dr. Manoj Kumar Yadav, Dr. Ayoub Sofi", rooms: "S 606, X 201" },
+                { id: "CSC203", code: "CSC 203", subject: "Design and Analysis of Algorithms", ltpc: "3-0-1-4", faculty: "Dr. Asit Kumar Das, Dr. Niladri Sett", rooms: "S 603, S 606" },
+                { id: "MGT286", code: "MGT 286", subject: "Sales and Relationship Marketing", ltpc: "3-0-0-3", faculty: "Dr. Md Faiz Ahmad", rooms: "C 608" },
+                { id: "SEC102", code: "SEC 102", subject: "Digital Literacy", ltpc: "1-0-2-2", faculty: "Dr. Chinmoy Das", rooms: "S 414" },
+                { id: "VAC104", code: "VAC 104", subject: "Community Service and Social Responsibility", ltpc: "0-0-2-0", faculty: "-", rooms: "-" }
+            ];
+            subjectDetails.forEach(sub => batch.set(doc(subjectsRef, sub.id), sub));
+
+            // Seed Attendance
+            const attendanceRef = doc(db, "users", uid, "attendance", "summary");
+             const defaultAttendance = {
+                'AEC 108': { classes: 19, present: 12, absent: 7 }, 'CSC 201': { classes: 34, present: 22, absent: 12 }, 'CSC 202': { classes: 34, present: 27, absent: 7 }, 'CSC 203': { classes: 34, present: 21, absent: 13 }, 'MGT 286': { classes: 24, present: 13, absent: 11 }, 'SEC 102': { classes: 8, present: 6, absent: 2 }, 'VAC 104': { classes: 0, present: 0, absent: 0 }
+            };
+            batch.set(attendanceRef, defaultAttendance);
+            
+            await batch.commit();
         };
 
-        const codeToSubjectMap = {
-            'AEC108': 'AEC 108', 'AEC108_2': 'AEC 108', 'CSC201': 'CSC 201', 'CSC201L': 'CSC 201', 'CSC201L_2': 'CSC 201', 'CSC202': 'CSC 202', 'CSC202L': 'CSC 202', 'CSC203': 'CSC 203', 'CSC203L': 'CSC 203', 'CSC203L_2': 'CSC 203', 'MGT286': 'MGT 286', 'SEC102': 'SEC 102', 'SEC102_2': 'SEC 102', 'VAC104': 'VAC 104',
+        const getSchedule = async (uid) => {
+            if (scheduleCache) return scheduleCache;
+            const docRef = doc(db, "users", uid, "classSchedule", "weekly");
+            const docSnap = await getDoc(docRef);
+            if (!docSnap.exists()) {
+                await seedInitialData(uid);
+                return getSchedule(uid);
+            }
+            scheduleCache = docSnap.data();
+            return scheduleCache;
         };
+
+        const getAttendance = async (uid) => {
+             if (attendanceCache) return attendanceCache;
+            const docRef = doc(db, "users", uid, "attendance", "summary");
+            const docSnap = await getDoc(docRef);
+            attendanceCache = docSnap.exists() ? docSnap.data() : {};
+            return attendanceCache;
+        };
+
+        const getSubjects = async(uid) => {
+            const querySnapshot = await getDocs(collection(db, "users", uid, "subjects"));
+            return querySnapshot.docs.map(doc => doc.data());
+        }
 
         // --- RENDERING FUNCTIONS ---
-        const renderAttendanceRecord = () => {
-            const tbody = document.getElementById('attendance-tbody');
-            tbody.innerHTML = ''; // Clear existing table
-            for (const code in attendanceData) {
-                const data = attendanceData[code];
-                const percentage = data.classes > 0 ? ((data.present / data.classes) * 100).toFixed(2) : '0.00';
-                const percentageClass = percentage >= 75 ? 'ok-text' : 'highlight-text';
+        const renderDateHeader = () => {
+            const dateEl = document.getElementById('current-date');
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateEl.textContent = now.toLocaleDateString('en-US', options);
+        };
 
-                const row = `
-                    <tr>
-                        <td class="font-semibold text-gray-700">${code}</td>
-                        <td>${data.classes}</td>
-                        <td>${data.present}</td>
-                        <td>${data.absent}</td>
-                        <td class="${percentageClass} text-center">${percentage}%</td>
-                    </tr>`;
-                tbody.innerHTML += row;
-            }
+        const renderAttendanceRecord = async (attendanceData) => {
+            const tbody = document.getElementById('attendance-tbody');
+            const subjects = await getSubjects(userId);
+
+            const fullAttendanceData = subjects.map(subj => {
+                const summary = attendanceData[subj.subject] || { classes: 0, present: 0, absent: 0 };
+                return { ...subj, ...summary };
+            });
+
+            tbody.innerHTML = fullAttendanceData.map(data => {
+                 const percentage = data.classes > 0 ? ((data.present / data.classes) * 100).toFixed(2) : '0.00';
+                 const percentageClass = percentage >= 75 ? 'ok-text' : 'highlight-text';
+                 return `<tr><td class="font-semibold text-gray-700">${data.code}</td><td>${data.subject}</td><td>${data.classes}</td><td>${data.present}</td><td>${data.absent}</td><td class="${percentageClass} text-center">${percentage}%</td></tr>`;
+            }).join('');
+        };
+
+        const renderSubjects = async(uid) => {
+            const subjects = await getSubjects(uid);
+            const tbody = document.getElementById('subjects-tbody');
+            tbody.innerHTML = subjects.map(s => `<tr><td>${s.code}</td><td>${s.subject}</td><td>${s.ltpc}</td><td>${s.faculty}</td><td>${s.rooms}</td></tr>`).join('');
         };
         
         const renderTimetable = async (uid) => {
             userId = uid;
+            const schedule = await getSchedule(uid);
             const timetableContainer = document.getElementById('vertical-timetable');
             const dayMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
             const today = new Date();
             const todayString = dayMap[today.getDay()];
             const dateString = today.toISOString().split('T')[0];
+            const dailyHistoryRef = doc(db, "users", uid, "dailyAttendance", dateString);
+            const dailyHistorySnap = await getDoc(dailyHistoryRef);
+            const dailyHistory = dailyHistorySnap.exists() ? dailyHistorySnap.data() : {};
 
             const todaysClasses = schedule[todayString] || [];
             if (todaysClasses.length === 0) {
@@ -230,93 +267,40 @@
 
             let html = '';
             for (const cls of todaysClasses) {
-                const docRef = doc(db, "attendance", userId, dateString, cls.code);
-                const docSnap = await getDoc(docRef);
-                let status = 'unmarked';
-                if (docSnap.exists()) {
-                    status = docSnap.data().status;
-                }
-
-                let statusColorClass = 'border-gray-200';
+                const status = dailyHistory[cls.code] || 'unmarked';
+                let statusColorClass = 'border-gray-300';
                 if (status === 'attended') statusColorClass = 'border-green-500';
                 if (status === 'absent') statusColorClass = 'border-red-500';
-
-                html += `
-                    <div id="class-${cls.code}" class="class-item bg-white rounded-2xl shadow-sm border-l-4 ${statusColorClass} overflow-hidden transition-all duration-300" data-status="${status}">
-                        <div class="p-5">
-                            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start">
-                                <div>
-                                    <p class="font-bold text-xl text-gray-800">${cls.subject}</p>
-                                    <div class="flex items-center text-gray-500 mt-2 text-sm space-x-4">
-                                        <span class="flex items-center">
-                                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                            ${cls.time}
-                                        </span>
-                                        <span class="flex items-center">
-                                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                            ${cls.location}
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="mt-4 sm:mt-0 flex items-center justify-end space-x-2 flex-shrink-0">
-                                    <button class="mark-btn text-sm font-medium py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors" data-code="${cls.code}">Mark</button>
-                                    <div class="options hidden" data-code="${cls.code}">
-                                        <button class="attended-btn text-sm font-medium py-2 px-3 rounded-lg bg-green-500 text-white hover:bg-green-600 flex items-center" data-code="${cls.code}"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Attended</button>
-                                        <button class="absent-btn text-sm font-medium py-2 px-3 rounded-lg bg-red-500 text-white hover:bg-red-600 flex items-center" data-code="${cls.code}"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>Absent</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
+                html += `<div id="class-${cls.code}" class="class-item bg-white rounded-2xl shadow-sm border-l-4 ${statusColorClass} overflow-hidden transition-all duration-300" data-status="${status}"><div class="p-5"><div class="flex flex-col sm:flex-row sm:justify-between sm:items-start"><div><p class="font-bold text-xl text-gray-800">${cls.subject}</p><div class="flex items-center text-gray-500 mt-2 text-sm space-x-4"><span class="flex items-center"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>${cls.time}</span><span class="flex items-center"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>${cls.location}</span></div></div><div class="mt-4 sm:mt-0 flex items-center justify-end space-x-2 flex-shrink-0"><button class="mark-btn text-sm font-medium py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors" data-code="${cls.code}" data-subject="${cls.subject}">Mark</button><div class="options hidden" data-code="${cls.code}"><button class="attended-btn text-sm font-medium py-2 px-3 rounded-lg bg-green-500 text-white hover:bg-green-600 flex items-center" data-code="${cls.code}" data-subject="${cls.subject}"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Attended</button><button class="absent-btn text-sm font-medium py-2 px-3 rounded-lg bg-red-500 text-white hover:bg-red-600 flex items-center" data-code="${cls.code}" data-subject="${cls.subject}"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>Absent</button></div></div></div></div></div>`;
             }
             timetableContainer.innerHTML = html;
             addEventListeners();
         };
 
         // --- LOGIC FUNCTIONS ---
-        const markAttendance = async (code, newStatus) => {
-            const today = new Date();
-            const dateString = today.toISOString().split('T')[0];
-            const docRef = doc(db, "attendance", userId, dateString, code);
+        const markAttendance = async (code, subject, newStatus) => {
+            const dateString = new Date().toISOString().split('T')[0];
+            const dailyHistoryRef = doc(db, "users", userId, "dailyAttendance", dateString);
+            
             const classItem = document.getElementById(`class-${code}`);
             const previousStatus = classItem.dataset.status;
 
-            if (previousStatus === newStatus) return; // No change
+            if (previousStatus === newStatus) return;
 
-            // Update attendance data object
-            const subjectName = codeToSubjectMap[code];
-            if (subjectName && attendanceData[subjectName]) {
-                const record = attendanceData[subjectName];
-                
-                // Adjust counts based on status change
-                if (previousStatus === 'unmarked') {
-                    record.classes++;
-                    if (newStatus === 'attended') record.present++;
-                    else record.absent++;
-                } else if (previousStatus === 'attended' && newStatus === 'absent') {
-                    record.present--;
-                    record.absent++;
-                } else if (previousStatus === 'absent' && newStatus === 'attended') {
-                    record.absent--;
-                    record.present++;
-                }
-            }
-
-            // Save to Firebase
             try {
-                await setDoc(docRef, { status: newStatus, timestamp: new Date() });
-                classItem.dataset.status = newStatus; // Update status on the element
-                
-                // Update UI
-                classItem.classList.remove('border-gray-200', 'border-green-500', 'border-red-500');
-                if (newStatus === 'attended') classItem.classList.add('border-green-500');
-                else classItem.classList.add('border-red-500');
-                
+                // Only save the daily status, do not modify the summary
+                await setDoc(dailyHistoryRef, { [code]: newStatus }, { merge: true });
+
+                // Manually update the UI for the card without a full re-render
+                classItem.dataset.status = newStatus;
+                classItem.classList.remove('border-gray-300', 'border-green-500', 'border-red-500');
+                if (newStatus === 'attended') {
+                    classItem.classList.add('border-green-500');
+                } else {
+                    classItem.classList.add('border-red-500');
+                }
                 document.querySelector(`.options[data-code="${code}"]`).classList.add('hidden');
                 document.querySelector(`.mark-btn[data-code="${code}"]`).classList.remove('hidden');
-
-                // Re-render the main attendance table
-                renderAttendanceRecord();
 
             } catch (e) {
                 console.error("Error updating document: ", e);
@@ -331,45 +315,43 @@
                     document.querySelector(`.options[data-code="${code}"]`).classList.remove('hidden');
                 });
             });
-            document.querySelectorAll('.attended-btn').forEach(button => {
-                button.addEventListener('click', (e) => markAttendance(e.target.dataset.code, 'attended'));
+            document.querySelectorAll('.attended-btn, .absent-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const { code, subject } = e.currentTarget.dataset;
+                    const newStatus = e.currentTarget.classList.contains('attended-btn') ? 'attended' : 'absent';
+                    markAttendance(code, subject, newStatus);
+                });
             });
-            document.querySelectorAll('.absent-btn').forEach(button => {
-                button.addEventListener('click', (e) => markAttendance(e.target.dataset.code, 'absent'));
-            });
+        };
+        
+        const renderDashboard = async (uid) => {
+            renderDateHeader();
+            const attendanceData = await getAttendance(uid);
+            await renderTimetable(uid);
+            await renderAttendanceRecord(attendanceData);
+            await renderSubjects(uid);
         };
 
         // --- INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Initial render of attendance table from static data
-            renderAttendanceRecord();
-            
             const toggleButton = document.getElementById('toggle-subjects');
             const content = document.getElementById('subjects-content');
             const arrow = document.getElementById('subjects-arrow');
 
             toggleButton.addEventListener('click', () => {
-                const isHidden = content.classList.contains('hidden');
-                if(isHidden) {
-                    content.classList.remove('hidden');
-                    setTimeout(() => {
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                        arrow.classList.add('rotate-180');
-                    }, 10);
-                } else {
-                    content.style.maxHeight = '0px';
-                    arrow.classList.remove('rotate-180');
-                     setTimeout(() => {
-                        content.classList.add('hidden');
-                    }, 500);
-                }
+                content.classList.toggle('hidden');
+                arrow.classList.toggle('rotate-180');
             });
 
-            onAuthStateChanged(auth, (user) => {
+            onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    renderTimetable(user.uid);
+                    userId = user.uid;
+                    await renderDashboard(userId);
                 } else {
-                    signInAnonymously(auth).catch((error) => console.error("Anonymous sign-in failed:", error));
+                    signInAnonymously(auth).catch((error) => {
+                         console.error("Anonymous sign-in failed:", error)
+                         document.body.innerHTML = `<div class="flex items-center justify-center h-screen bg-gray-100 text-center p-4"><div class="p-8 bg-white rounded-lg shadow-md"><h1 class="text-2xl font-bold text-red-600 mb-2">Connection Error</h1><p class="text-gray-600">Could not load your tasks. Please ensure you have enabled Anonymous Authentication in your Firebase project's sign-in methods and then refresh the page.</p></div></div>`;
+                    });
                 }
             });
         });
