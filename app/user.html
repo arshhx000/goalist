@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* Lighter gray background */
+        }
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.5s ease-out;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Main Content - Initially hidden until auth check -->
+    <div id="main-content" class="hidden flex-col min-h-screen">
+        <!-- Header Section -->
+        <header class="bg-white shadow-sm sticky top-0 z-20">
+            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                     <button id="notes-btn" class="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-[#0156d2] transition-colors" title="Open Notes">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                    </button>
+                </div>
+                <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-300 text-sm">
+                    Logout
+                </button>
+            </nav>
+        </header>
+
+        <!-- Main Dashboard -->
+        <main class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Left Column -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Today's Progress Section -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">Today's Progress</h2>
+                        <div id="progress-summary-container" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <!-- Goals Progress Ring -->
+                            <div class="flex items-center space-x-4">
+                                <div class="relative w-24 h-24">
+                                    <svg class="w-full h-full" viewBox="0 0 100 100">
+                                        <circle class="text-gray-200" stroke-width="10" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
+                                        <circle id="goals-progress-ring" class="progress-ring-circle text-[#0156d2]" stroke-width="10" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
+                                    </svg>
+                                    <div id="goals-summary-text" class="absolute inset-0 flex items-center justify-center text-xl font-bold text-[#0156d2]">0/3</div>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-700">Goals Completed</p>
+                                    <p class="text-sm text-gray-500">Daily objectives</p>
+                                </div>
+                            </div>
+                            <!-- Schedule Progress Ring -->
+                             <div class="flex items-center space-x-4">
+                                <div class="relative w-24 h-24">
+                                    <svg class="w-full h-full" viewBox="0 0 100 100">
+                                        <circle class="text-gray-200" stroke-width="10" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
+                                        <circle id="schedule-progress-ring" class="progress-ring-circle text-[#f4811f]" stroke-width="10" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
+                                    </svg>
+                                    <div id="schedule-summary-text" class="absolute inset-0 flex items-center justify-center text-xl font-bold text-[#f4811f]">0%</div>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-gray-700">Schedule Achieved</p>
+                                    <p class="text-sm text-gray-500">Based on timed tasks</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quote Slider -->
+                    <div class="relative bg-white p-6 rounded-xl shadow-sm text-center">
+                        <span id="view-count" class="absolute top-3 left-3 bg-[#f4811f] text-white text-xs font-semibold px-2 py-1 rounded-full"></span>
+                        <p id="quote-text" class="text-lg md:text-xl text-gray-700 min-h-[100px] flex items-center justify-center px-8"></p>
+                        <div class="absolute inset-y-0 left-2 flex items-center">
+                            <button id="prev-btn" class="p-2 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                            </button>
+                        </div>
+                        <div class="absolute inset-y-0 right-2 flex items-center">
+                             <button id="next-btn" class="p-2 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none transition-colors">
+                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="lg:col-span-1 space-y-8">
+                     <div class="bg-white p-6 rounded-xl shadow-sm">
+                        <h2 class="text-xl font-bold text-gray-800 mb-4">Navigation</h2>
+                        <div class="space-y-4">
+                            <a href="class.html" class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-blue-100 hover:shadow-md transition-all duration-300">
+                                <div class="bg-blue-500 text-white p-3 rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                                        <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222 4 2.222V20M1 12l11 6 11-6" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-800">Class Dashboard</p>
+                                    <p class="text-sm text-gray-500">View timetable & attendance</p>
+                                </div>
+                            </a>
+                            <a href="contact.html" class="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg hover:bg-orange-100 hover:shadow-md transition-all duration-300">
+                                <div class="bg-orange-500 text-white p-3 rounded-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-800">Daily Tasks</p>
+                                    <p class="text-sm text-gray-500">Track your schedule & goals</p>
+                                </div>
+                            </a>
+                        </div>
+                     </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notes Modal -->
+    <div id="notes-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-lg p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-2xl font-bold text-gray-800">My Notes</h3>
+                <button id="close-notes-btn" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            <textarea id="notes-textarea" class="w-full h-64 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#0156d2] focus:outline-none" placeholder="Write your notes here..."></textarea>
+            <div class="mt-4 flex justify-end">
+                <button id="save-notes-btn" class="bg-[#0156d2] hover:bg-orange-500 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        // --- Firebase Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyDX8H-_OfG4LMbPMji9IJEgHJfanyedEGY",
+          authDomain: "goalist-a6573.firebaseapp.com",
+          projectId: "goalist-a6573",
+          storageBucket: "goalist-a6573.appspot.com",
+          messagingSenderId: "850792903925",
+          appId: "1:850792903925:web:8bdf55f3de7926b19e81bc",
+          measurementId: "G-HZQ897N97C"
+        };
+        
+        // --- Initialize Firebase ---
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let userId = null;
+
+        // --- Auth Guard ---
+        const mainContent = document.getElementById('main-content');
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userId = user.uid;
+                // User is signed in, show the main content.
+                mainContent.classList.remove('hidden');
+                mainContent.classList.add('flex');
+                showQuote(currentQuoteIndex);
+                loadNotes();
+                loadProgressSummary();
+            } else {
+                // User is signed out, redirect to login page.
+                window.location.href = 'index.html';
+            }
+        });
+        
+        // --- Progress Ring Logic ---
+        const setProgressRing = (ringId, textId, percentage) => {
+            const ring = document.getElementById(ringId);
+            const text = document.getElementById(textId);
+            if (!ring || !text) return;
+
+            const radius = ring.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (percentage / 100) * circumference;
+
+            ring.style.strokeDasharray = `${circumference} ${circumference}`;
+            ring.style.strokeDashoffset = offset;
+            
+            if(textId.includes('schedule')) {
+                 text.textContent = `${Math.round(percentage)}%`;
+            }
+        };
+
+        // --- Progress Summary Logic ---
+        const loadProgressSummary = async () => {
+            if (!userId) return;
+
+            const goalsSummaryTextEl = document.getElementById('goals-summary-text');
+            const todayKey = new Date().toISOString().split('T')[0];
+
+            // Calculate goals progress
+            try {
+                const goalsRef = collection(db, 'users', userId, 'goals');
+                const goalsSnapshot = await getDocs(goalsRef);
+                let completedGoals = 0;
+                let totalGoals = 0;
+                goalsSnapshot.forEach((doc) => {
+                    totalGoals++;
+                    if (doc.data().lastCompleted === todayKey) {
+                        completedGoals++;
+                    }
+                });
+                goalsSummaryTextEl.textContent = `${completedGoals}/${totalGoals}`;
+                const goalPercentage = totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
+                setProgressRing('goals-progress-ring', 'goals-summary-text', goalPercentage);
+
+            } catch (error) {
+                console.error("Error loading goals summary:", error);
+            }
+
+            // Calculate schedule progress
+            try {
+                const scheduleRef = collection(db, 'users', userId, 'schedule');
+                const scheduleSnapshot = await getDocs(scheduleRef);
+                const totalTasks = scheduleSnapshot.size;
+
+                const historyDocRef = doc(db, 'users', userId, 'taskHistory', todayKey);
+                const historySnapshot = await getDoc(historyDocRef);
+                
+                let achievedTasks = 0;
+                if (historySnapshot.exists() && historySnapshot.data().statuses) {
+                    const statuses = historySnapshot.data().statuses;
+                    achievedTasks = Object.values(statuses).filter(s => s === 'achieved').length;
+                }
+                
+                const percentage = totalTasks > 0 ? (achievedTasks / totalTasks) * 100 : 0;
+                setProgressRing('schedule-progress-ring', 'schedule-summary-text', percentage);
+
+            } catch (error) {
+                console.error("Error loading schedule summary:", error);
+            }
+        };
+
+        // --- Logout Logic ---
+        const logoutBtn = document.getElementById('logout-btn');
+        logoutBtn.addEventListener('click', async () => {
+            await signOut(auth);
+        });
+
+        // --- Notes Modal Logic ---
+        const notesBtn = document.getElementById('notes-btn');
+        const notesModal = document.getElementById('notes-modal');
+        const closeNotesBtn = document.getElementById('close-notes-btn');
+        const saveNotesBtn = document.getElementById('save-notes-btn');
+        const notesTextarea = document.getElementById('notes-textarea');
+
+        notesBtn.addEventListener('click', () => notesModal.classList.remove('hidden'));
+        closeNotesBtn.addEventListener('click', () => notesModal.classList.add('hidden'));
+
+        saveNotesBtn.addEventListener('click', async () => {
+            if (!userId) return;
+            const notesContent = notesTextarea.value;
+            const notesDocRef = doc(db, 'users', userId, 'notes', 'main');
+            await setDoc(notesDocRef, { content: notesContent, lastUpdated: new Date() });
+            notesModal.classList.add('hidden');
+        });
+
+        const loadNotes = async () => {
+            if (!userId) return;
+            const notesDocRef = doc(db, 'users', userId, 'notes', 'main');
+            const docSnap = await getDoc(notesDocRef);
+            if (docSnap.exists()) {
+                notesTextarea.value = docSnap.data().content;
+            }
+        };
+
+        // --- Quote Slider Script ---
+        const quotes = [
+            "The only way to do great work is to love what you do.", "Innovation distinguishes between a leader and a follower.", "Strive not to be a success, but rather to be of value.", "The mind is everything. What you think you become.", "Your time is limited, don't waste it living someone else's life.", "The best way to predict the future is to create it.", "Success is not final, failure is not fatal: it is the courage to continue that counts.", "Believe you can and you're halfway there.", "The future belongs to those who believe in the beauty of their dreams.", "It does not matter how slowly you go as long as you do not stop.", "Everything you’ve ever wanted is on the other side of fear.", "Hardships often prepare ordinary people for an extraordinary destiny.", "The only limit to our realization of tomorrow will be our doubts of today."
+        ];
+
+        let currentQuoteIndex = 0;
+        const quoteTextElement = document.getElementById('quote-text');
+        const viewCountElement = document.getElementById('view-count');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        const getViewCounts = () => JSON.parse(localStorage.getItem('quoteViewCounts')) || new Array(quotes.length).fill(0);
+        const saveViewCounts = (counts) => localStorage.setItem('quoteViewCounts', JSON.stringify(counts));
+
+        const showQuote = (index) => {
+            quoteTextElement.textContent = quotes[index];
+            const counts = getViewCounts();
+            counts[index]++;
+            saveViewCounts(counts);
+            viewCountElement.textContent = `Viewed: ${counts[index]}`;
+        };
+
+        prevBtn.addEventListener('click', () => {
+            currentQuoteIndex = (currentQuoteIndex - 1 + quotes.length) % quotes.length;
+            showQuote(currentQuoteIndex);
+        });
+
+        nextBtn.addEventListener('click', () => {
+            currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+            showQuote(currentQuoteIndex);
+        });
+    </script>
+</body>
+</html>
+
