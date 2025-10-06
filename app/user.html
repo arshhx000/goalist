@@ -33,6 +33,23 @@
         .animate-enter {
             opacity: 0;
         }
+
+        .modal-enter {
+            animation: modal-enter-animation 0.3s ease-out forwards;
+        }
+        .modal-content-enter {
+             animation: enter-animation 0.3s ease-out 0.1s forwards;
+             opacity: 0;
+        }
+        @keyframes modal-enter-animation {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        .note-card {
+            animation: enter-animation 0.4s ease-out forwards;
+            opacity: 0;
+        }
+
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -97,34 +114,57 @@
         </main>
     </div>
 
+    <!-- Floating Action Button for Notes -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-30">
+        <button id="open-notes-btn" class="w-16 h-16 bg-blue-500 hover:bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-110" aria-label="Open Notes">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Notes Modal -->
+    <div id="notes-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center p-4 modal-enter">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" id="modal-backdrop"></div>
+        <div class="bg-white/80 backdrop-blur-md border border-white/30 rounded-2xl shadow-2xl w-full max-w-2xl p-6 relative modal-content-enter flex flex-col" style="max-height: 90vh;">
+            <div class="flex-shrink-0">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-2xl font-bold text-gray-800">Reminders & Notes</h3>
+                    <button id="close-notes-btn" class="text-gray-400 hover:text-gray-700 text-3xl leading-none">&times;</button>
+                </div>
+                <!-- Add New Note Form -->
+                <form id="add-note-form" class="bg-white/50 p-4 rounded-lg mb-4">
+                    <textarea id="note-content" class="w-full p-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none bg-transparent" placeholder="Write a new note..." rows="2" required></textarea>
+                    <div class="flex items-center justify-between mt-2">
+                        <div class="flex items-center space-x-4">
+                            <div>
+                                <label for="note-deadline" class="text-sm font-medium text-gray-600">Deadline:</label>
+                                <input type="date" id="note-deadline" class="p-1 border border-gray-300 rounded-md text-sm">
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-600">Priority:</label>
+                                <select id="note-priority" class="p-1 border border-gray-300 rounded-md text-sm">
+                                    <option value="Chill">Chill</option>
+                                    <option value="Important">Important</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition-colors">Add Note</button>
+                    </div>
+                </form>
+            </div>
+            <!-- Notes List -->
+            <div id="notes-list-container" class="flex-grow overflow-y-auto pr-2 space-y-3">
+                <!-- Notes will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+
     <script>
         // --- Quote Slider Script ---
         const quotes = [
-            "Do not go near adultery; it is truly a shameful deed and an evil way. (17:32)",
-            "Allah loves to see one’s job done with itqan (meticulous excellence).",
-            "When one task is finished, immediately “strive on” into the next, reducing procrastination by keeping momentum. (94:7–8)",
-            "Aim for itqan: set a clear definition of “done well,” review work, and refine, seeking the love of Allah for excellent effort.",
-            "Actions are only by intentions, and each person will have only what he intended…",
-            "Allah does not look at your appearance or wealth, but He looks at your hearts and your deeds.",
-            "Surely, with hardship comes ease; surely, with that hardship comes more ease.",
-            "When finished with one duty, strive on; and to the Lord turn with longing.",
-            "Do not despair; return to Allah with repentance and hope, trusting His promise of forgiveness and relief.",
-            "Aim for إتقان (itqān)—doing work with excellence—as a Prophetic ethic that turns effort into worship.",
-            "Say: Work, for Allah will see your deeds” (9:105), which turns daily work into accountable worship and fuels consistent quality.",
-            "And when your Lord proclaimed: If you are grateful, I will surely increase you.",
-            "We are what we repeatedly do. Excellence, then, is not an act, but a habit. — Aristotle",
-            "The secret of getting ahead is getting started. — Mark Twain",
-            "You do not rise to the level of your goals. You fall to the level of your systems. — James Clear",
-            "Amateurs sit and wait for inspiration, the rest of us just get up and go to work. — Stephen King",
-            "Well done is better than well said. — Benjamin Franklin",
-            "You have a right to perform your prescribed duties, but you are not entitled to the fruits of your actions. — The Bhagavad Gita",
-            "Arise, awake, and stop not till the goal is reached. — Swami Vivekananda",
-            "The mind is everything. What you think you become. — Gautama Buddha",
-            "A man is great by deeds, not by birth. — Chanakya",
-            "To make a deep mental path, we must think over and over the kind of thoughts we wish to dominate our lives. — Henry David Thoreau",
-            "The chains of habit are too weak to be felt until they are too strong to be broken. — Samuel Johnson",
-            "The first principle is that you must not fool yourself – and you are the easiest person to fool. — Richard Feynman",
-            "Success is not final, failure is not fatal: it is the courage to continue that counts. — Winston Churchill"
+            "Do not go near adultery; it is truly a shameful deed and an evil way. (17:32)", "Allah loves to see one’s job done with itqan (meticulous excellence).", "When one task is finished, immediately “strive on” into the next, reducing procrastination by keeping momentum. (94:7–8)", "Aim for itqan: set a clear definition of “done well,” review work, and refine, seeking the love of Allah for excellent effort.", "Actions are only by intentions, and each person will have only what he intended…", "Allah does not look at your appearance or wealth, but He looks at your hearts and your deeds.", "Surely, with hardship comes ease; surely, with that hardship comes more ease.", "When finished with one duty, strive on; and to the Lord turn with longing.", "Do not despair; return to Allah with repentance and hope, trusting His promise of forgiveness and relief.", "Aim for إتقان (itqān)—doing work with excellence—as a Prophetic ethic that turns effort into worship.", "Say: Work, for Allah will see your deeds” (9:105), which turns daily work into accountable worship and fuels consistent quality.", "And when your Lord proclaimed: If you are grateful, I will surely increase you.", "We are what we repeatedly do. Excellence, then, is not an act, but a habit. — Aristotle", "The secret of getting ahead is getting started. — Mark Twain", "You do not rise to the level of your goals. You fall to the level of your systems. — James Clear", "Amateurs sit and wait for inspiration, the rest of us just get up and go to work. — Stephen King", "Well done is better than well said. — Benjamin Franklin", "You have a right to perform your prescribed duties, but you are not entitled to the fruits of your actions. — The Bhagavad Gita", "Arise, awake, and stop not till the goal is reached. — Swami Vivekananda", "The mind is everything. What you think you become. — Gautama Buddha", "A man is great by deeds, not by birth. — Chanakya", "To make a deep mental path, we must think over and over the kind of thoughts we wish to dominate our lives. — Henry David Thoreau", "The chains of habit are too weak to be felt until they are too strong to be broken. — Samuel Johnson", "The first principle is that you must not fool yourself – and you are the easiest person to fool. — Richard Feynman", "Success is not final, failure is not fatal: it is the courage to continue that counts. — Winston Churchill"
         ];
 
         let currentQuoteIndex = -1; // Use -1 to ensure the first quote is always new
@@ -137,46 +177,129 @@
         const saveViewCounts = (counts) => localStorage.setItem('quoteViewCounts', JSON.stringify(counts));
 
         const showQuote = (index) => {
-            // Fade out the text
             quoteTextElement.classList.add('opacity-0');
-            
             setTimeout(() => {
-                // Update the content after fade out
                 quoteTextElement.textContent = quotes[index];
                 const counts = getViewCounts();
                 counts[index]++;
                 saveViewCounts(counts);
                 viewCountElement.textContent = counts[index];
-                
-                // Fade the text back in
                 quoteTextElement.classList.remove('opacity-0');
-            }, 300); // Duration should match the CSS transition
+            }, 300);
         };
         
         const showRandomQuote = () => {
-            if (quotes.length <= 1) {
-                showQuote(0);
-                return;
-            }
+            if (quotes.length <= 1) { showQuote(0); return; }
             let newIndex;
-            do {
-                newIndex = Math.floor(Math.random() * quotes.length);
-            } while (newIndex === currentQuoteIndex); // Ensure the new quote is different from the current one
-
+            do { newIndex = Math.floor(Math.random() * quotes.length); } while (newIndex === currentQuoteIndex);
             currentQuoteIndex = newIndex;
             showQuote(currentQuoteIndex);
         };
 
-        // Initialize slider on page load with a random quote
-        document.addEventListener('DOMContentLoaded', () => {
-            showRandomQuote();
+        // --- Notes Modal Script ---
+        const openNotesBtn = document.getElementById('open-notes-btn');
+        const closeNotesBtn = document.getElementById('close-notes-btn');
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const addNoteForm = document.getElementById('add-note-form');
+        const notesModal = document.getElementById('notes-modal');
+        const notesListContainer = document.getElementById('notes-list-container');
+        const NOTES_KEY = 'dashboard_notes_list';
+
+        const loadNotes = () => JSON.parse(localStorage.getItem(NOTES_KEY)) || [];
+        const saveNotes = (notes) => localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+
+        const renderNotes = () => {
+            const notes = loadNotes();
+            
+            // Sort notes: Important first, then by deadline
+            notes.sort((a, b) => {
+                if (a.priority === 'Important' && b.priority !== 'Important') return -1;
+                if (a.priority !== 'Important' && b.priority === 'Important') return 1;
+                if (a.deadline && b.deadline) return new Date(a.deadline) - new Date(b.deadline);
+                if (a.deadline) return -1;
+                if (b.deadline) return 1;
+                return b.id - a.id; // Fallback to newest first
+            });
+
+            notesListContainer.innerHTML = '';
+            if (notes.length === 0) {
+                notesListContainer.innerHTML = `<p class="text-center text-gray-500 py-8">No notes yet. Add one above!</p>`;
+                return;
+            }
+
+            notes.forEach(note => {
+                const isImportant = note.priority === 'Important';
+                const deadlineFormatted = note.deadline ? new Date(note.deadline + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+                const isPastDue = note.deadline && new Date(note.deadline) < new Date().setHours(0,0,0,0);
+
+                const card = `
+                    <div class="note-card bg-white/60 p-4 rounded-lg flex justify-between items-start gap-4">
+                        <div class="flex-grow">
+                            <p class="text-gray-800">${note.content.replace(/\n/g, '<br>')}</p>
+                            <div class="flex items-center space-x-3 mt-2 text-sm">
+                                ${note.deadline ? `
+                                <span class="flex items-center ${isPastDue ? 'text-red-500 font-semibold' : 'text-gray-500'}">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                    ${deadlineFormatted}
+                                </span>` : ''}
+                                <span class="px-2 py-0.5 rounded-full text-xs font-medium ${isImportant ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}">
+                                    ${note.priority}
+                                </span>
+                            </div>
+                        </div>
+                        <button class="delete-note-btn flex-shrink-0 text-gray-400 hover:text-red-500 p-1" data-id="${note.id}">
+                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                `;
+                notesListContainer.innerHTML += card;
+            });
+        };
+        
+        addNoteForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const content = document.getElementById('note-content').value;
+            const deadline = document.getElementById('note-deadline').value;
+            const priority = document.getElementById('note-priority').value;
+            if (!content) return;
+
+            const newNote = {
+                id: Date.now(),
+                content,
+                deadline: deadline || null,
+                priority,
+            };
+
+            const notes = loadNotes();
+            notes.push(newNote);
+            saveNotes(notes);
+            renderNotes();
+            addNoteForm.reset();
         });
 
-        prevBtn.addEventListener('click', showRandomQuote);
+        notesListContainer.addEventListener('click', (e) => {
+            const deleteBtn = e.target.closest('.delete-note-btn');
+            if (deleteBtn) {
+                const noteId = Number(deleteBtn.dataset.id);
+                let notes = loadNotes();
+                notes = notes.filter(note => note.id !== noteId);
+                saveNotes(notes);
+                renderNotes();
+            }
+        });
 
+        // Initialize and handle modal state
+        document.addEventListener('DOMContentLoaded', () => {
+            showRandomQuote();
+            renderNotes();
+        });
+        prevBtn.addEventListener('click', showRandomQuote);
         nextBtn.addEventListener('click', showRandomQuote);
+        openNotesBtn.addEventListener('click', () => notesModal.classList.remove('hidden'));
+        closeNotesBtn.addEventListener('click', () => notesModal.classList.add('hidden'));
+        modalBackdrop.addEventListener('click', () => notesModal.classList.add('hidden'));
+
     </script>
 </body>
 </html>
-
 
