@@ -69,8 +69,7 @@
     <main class="container mx-auto px-4 sm:px-6 py-12">
         <div class="bg-white p-6 md:p-8 rounded-3xl shadow-lg">
             
-            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Today's Timetable</h2>
-            <p id="current-date" class="text-md text-gray-500 mb-6"></p>
+            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Today's Timetable</h2>
             
             <div id="vertical-timetable" class="space-y-4">
                 <!-- Timetable will be dynamically generated here -->
@@ -218,27 +217,24 @@
         }
 
         // --- RENDERING FUNCTIONS ---
-        const renderDateHeader = () => {
-            const dateEl = document.getElementById('current-date');
-            const now = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            dateEl.textContent = now.toLocaleDateString('en-US', options);
-        };
-
-        const renderAttendanceRecord = async (attendanceData) => {
+        const renderAttendanceRecord = (attendanceData) => {
             const tbody = document.getElementById('attendance-tbody');
-            const subjects = await getSubjects(userId);
-
-            const fullAttendanceData = subjects.map(subj => {
-                const summary = attendanceData[subj.subject] || { classes: 0, present: 0, absent: 0 };
-                return { ...subj, ...summary };
-            });
-
-            tbody.innerHTML = fullAttendanceData.map(data => {
-                 const percentage = data.classes > 0 ? ((data.present / data.classes) * 100).toFixed(2) : '0.00';
-                 const percentageClass = percentage >= 75 ? 'ok-text' : 'highlight-text';
-                 return `<tr><td class="font-semibold text-gray-700">${data.code}</td><td>${data.subject}</td><td>${data.classes}</td><td>${data.present}</td><td>${data.absent}</td><td class="${percentageClass} text-center">${percentage}%</td></tr>`;
-            }).join('');
+            tbody.innerHTML = '';
+            for (const subjectName in attendanceData) {
+                const data = attendanceData[subjectName];
+                const percentage = data.classes > 0 ? ((data.present / data.classes) * 100).toFixed(2) : '0.00';
+                const percentageClass = percentage >= 75 ? 'ok-text' : 'highlight-text';
+                const row = `<tr><td class="font-semibold text-gray-700">${data.code || subjectName}</td><td>${data.subject}</td><td>${data.classes}</td><td>${data.present}</td><td>${data.absent}</td><td class="${percentageClass} text-center">${percentage}%</td></tr>`;
+                const fullAttendanceData = (await getSubjects(userId)).reduce((acc, subj) => {
+                    acc[subj.subject] = { ...subj, ...(attendanceData[subj.subject] || { classes: 0, present: 0, absent: 0})};
+                    return acc;
+                }, {});
+                tbody.innerHTML = Object.values(fullAttendanceData).map(data => {
+                     const percentage = data.classes > 0 ? ((data.present / data.classes) * 100).toFixed(2) : '0.00';
+                     const percentageClass = percentage >= 75 ? 'ok-text' : 'highlight-text';
+                     return `<tr><td class="font-semibold text-gray-700">${data.code}</td><td>${data.subject}</td><td>${data.classes}</td><td>${data.present}</td><td>${data.absent}</td><td class="${percentageClass} text-center">${percentage}%</td></tr>`;
+                }).join('');
+            }
         };
 
         const renderSubjects = async(uid) => {
@@ -271,6 +267,7 @@
                 let statusColorClass = 'border-gray-300';
                 if (status === 'attended') statusColorClass = 'border-green-500';
                 if (status === 'absent') statusColorClass = 'border-red-500';
+                // HTML structure from your provided file
                 html += `<div id="class-${cls.code}" class="class-item bg-white rounded-2xl shadow-sm border-l-4 ${statusColorClass} overflow-hidden transition-all duration-300" data-status="${status}"><div class="p-5"><div class="flex flex-col sm:flex-row sm:justify-between sm:items-start"><div><p class="font-bold text-xl text-gray-800">${cls.subject}</p><div class="flex items-center text-gray-500 mt-2 text-sm space-x-4"><span class="flex items-center"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>${cls.time}</span><span class="flex items-center"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>${cls.location}</span></div></div><div class="mt-4 sm:mt-0 flex items-center justify-end space-x-2 flex-shrink-0"><button class="mark-btn text-sm font-medium py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors" data-code="${cls.code}" data-subject="${cls.subject}">Mark</button><div class="options hidden" data-code="${cls.code}"><button class="attended-btn text-sm font-medium py-2 px-3 rounded-lg bg-green-500 text-white hover:bg-green-600 flex items-center" data-code="${cls.code}" data-subject="${cls.subject}"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Attended</button><button class="absent-btn text-sm font-medium py-2 px-3 rounded-lg bg-red-500 text-white hover:bg-red-600 flex items-center" data-code="${cls.code}" data-subject="${cls.subject}"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>Absent</button></div></div></div></div></div>`;
             }
             timetableContainer.innerHTML = html;
@@ -281,27 +278,32 @@
         const markAttendance = async (code, subject, newStatus) => {
             const dateString = new Date().toISOString().split('T')[0];
             const dailyHistoryRef = doc(db, "users", userId, "dailyAttendance", dateString);
+            const attendanceSummaryRef = doc(db, "users", userId, "attendance", "summary");
             
             const classItem = document.getElementById(`class-${code}`);
             const previousStatus = classItem.dataset.status;
 
             if (previousStatus === newStatus) return;
 
+            const attendanceSummary = await getAttendance(userId);
+            const record = attendanceSummary[subject];
+
+            if (previousStatus === 'unmarked') {
+                if (newStatus === 'attended') record.present++; else record.absent++;
+            } else if (previousStatus === 'attended' && newStatus === 'absent') {
+                record.present--; record.absent++;
+            } else if (previousStatus === 'absent' && newStatus === 'attended') {
+                record.absent--; record.present++;
+            }
+
             try {
-                // Only save the daily status, do not modify the summary
-                await setDoc(dailyHistoryRef, { [code]: newStatus }, { merge: true });
+                const batch = writeBatch(db);
+                batch.set(dailyHistoryRef, { [code]: newStatus }, { merge: true });
+                batch.set(attendanceSummaryRef, { [subject]: record }, { merge: true });
+                await batch.commit();
 
-                // Manually update the UI for the card without a full re-render
-                classItem.dataset.status = newStatus;
-                classItem.classList.remove('border-gray-300', 'border-green-500', 'border-red-500');
-                if (newStatus === 'attended') {
-                    classItem.classList.add('border-green-500');
-                } else {
-                    classItem.classList.add('border-red-500');
-                }
-                document.querySelector(`.options[data-code="${code}"]`).classList.add('hidden');
-                document.querySelector(`.mark-btn[data-code="${code}"]`).classList.remove('hidden');
-
+                attendanceCache = null; // Invalidate cache
+                renderDashboard(userId); // Re-render everything
             } catch (e) {
                 console.error("Error updating document: ", e);
             }
@@ -325,10 +327,9 @@
         };
         
         const renderDashboard = async (uid) => {
-            renderDateHeader();
             const attendanceData = await getAttendance(uid);
             await renderTimetable(uid);
-            await renderAttendanceRecord(attendanceData);
+            renderAttendanceRecord(attendanceData);
             await renderSubjects(uid);
         };
 
