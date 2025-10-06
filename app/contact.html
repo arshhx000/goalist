@@ -25,10 +25,10 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
         }
-        .status-btn {
+        .status-btn, .delete-btn {
             transition: all 0.2s ease-in-out;
         }
-        .status-btn:hover {
+        .status-btn:hover, .delete-btn:hover {
             transform: scale(1.05);
         }
         .modal {
@@ -165,7 +165,7 @@
         // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, writeBatch, getDocs, query, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, writeBatch, getDocs, query, orderBy, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // Firebase config
         const firebaseConfig = {
@@ -228,15 +228,17 @@
                 const endTime24 = document.getElementById('task-end-time').value;
 
                 const formatTime12h = (t) => { let [h, m] = t.split(':'); return `${(h % 12 || 12)}:${m} ${h >= 12 ? 'PM' : 'AM'}`; };
-                const newTask = { name: taskName, startTime: formatTime12h(startTime24), endTime: formatTime12h(endTime24), order: Date.now() };
+                
+                const dateKey = getTodaysDateKey();
+                const newDailyTask = { name: taskName, startTime: formatTime12h(startTime24), endTime: formatTime12h(endTime24) };
                 
                 try {
-                    await addDoc(collection(db, 'users', userId, 'schedule'), newTask);
+                    await addDoc(collection(db, 'users', userId, 'dailyTasks', dateKey, 'tasks'), newDailyTask);
                     scheduleCache = [];
                     await updateDashboard();
                     addTaskModal.classList.add('hidden');
                     addTaskForm.reset();
-                } catch (error) { console.error("Error adding task: ", error); }
+                } catch (error) { console.error("Error adding daily task: ", error); }
             });
             
             // --- Copy Data Logic ---
@@ -244,7 +246,7 @@
                 if (!userId) return;
                 
                 const dateKey = getTodaysDateKey();
-                const dailyTasks = await getSchedule(userId);
+                const dailyTasks = await getCombinedSchedule(userId);
                 const statuses = await getTaskStatuses(userId, dateKey);
 
                 let summary = `Daily Summary for ${new Date().toLocaleDateString('en-US', { dateStyle: 'full' })}\n\n--- Schedule ---\n`;
@@ -271,25 +273,33 @@
                 return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
             };
 
-            const seedInitialSchedule = async (uid) => {
-                const scheduleRef = collection(db, 'users', uid, 'schedule');
+            const seedInitialDefaultSchedule = async (uid) => {
+                const scheduleRef = collection(db, 'users', uid, 'defaultSchedule');
                 const batch = writeBatch(db);
                 const defaultSchedule = [
-                    { name: 'Gym Session', startTime: '06:30 AM', endTime: '07:30 AM', order: 1 }, { name: 'Breakfast', startTime: '07:30 AM', endTime: '08:00 AM', order: 2 }, { name: 'Personal Work', startTime: '08:00 AM', endTime: '09:00 AM', order: 3 }, { name: 'College', startTime: '09:00 AM', endTime: '05:00 PM', order: 4 },
+                    { name: 'Gym Session', startTime: '06:30 AM', endTime: '07:30 AM' }, { name: 'Breakfast', startTime: '07:30 AM', endTime: '08:00 AM' }, { name: 'Personal Work', startTime: '08:00 AM', endTime: '09:00 AM' }, { name: 'College', startTime: '09:00 AM', endTime: '05:00 PM' },
                 ];
                 defaultSchedule.forEach(task => batch.set(doc(scheduleRef), task));
                 await batch.commit();
             };
 
-            const getSchedule = async (uid) => {
+            const getCombinedSchedule = async (uid) => {
                 if (scheduleCache.length > 0) return scheduleCache;
-                const q = query(collection(db, 'users', uid, 'schedule'), orderBy("order"));
-                const querySnapshot = await getDocs(q);
-                if (querySnapshot.empty) {
-                    await seedInitialSchedule(uid);
-                    return getSchedule(uid);
+                
+                const defaultScheduleQuery = query(collection(db, 'users', uid, 'defaultSchedule'));
+                const defaultSnapshot = await getDocs(defaultScheduleQuery);
+                if (defaultSnapshot.empty) {
+                    await seedInitialDefaultSchedule(uid);
+                    return getCombinedSchedule(uid);
                 }
-                scheduleCache = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const defaultTasks = defaultSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), isDefault: true }));
+
+                const dateKey = getTodaysDateKey();
+                const dailyTasksQuery = query(collection(db, 'users', uid, 'dailyTasks', dateKey, 'tasks'));
+                const dailySnapshot = await getDocs(dailyTasksQuery);
+                const dailyTasks = dailySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), isDefault: false }));
+                
+                scheduleCache = [...defaultTasks, ...dailyTasks].sort((a, b) => parseTime(a.startTime) - parseTime(b.startTime));
                 return scheduleCache;
             };
 
@@ -302,7 +312,7 @@
                 try {
                     if (!userId) return;
                 
-                    const dailyTasks = await getSchedule(userId);
+                    const dailyTasks = await getCombinedSchedule(userId);
                     const dateKey = getTodaysDateKey();
                     const statuses = await getTaskStatuses(userId, dateKey);
                     const now = new Date();
@@ -334,7 +344,20 @@
                             if (status === 'achieved') { stateClass = 'bg-green-50'; borderColor = 'border-green-500'; }
                             if (status === 'failed') { stateClass = 'bg-red-50'; borderColor = 'border-red-500'; }
 
-                            const card = `<div class="task-card p-4 rounded-lg shadow-sm border-l-4 ${borderColor} ${stateClass}"><div class="flex justify-between items-center"><p class="text-lg font-semibold text-gray-800">${task.name}</p><p class="text-base font-medium text-gray-600">${task.startTime} - ${task.endTime}</p></div><div class="mt-3 pt-3 border-t border-gray-200 flex justify-end space-x-2"><button class="status-btn p-2 rounded-full flex items-center space-x-2 text-sm ${status === 'achieved' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-green-500 hover:text-white'}" data-task-id="${task.id}" data-status="achieved"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg><span>Achieved</span></button><button class="status-btn p-2 rounded-full flex items-center space-x-2 text-sm ${status === 'failed' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-red-500 hover:text-white'}" data-task-id="${task.id}" data-status="failed"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.697a1 1 0 010-1.414z" clip-rule="evenodd" /></svg><span>Failed</span></button></div></div>`;
+                            const card = `
+                            <div class="task-card p-4 rounded-lg shadow-sm border-l-4 ${borderColor} ${stateClass}">
+                                <div class="flex justify-between items-center">
+                                    <p class="text-lg font-semibold text-gray-800">${task.name}</p>
+                                    <p class="text-base font-medium text-gray-600">${task.startTime} - ${task.endTime}</p>
+                                </div>
+                                <div class="mt-3 pt-3 border-t border-gray-200 flex justify-end items-center space-x-2">
+                                    <button class="status-btn p-2 rounded-full flex items-center space-x-2 text-sm ${status === 'achieved' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-green-500 hover:text-white'}" data-task-id="${task.id}" data-status="achieved"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg><span>Achieved</span></button>
+                                    <button class="status-btn p-2 rounded-full flex items-center space-x-2 text-sm ${status === 'failed' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-red-500 hover:text-white'}" data-task-id="${task.id}" data-status="failed"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.697a1 1 0 010-1.414z" clip-rule="evenodd" /></svg><span>Failed</span></button>
+                                    <button class="delete-btn p-2 rounded-full text-gray-400 hover:bg-red-100 hover:text-red-500" data-task-id="${task.id}" data-is-default="${task.isDefault}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                                    </button>
+                                </div>
+                            </div>`;
                             taskContainer.innerHTML += card;
                         });
                     }
@@ -345,15 +368,30 @@
             };
             
             taskContainer.addEventListener('click', async (e) => {
-                const button = e.target.closest('.status-btn');
-                if (!button) return;
-                const { taskId, status } = button.dataset;
-                const dateKey = getTodaysDateKey();
-                const docRef = doc(db, "users", userId, "taskHistory", dateKey);
-                const currentStatuses = await getTaskStatuses(userId, dateKey);
-                const newStatus = currentStatuses[taskId] === status ? 'unmarked' : status;
-                await setDoc(docRef, { statuses: { ...currentStatuses, [taskId]: newStatus } }, { merge: true });
-                await updateDashboard();
+                const statusButton = e.target.closest('.status-btn');
+                const deleteButton = e.target.closest('.delete-btn');
+
+                if (statusButton) {
+                    const { taskId, status } = statusButton.dataset;
+                    const dateKey = getTodaysDateKey();
+                    const docRef = doc(db, "users", userId, "taskHistory", dateKey);
+                    const currentStatuses = await getTaskStatuses(userId, dateKey);
+                    const newStatus = currentStatuses[taskId] === status ? 'unmarked' : status;
+                    await setDoc(docRef, { statuses: { ...currentStatuses, [taskId]: newStatus } }, { merge: true });
+                }
+
+                if (deleteButton) {
+                    const { taskId, isDefault } = deleteButton.dataset;
+                    const isDefaultBool = isDefault === 'true';
+                    const collectionName = isDefaultBool ? 'defaultSchedule' : `dailyTasks/${getTodaysDateKey()}/tasks`;
+                    const docRef = doc(db, 'users', userId, collectionName, taskId);
+                    await deleteDoc(docRef);
+                }
+                
+                if(statusButton || deleteButton) {
+                    scheduleCache = []; // Clear cache to force a re-fetch
+                    await updateDashboard();
+                }
             });
 
             const updateClock = () => {
