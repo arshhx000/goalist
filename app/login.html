@@ -3,102 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
+    <title>Dashboard | Access</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            black: '#0F0F0F',
+                            dark: '#141414',
+                            surface: '#1F1F1F',
+                            border: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background: #f0f4f8 url('https://www.transparenttextures.com/patterns/cubes.png');
+            background-color: #0F0F0F;
+            color: #e5e5e5;
+            -webkit-font-smoothing: antialiased;
         }
-        /* Animation for elements fading in on load */
-        @keyframes enter-animation {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .animate-enter {
-            animation: enter-animation 0.6s ease-out forwards;
-        }
-        /* Staggered animation delay */
-        .delay-150 { animation-delay: 150ms; }
-        .delay-300 { animation-delay: 300ms; }
 
-        /* Make sure initial state is invisible for animation */
-        .animate-enter {
-            opacity: 0;
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(30, 30, 30, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-4px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0F0F0F; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+        /* Quote Transition */
+        #quote-text { transition: opacity 0.5s ease; }
+        
+        .delay-200 { animation-delay: 200ms; }
+        .delay-400 { animation-delay: 400ms; }
+        .opacity-0-start { opacity: 0; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body class="flex flex-col min-h-screen selection:bg-white selection:text-black">
+
+    <!-- Header (Clean) -->
+    <header class="fixed w-full z-50 glass-panel border-b-0 border-t-0 border-x-0 h-16">
+        <nav class="max-w-7xl mx-auto px-6 h-full flex justify-between items-center">
+             <!-- Left: Project Title -->
+             <div class="flex items-center gap-4">
+                <span class="text-sm tracking-[0.2em] uppercase font-light text-gray-200">PROJECT 11</span>
+             </div>
+             
+             <!-- Right: Stopwatch -->
+             <div class="flex items-baseline gap-3">
+                <!-- Sync Indicator (Subtle) -->
+                <div id="auth-status" class="w-1.5 h-1.5 rounded-full bg-gray-600 mr-2 transition-colors duration-300" title="Offline Mode"></div>
+                
+                <div class="flex items-baseline">
+                    <span id="timer-seconds" class="font-mono text-sm tracking-widest text-emerald-400/80">0</span>
+                    <span class="text-[10px] uppercase text-gray-500 tracking-widest ml-1">S</span>
+                </div>
+                <div class="flex items-baseline">
+                    <!-- Milliseconds: Larger size (text-xl) compared to seconds (text-sm) -->
+                    <span id="timer-ms" class="font-mono text-xl tracking-widest text-emerald-400 font-medium">00</span>
+                    <span class="text-[10px] uppercase text-gray-500 tracking-widest ml-1">MS</span>
+                </div>
+             </div>
+        </nav>
+    </header>
 
     <!-- Main Content -->
-    <div id="main-content" class="flex flex-col min-h-screen">
-        <!-- Header Section -->
-        <header class="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-20">
-            <nav class="container mx-auto px-6 py-4 flex justify-between items-center h-16">
-                 
-            </nav>
-        </header>
-
-        <!-- Main Dashboard -->
-        <main class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8 flex items-center">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
-                
-                <!-- Left Column -->
-                <div class="lg:col-span-1 flex items-center justify-center animate-enter delay-150">
-                    <!-- Quote Slider -->
-                    <div class="relative bg-white/70 backdrop-blur-sm border border-white/30 p-6 rounded-2xl shadow-lg text-center w-full">
-                        <span id="view-count" class="absolute top-3 left-3 bg-[#f4811f] text-white text-xs font-semibold px-2 py-1 rounded-full shadow"></span>
-                        <p id="quote-text" class="text-lg md:text-xl text-gray-800 min-h-[120px] flex items-center justify-center px-8 transition-opacity duration-300"></p>
-                        <div class="absolute inset-y-0 left-2 flex items-center">
-                            <button id="prev-btn" class="p-2 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none transition-colors">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                            </button>
-                        </div>
-                        <div class="absolute inset-y-0 right-2 flex items-center">
-                             <button id="next-btn" class="p-2 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus:outline-none transition-colors">
-                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                            </button>
-                        </div>
+    <main class="flex-grow pt-24 pb-12 px-6 flex items-center justify-center">
+        <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Left Column: Quote Slider -->
+            <div class="lg:col-span-1 flex items-center justify-center animate-fade-in opacity-0-start delay-200">
+                <div class="relative glass-panel p-10 rounded-2xl w-full min-h-[300px] flex flex-col justify-center items-center group">
+                    
+                    <!-- View Badge -->
+                    <div class="absolute top-6 left-6">
+                        <span id="view-count" class="text-[10px] font-mono border border-orange-500/30 text-orange-400 bg-orange-500/10 px-2 py-1 rounded-full tracking-widest">
+                            00
+                        </span>
                     </div>
-                </div>
 
-                <!-- Right Column -->
-                <div class="lg:col-span-1 animate-enter delay-300">
-                     <div class="bg-white/70 backdrop-blur-sm border border-white/30 p-6 rounded-2xl shadow-lg">
-                        <div class="flex justify-around items-center gap-6">
-                            <a href="class.html" class="w-40 h-40 flex flex-col items-center justify-center space-y-3 p-4 bg-white/50 rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-transparent hover:border-blue-200">
-                                <div class="text-blue-500">
-                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                    </svg>
-                                </div>
-                                <p class="font-bold text-gray-800 text-lg">Class</p>
-                            </a>
-                            <a href="contact.html" class="w-40 h-40 flex flex-col items-center justify-center space-y-3 p-4 bg-white/50 rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-transparent hover:border-orange-200">
-                                <div class="text-orange-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2 2 4-4" />
-                                    </svg>
-                                </div>
-                                <p class="font-bold text-gray-800 text-lg">Fard</p>
-                            </a>
-                        </div>
-                     </div>
+                    <!-- Quote Text -->
+                    <div class="relative z-10 px-8">
+                        <p id="quote-text" class="text-xl md:text-2xl font-light font-serif italic text-center leading-relaxed text-gray-200 min-h-[140px] flex items-center justify-center">
+                            Loading inspiration...
+                        </p>
+                    </div>
+
+                    <!-- Navigation Arrows (Hidden by default, shown on hover) -->
+                    <button id="prev-btn" class="absolute left-4 top-1/2 -translate-y-1/2 p-3 text-gray-600 hover:text-white transition-colors opacity-0 group-hover:opacity-100">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <button id="next-btn" class="absolute right-4 top-1/2 -translate-y-1/2 p-3 text-gray-600 hover:text-white transition-colors opacity-0 group-hover:opacity-100">
+                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                    
+                    <div class="absolute bottom-6 text-xs text-gray-600 uppercase tracking-[0.3em]">Daily Wisdom</div>
                 </div>
             </div>
-        </main>
-    </div>
 
-    <script>
-        // --- Quote Slider Script ---
+            <!-- Right Column: Navigation Links -->
+            <div class="lg:col-span-1 flex items-center animate-fade-in opacity-0-start delay-400">
+                 <div class="glass-panel p-8 rounded-2xl w-full">
+                    <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                        
+                        <!-- Class Link -->
+                        <a href="class.html" class="glass-card w-40 h-40 sm:w-48 sm:h-48 flex flex-col items-center justify-center p-6 rounded-2xl group relative overflow-hidden">
+                            <div class="absolute inset-0 bg-blue-500/5 group-hover:bg-blue-500/10 transition-colors duration-500"></div>
+                            <div class="text-blue-400/80 group-hover:text-blue-300 transition-colors duration-300 mb-4 transform group-hover:scale-110 transition-transform">
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 stroke-[1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                            </div>
+                            <p class="text-sm uppercase tracking-[0.2em] text-gray-400 group-hover:text-white transition-colors relative z-10">Class</p>
+                        </a>
+
+                        <!-- Fard Link -->
+                        <a href="contact.html" class="glass-card w-40 h-40 sm:w-48 sm:h-48 flex flex-col items-center justify-center p-6 rounded-2xl group relative overflow-hidden">
+                            <div class="absolute inset-0 bg-orange-500/5 group-hover:bg-orange-500/10 transition-colors duration-500"></div>
+                            <div class="text-orange-400/80 group-hover:text-orange-300 transition-colors duration-300 mb-4 transform group-hover:scale-110 transition-transform">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 stroke-[1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2 2 4-4" />
+                                </svg>
+                            </div>
+                            <p class="text-sm uppercase tracking-[0.2em] text-gray-400 group-hover:text-white transition-colors relative z-10">Fard</p>
+                        </a>
+
+                    </div>
+                 </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // --- Firebase Init ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyA-89SA71JDCDbCE3PjIdWHZHJs0qN-1Pc",
+          authDomain: "project---11.firebaseapp.com",
+          projectId: "project---11",
+          storageBucket: "project---11.firebasestorage.app",
+          messagingSenderId: "958555644000",
+          appId: "1:958555644000:web:405109efd428b349f62305",
+          measurementId: "G-DPGZ8CS3SP"
+        };
+
+        const appId = "project-11"; 
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let stopwatchInterval;
+
+        // --- Core Time Management ---
+        const getLocalStartTime = () => {
+            const stored = localStorage.getItem('project11_start_time');
+            // Strict check to ensure we don't return NaN or undefined
+            if (stored && stored !== 'NaN' && stored !== 'undefined') {
+                return parseInt(stored);
+            }
+            return null;
+        };
+
+        const setLocalStartTime = (time) => {
+            localStorage.setItem('project11_start_time', time);
+        };
+
+        const runStopwatch = (startTime) => {
+            const secondsElement = document.getElementById('timer-seconds');
+            const msElement = document.getElementById('timer-ms');
+            
+            if (stopwatchInterval) clearInterval(stopwatchInterval);
+
+            const update = () => {
+                const now = Date.now();
+                const diff = now - startTime;
+                
+                if (diff < 0) {
+                    secondsElement.textContent = "0";
+                    msElement.textContent = "00";
+                    return;
+                }
+
+                const seconds = Math.floor(diff / 1000);
+                const ms = Math.floor((diff % 1000) / 10);
+                
+                secondsElement.textContent = seconds;
+                msElement.textContent = String(ms).padStart(2, '0');
+            };
+
+            update();
+            stopwatchInterval = setInterval(update, 10);
+        };
+
+        // --- Sync Logic ---
+        const initUserData = async (user) => {
+            const statusDot = document.getElementById('auth-status');
+            statusDot.classList.add('bg-emerald-500', 'animate-pulse');
+            statusDot.classList.remove('bg-gray-600', 'bg-orange-500');
+
+            // Use the consistent 'project-11' app ID for the path
+            const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'stopwatch');
+            
+            try {
+                const docSnap = await getDoc(docRef);
+                let startTime;
+
+                if (docSnap.exists()) {
+                    // Cloud has data: Trust Cloud
+                    startTime = docSnap.data().startTime;
+                    console.log("Synced with Cloud");
+                } else {
+                    // Cloud is empty: Trust Local or Create New
+                    const local = getLocalStartTime();
+                    if (local) {
+                        startTime = local;
+                        console.log("Pushing local timer to Cloud");
+                    } else {
+                        startTime = Date.now();
+                        console.log("Starting new timer");
+                    }
+                    // Save to cloud
+                    await setDoc(docRef, { startTime }); 
+                }
+                
+                // Update local to match cloud
+                setLocalStartTime(startTime);
+                runStopwatch(startTime);
+                
+                statusDot.classList.remove('animate-pulse');
+                statusDot.classList.add('bg-emerald-500', 'shadow-[0_0_8px_#10b981]');
+                statusDot.title = "Synced with Cloud";
+
+            } catch (err) {
+                console.warn("Sync failed, staying on local:", err);
+                // On error, just ensure visual indicator is correct, 
+                // we already started the local timer in initAuth
+                statusDot.classList.remove('bg-emerald-500', 'animate-pulse');
+                statusDot.classList.add('bg-orange-500');
+                statusDot.title = "Local Mode";
+            }
+        };
+
+        // --- Initialization ---
+        const init = async () => {
+            // 1. First Priority: Load Local Storage IMMEDIATELY
+            // This ensures no flicker of "0" and no reset if auth fails later
+            let currentStartTime = getLocalStartTime();
+            
+            if (!currentStartTime) {
+                // Only create new time if absolutely nothing exists
+                currentStartTime = Date.now();
+                setLocalStartTime(currentStartTime);
+            }
+            
+            runStopwatch(currentStartTime);
+
+            // 2. Second Priority: Try Cloud Sync
+            try {
+                // Note: Anonymous Auth must be enabled in Firebase Console
+                await signInAnonymously(auth);
+            } catch (e) {
+                console.log("Running in offline mode (Auth failed)");
+                // Visual update for offline
+                const status = document.getElementById('auth-status');
+                status.classList.remove('bg-gray-600');
+                status.classList.add('bg-orange-500');
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                initUserData(user);
+            }
+        });
+        
+        // Start the application
+        init();
+
+
+        // --- Quote Logic ---
         const quotes = [
             "Do not go near adultery; it is truly a shameful deed and an evil way. (17:32)",
             "Allah loves to see one’s job done with itqan (meticulous excellence).",
@@ -127,7 +349,7 @@
             "Success is not final, failure is not fatal: it is the courage to continue that counts. — Winston Churchill"
         ];
 
-        let currentQuoteIndex = -1; // Use -1 to ensure the first quote is always new
+        let currentQuoteIndex = -1;
         const quoteTextElement = document.getElementById('quote-text');
         const viewCountElement = document.getElementById('view-count');
         const prevBtn = document.getElementById('prev-btn');
@@ -137,46 +359,29 @@
         const saveViewCounts = (counts) => localStorage.setItem('quoteViewCounts', JSON.stringify(counts));
 
         const showQuote = (index) => {
-            // Fade out the text
             quoteTextElement.classList.add('opacity-0');
-            
             setTimeout(() => {
-                // Update the content after fade out
                 quoteTextElement.textContent = quotes[index];
                 const counts = getViewCounts();
                 counts[index]++;
                 saveViewCounts(counts);
-                viewCountElement.textContent = counts[index];
-                
-                // Fade the text back in
+                viewCountElement.textContent = String(counts[index]).padStart(2, '0');
                 quoteTextElement.classList.remove('opacity-0');
-            }, 300); // Duration should match the CSS transition
+            }, 500);
         };
         
         const showRandomQuote = () => {
-            if (quotes.length <= 1) {
-                showQuote(0);
-                return;
-            }
+            if (quotes.length <= 1) { showQuote(0); return; }
             let newIndex;
-            do {
-                newIndex = Math.floor(Math.random() * quotes.length);
-            } while (newIndex === currentQuoteIndex); // Ensure the new quote is different from the current one
-
+            do { newIndex = Math.floor(Math.random() * quotes.length); } while (newIndex === currentQuoteIndex);
             currentQuoteIndex = newIndex;
             showQuote(currentQuoteIndex);
         };
 
-        // Initialize slider on page load with a random quote
-        document.addEventListener('DOMContentLoaded', () => {
-            showRandomQuote();
-        });
-
         prevBtn.addEventListener('click', showRandomQuote);
-
         nextBtn.addEventListener('click', showRandomQuote);
+        showRandomQuote();
+
     </script>
 </body>
 </html>
-
-
