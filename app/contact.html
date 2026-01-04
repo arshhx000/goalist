@@ -3,160 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Tasks Dashboard</title>
+    <title>VISIONARY | Daily Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            black: '#0F0F0F',
+                            dark: '#141414',
+                            surface: '#1F1F1F',
+                            elevated: '#2D2D2D',
+                            border: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        mono: ['monospace']
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'modal-in': 'modalScaleIn 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        modalScaleIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #e2e8f0; /* Light blue-gray background */
-        }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .task-card, .goal-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-        .task-card:hover, .goal-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
-        }
-        .status-btn, .delete-btn {
-            transition: all 0.2s ease-in-out;
-        }
-        .status-btn:hover, .delete-btn:hover {
-            transform: scale(1.05);
-        }
-        .modal {
-            animation: modalFadeIn 0.3s ease-out forwards;
-        }
-        .modal-content {
-             animation: modalScaleIn 0.3s ease-out forwards;
+            background-color: #0F0F0F;
+            color: #e5e5e5;
+            -webkit-font-smoothing: antialiased;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(30, 30, 30, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
-         @keyframes modalFadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
         }
-        @keyframes modalScaleIn {
-            from { transform: scale(0.95); }
-            to { transform: scale(1); }
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
         }
-        #copy-tooltip {
-            transition: opacity 0.3s ease-in-out;
-        }
-        /* Radial Progress */
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0F0F0F; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+        /* Progress Ring */
         .progress-ring__circle {
-            transition: stroke-dashoffset 0.5s ease-out;
+            transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
             transform: rotate(-90deg);
             transform-origin: 50% 50%;
         }
+
+        /* Inputs */
+        .input-dark {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .input-dark:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        /* Tooltip */
+        #copy-tooltip {
+            transition: opacity 0.3s ease;
+        }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="min-h-screen flex flex-col selection:bg-white selection:text-black">
 
-    <!-- Header Section -->
-    <header class="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="index.html" class="text-lg font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-300">Home</a>
-        </nav>
-    </header>
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 glass-panel border-b-0 border-t-0 border-x-0 h-16">
+        <div class="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <!-- Back Icon (Logout) -->
+                <a href="#" id="back-btn" class="text-gray-500 hover:text-white transition-colors mr-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                </a>
+                <span class="text-sm tracking-[0.2em] uppercase font-light">Project 11</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <!-- Hours Button -->
+                <a href="hours.html" class="px-4 py-2 bg-white/5 hover:bg-white hover:text-black border border-white/10 rounded-lg transition-all duration-300 text-xs uppercase tracking-widest font-medium">
+                    Hours
+                </a>
+                <div id="status-indicator" class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] opacity-50"></div>
+            </div>
+        </div>
+    </nav>
 
     <!-- Main Content -->
-    <main class="container mx-auto px-4 sm:px-6 py-12">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <main class="flex-grow pt-24 pb-12 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-            <!-- Left Column: Main Schedule -->
-            <div class="lg:col-span-2">
-                <div class="glass-card p-6 md:p-8 rounded-2xl shadow-lg">
-                    <div class="flex justify-between items-center mb-6">
-                         <div class="text-left">
-                            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">Today's Schedule</h1>
+            <!-- Left Col: Schedule (8 cols) - Swapped for better balance in this layout -->
+            <div class="lg:col-span-8 space-y-6 order-2 lg:order-1">
+                <div class="glass-panel p-8 rounded-2xl min-h-[600px]">
+                    <div class="flex justify-between items-end mb-8">
+                        <div>
+                            <h1 class="text-3xl font-light">Today's <span class="font-serif italic text-gray-500">Focus</span></h1>
+                            <p class="text-xs tracking-widest text-gray-500 uppercase mt-2">Structure your day</p>
                         </div>
-                        <button id="add-task-btn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 shadow-md hover:shadow-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-                            <span>Add Task</span>
+                        <button id="add-task-btn" class="group flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white hover:text-black border border-white/10 rounded-lg transition-all duration-300">
+                            <span class="text-xs uppercase tracking-widest font-medium">Add Task</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform group-hover:rotate-90" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
                         </button>
                     </div>
 
                     <!-- Task List -->
-                    <div class="space-y-4" id="tasks-container">
-                        <p class="text-gray-500 text-center">Loading schedule...</p>
+                    <div class="space-y-3" id="tasks-container">
+                        <div class="animate-pulse space-y-3">
+                            <div class="h-20 bg-white/5 rounded-xl border border-white/5"></div>
+                            <div class="h-20 bg-white/5 rounded-xl border border-white/5"></div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Widgets -->
-            <div class="space-y-8">
-                 <!-- Time Widget -->
-                <div class="glass-card p-6 rounded-2xl shadow-lg text-center">
-                    <p id="current-date-heading" class="text-gray-600 font-medium"></p>
-                    <p id="current-time" class="text-4xl font-bold text-gray-800 mt-2"></p>
-                </div>
+            <!-- Right Col: Widgets (4 cols) -->
+            <div class="lg:col-span-4 space-y-6 order-1 lg:order-2">
                 
-                 <!-- Progress Widget -->
-                <div class="glass-card p-6 rounded-2xl shadow-lg text-center relative">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">Daily Progress</h2>
-                    <div class="relative w-40 h-40 mx-auto">
-                        <svg class="w-full h-full" viewBox="0 0 100 100">
-                            <!-- Background circle -->
-                            <circle class="text-gray-200" stroke-width="10" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
-                            <!-- Progress circle -->
-                            <circle id="progress-ring" class="progress-ring__circle text-blue-600" stroke-width="10" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
-                        </svg>
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <span id="progress-text" class="text-3xl font-bold text-blue-600">0%</span>
+                <!-- Time Widget -->
+                <div class="glass-panel p-8 rounded-2xl text-center relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-20 bg-white/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
+                    <p id="current-date-heading" class="text-xs tracking-[0.2em] text-gray-500 uppercase mb-4">Loading...</p>
+                    <p id="current-time" class="text-5xl font-light font-sans tracking-tight text-white">--:--</p>
+                </div>
+
+                <!-- Progress Widget -->
+                <div class="glass-panel p-8 rounded-2xl text-center relative">
+                    <div class="flex justify-between items-start mb-6">
+                        <h2 class="text-sm uppercase tracking-widest text-gray-400">Progress</h2>
+                        
+                        <!-- Copy Button -->
+                        <div class="relative">
+                            <button id="copy-data-btn" class="text-gray-500 hover:text-white transition-colors" title="Copy Summary">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M7 9a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9z" /><path d="M5 3a2 2 0 00-2 2v6a2 2 0 002 2V5h6a2 2 0 00-2-2H5z" /></svg>
+                            </button>
+                            <span id="copy-tooltip" class="absolute right-0 -top-8 bg-white text-black text-[10px] uppercase tracking-wider px-2 py-1 rounded opacity-0 pointer-events-none whitespace-nowrap">
+                                Copied
+                            </span>
                         </div>
                     </div>
-                     <div id="progress-recommendation-section" class="mt-4 text-sm text-gray-600">
-                        <!-- Recommendation text here -->
-                    </div>
 
-                    <!-- Copy Data Button -->
-                    <div class="absolute top-4 right-4">
-                        <button id="copy-data-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-600 font-bold p-2 rounded-full transition-all duration-300" title="Copy Daily Summary">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M7 9a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2V9z" /><path d="M5 3a2 2 0 00-2 2v6a2 2 0 002 2V5h6a2 2 0 00-2-2H5z" /></svg>
-                        </button>
-                        <span id="copy-tooltip" class="absolute right-0 mt-2 bg-gray-800 text-white text-xs px-2 py-1 rounded-md opacity-0 transition-opacity whitespace-nowrap">
-                            Copied!
-                        </span>
+                    <div class="relative w-48 h-48 mx-auto mb-6">
+                        <svg class="w-full h-full" viewBox="0 0 100 100">
+                            <!-- Background circle -->
+                            <circle class="text-white/5" stroke-width="6" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
+                            <!-- Progress circle -->
+                            <circle id="progress-ring" class="progress-ring__circle text-white" stroke-width="6" stroke-linecap="round" stroke="currentColor" fill="transparent" r="45" cx="50" cy="50" />
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span id="progress-text" class="text-4xl font-light">0%</span>
+                            <span class="text-[10px] uppercase tracking-widest text-gray-500 mt-1">Complete</span>
+                        </div>
+                    </div>
+                    
+                    <div id="progress-recommendation-section" class="text-sm text-gray-500 font-serif italic border-t border-white/10 pt-4">
+                        Loading insights...
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Add Task Modal -->
-    <div id="add-task-modal" class="hidden modal fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
-        <div class="modal-content bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-2xl font-bold text-gray-800">Add a New Task</h3>
-                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+    <!-- Modal -->
+    <div id="add-task-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" id="modal-backdrop"></div>
+        
+        <!-- Content -->
+        <div class="glass-panel w-full max-w-md p-8 rounded-2xl relative z-10 animate-modal-in shadow-2xl">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-xl font-light">New <span class="font-serif italic text-gray-400">Task</span></h3>
+                <button id="close-modal-btn" class="text-gray-500 hover:text-white transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
             </div>
-            <form id="add-task-form">
-                <div class="mb-4">
-                    <label for="task-name" class="block text-sm font-medium text-gray-700 mb-1">Task Name</label>
-                    <input type="text" id="task-name" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" required>
+            
+            <form id="add-task-form" class="space-y-6">
+                <div>
+                    <label class="block text-xs uppercase tracking-widest text-gray-500 mb-2">Objective</label>
+                    <input type="text" id="task-name" class="w-full input-dark rounded-lg p-3" placeholder="e.g. Deep Work Session" required>
                 </div>
-                <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label for="task-start-time" class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
-                        <input type="time" id="task-start-time" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" required>
+                        <label class="block text-xs uppercase tracking-widest text-gray-500 mb-2">Start</label>
+                        <input type="time" id="task-start-time" class="w-full input-dark rounded-lg p-3 text-sm" required>
                     </div>
                     <div>
-                        <label for="task-end-time" class="block text-sm font-medium text-gray-700 mb-1">End Time</label>
-                        <input type="time" id="task-end-time" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500" required>
+                        <label class="block text-xs uppercase tracking-widest text-gray-500 mb-2">End</label>
+                        <input type="time" id="task-end-time" class="w-full input-dark rounded-lg p-3 text-sm" required>
                     </div>
                 </div>
-                <button type="submit" id="save-task-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">Save Task</button>
+                <button type="submit" class="w-full bg-white text-black hover:bg-gray-200 py-3 rounded-lg font-medium text-sm uppercase tracking-widest transition-colors mt-4">
+                    Confirm Schedule
+                </button>
             </form>
         </div>
     </div>
@@ -164,28 +237,44 @@
     <script type="module">
         // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, collection, writeBatch, getDocs, query, orderBy, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Firebase config
+        // Environment Config
         const firebaseConfig = {
-          apiKey: "AIzaSyDX8H-_OfG4LMbPMji9IJEgHJfanyedEGY",
-          authDomain: "goalist-a6573.firebaseapp.com",
-          projectId: "goalist-a6573",
-          storageBucket: "goalist-a6573.appspot.com",
-          messagingSenderId: "850792903925",
-          appId: "1:850792903925:web:8bdf55f3de7926b19e81bc",
-          measurementId: "G-HZQ897N97C"
+          apiKey: "AIzaSyA-89SA71JDCDbCE3PjIdWHZHJs0qN-1Pc",
+          authDomain: "project---11.firebaseapp.com",
+          projectId: "project---11",
+          storageBucket: "project---11.firebasestorage.app",
+          messagingSenderId: "958555644000",
+          appId: "1:958555644000:web:405109efd428b349f62305",
+          measurementId: "G-DPGZ8CS3SP"
         };
+
+        const appId = "project-11";
         
         // Init Firebase
         const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        
         let userId = null;
         let scheduleCache = [];
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Logout / Back Button Logic
+            const backBtn = document.getElementById('back-btn');
+            if (backBtn) {
+                backBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await signOut(auth);
+                    localStorage.removeItem('last_login');
+                    window.location.href = 'index.html'; // Redirect to Login Page
+                });
+            }
+
             const taskContainer = document.getElementById('tasks-container');
             const dateHeadingEl = document.getElementById('current-date-heading');
             const timeEl = document.getElementById('current-time');
@@ -197,6 +286,7 @@
             const addTaskBtn = document.getElementById('add-task-btn');
             const addTaskModal = document.getElementById('add-task-modal');
             const closeModalBtn = document.getElementById('close-modal-btn');
+            const modalBackdrop = document.getElementById('modal-backdrop');
             const addTaskForm = document.getElementById('add-task-form');
             
             // Copy Elements
@@ -216,8 +306,14 @@
             }
 
             // --- Modal Logic ---
-            addTaskBtn.addEventListener('click', () => addTaskModal.classList.remove('hidden'));
-            closeModalBtn.addEventListener('click', () => addTaskModal.classList.add('hidden'));
+            const toggleModal = (show) => {
+                if(show) addTaskModal.classList.remove('hidden');
+                else addTaskModal.classList.add('hidden');
+            }
+            
+            addTaskBtn.addEventListener('click', () => toggleModal(true));
+            closeModalBtn.addEventListener('click', () => toggleModal(false));
+            modalBackdrop.addEventListener('click', () => toggleModal(false));
 
             addTaskForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -233,10 +329,11 @@
                 const newDailyTask = { name: taskName, startTime: formatTime12h(startTime24), endTime: formatTime12h(endTime24) };
                 
                 try {
-                    await addDoc(collection(db, 'users', userId, 'dailyTasks', dateKey, 'tasks'), newDailyTask);
+                    // Using artifacts path structure for compatibility
+                    await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'dailyTasks', dateKey, 'tasks'), newDailyTask);
                     scheduleCache = [];
                     await updateDashboard();
-                    addTaskModal.classList.add('hidden');
+                    toggleModal(false);
                     addTaskForm.reset();
                 } catch (error) { console.error("Error adding daily task: ", error); }
             });
@@ -249,12 +346,12 @@
                 const dailyTasks = await getCombinedSchedule(userId);
                 const statuses = await getTaskStatuses(userId, dateKey);
 
-                let summary = `Daily Summary for ${new Date().toLocaleDateString('en-US', { dateStyle: 'full' })}\n\n--- Schedule ---\n`;
-                dailyTasks.forEach(t => summary += `- ${t.name} (${t.startTime} - ${t.endTime}): ${(statuses[t.id] || 'Unmarked').replace(/^\w/, c => c.toUpperCase())}\n`);
+                let summary = `VISIONARY SUMMARY | ${new Date().toLocaleDateString('en-US', { dateStyle: 'full' })}\n\n`;
+                dailyTasks.forEach(t => summary += `• ${t.name} (${t.startTime} - ${t.endTime}): ${(statuses[t.id] || 'Pending').toUpperCase()}\n`);
 
                 const achievedTasks = Object.values(statuses).filter(s => s === 'achieved').length;
                 const pct = dailyTasks.length > 0 ? ((achievedTasks / dailyTasks.length) * 100).toFixed(0) : 0;
-                summary += `\n--- Progress ---\nCompletion: ${pct}%`;
+                summary += `\nPROGRESS: ${pct}%`;
                 
                 navigator.clipboard.writeText(summary).then(() => {
                     copyTooltip.classList.remove('opacity-0');
@@ -264,6 +361,7 @@
 
             // --- Data & Core Logic ---
             const getTodaysDateKey = () => new Date().toISOString().split('T')[0];
+            
             const parseTime = (timeStr) => {
                 const now = new Date();
                 const [time, modifier] = timeStr.split(' ');
@@ -273,29 +371,21 @@
                 return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
             };
 
-            const seedInitialDefaultSchedule = async (uid) => {
-                const scheduleRef = collection(db, 'users', uid, 'defaultSchedule');
-                const batch = writeBatch(db);
-                const defaultSchedule = [
-                    { name: 'Gym Session', startTime: '06:30 AM', endTime: '07:30 AM' }, { name: 'Breakfast', startTime: '07:30 AM', endTime: '08:00 AM' }, { name: 'Personal Work', startTime: '08:00 AM', endTime: '09:00 AM' }, { name: 'College', startTime: '09:00 AM', endTime: '05:00 PM' },
-                ];
-                defaultSchedule.forEach(task => batch.set(doc(scheduleRef), task));
-                await batch.commit();
-            };
+            // Removed seedInitialDefaultSchedule function to stop creating default tasks
 
             const getCombinedSchedule = async (uid) => {
                 if (scheduleCache.length > 0) return scheduleCache;
                 
-                const defaultScheduleQuery = query(collection(db, 'users', uid, 'defaultSchedule'));
+                // Path updated to 'artifacts'
+                const defaultScheduleQuery = query(collection(db, 'artifacts', appId, 'users', uid, 'defaultSchedule'));
                 const defaultSnapshot = await getDocs(defaultScheduleQuery);
-                if (defaultSnapshot.empty) {
-                    await seedInitialDefaultSchedule(uid);
-                    return getCombinedSchedule(uid);
-                }
+                
+                // Default seeding logic removed
+                
                 const defaultTasks = defaultSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), isDefault: true }));
 
                 const dateKey = getTodaysDateKey();
-                const dailyTasksQuery = query(collection(db, 'users', uid, 'dailyTasks', dateKey, 'tasks'));
+                const dailyTasksQuery = query(collection(db, 'artifacts', appId, 'users', uid, 'dailyTasks', dateKey, 'tasks'));
                 const dailySnapshot = await getDocs(dailyTasksQuery);
                 const dailyTasks = dailySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), isDefault: false }));
                 
@@ -304,7 +394,7 @@
             };
 
             const getTaskStatuses = async (uid, dateKey) => {
-                const docSnap = await getDoc(doc(db, 'users', uid, 'taskHistory', dateKey));
+                const docSnap = await getDoc(doc(db, 'artifacts', appId, 'users', uid, 'taskHistory', dateKey));
                 return docSnap.exists() ? docSnap.data().statuses || {} : {};
             };
 
@@ -330,32 +420,78 @@
                     const completionPercentage = dailyTasks.length > 0 ? (achievedTasks / dailyTasks.length) * 100 : 0;
                     setProgress(completionPercentage);
                     
-                    const recommendationPercentage = Math.min(100, Math.round(completionPercentage) + 5);
-                    progressRecommendation.innerHTML = `Great work today! Let's aim for <strong>${recommendationPercentage}%</strong> completion tomorrow.`;
+                    // Recommendation Logic
+                    const pct = Math.round(completionPercentage);
+                    let recText = "Initialize your day.";
+                    if (pct > 0) recText = "Momentum is building.";
+                    if (pct > 50) recText = "Maintain this trajectory.";
+                    if (pct > 90) recText = "Excellence achieved.";
+                    
+                    progressRecommendation.innerHTML = `<span>${recText}</span>`;
                     
                     if (dailyTasks.length === 0) {
-                        taskContainer.innerHTML = `<p class="text-gray-500 text-center">No tasks scheduled for today. Add one to get started!</p>`;
+                        taskContainer.innerHTML = `<div class="text-center py-12 border border-dashed border-white/10 rounded-xl"><p class="text-gray-500 font-serif italic">No objectives set.</p></div>`;
                     } else {
                         dailyTasks.forEach((task, index) => {
                             const status = statuses[task.id] || 'unmarked';
-                            let stateClass = 'bg-white';
-                            let borderColor = 'border-gray-200';
-                            if (index === currentTaskIndex) { stateClass = 'bg-blue-50'; borderColor = 'border-blue-500'; }
-                            if (status === 'achieved') { stateClass = 'bg-green-50'; borderColor = 'border-green-500'; }
-                            if (status === 'failed') { stateClass = 'bg-red-50'; borderColor = 'border-red-500'; }
+                            
+                            // Visual States
+                            let opacityClass = 'opacity-50'; // Future
+                            let borderClass = 'border-white/5';
+                            let activeIndicator = '';
+                            
+                            // Current Task Highlighting
+                            if (index === currentTaskIndex) { 
+                                opacityClass = 'opacity-100'; 
+                                borderClass = 'border-l-white border-l-4'; 
+                                activeIndicator = '<span class="text-[10px] uppercase tracking-widest text-emerald-400 absolute top-2 right-4">Active</span>';
+                            } else {
+                                opacityClass = 'opacity-100'; // Show all clearly, maybe dim past ones?
+                                if (now > parseTime(task.endTime)) opacityClass = 'opacity-60 grayscale'; // Past
+                            }
+                            
+                            // Status colors
+                            let statusBtnClass = 'text-gray-500 hover:text-white border-transparent';
+                            let checkColor = '';
+                            let xColor = '';
+                            
+                            if (status === 'achieved') {
+                                borderClass = 'border-emerald-500/50 border-l-4 bg-emerald-500/5';
+                                checkColor = 'text-emerald-400';
+                            }
+                            if (status === 'failed') {
+                                borderClass = 'border-rose-500/50 border-l-4 bg-rose-500/5';
+                                xColor = 'text-rose-400';
+                            }
 
                             const card = `
-                            <div class="task-card p-4 rounded-lg shadow-sm border-l-4 ${borderColor} ${stateClass}">
-                                <div class="flex justify-between items-center">
-                                    <p class="text-lg font-semibold text-gray-800">${task.name}</p>
-                                    <p class="text-base font-medium text-gray-600">${task.startTime} - ${task.endTime}</p>
-                                </div>
-                                <div class="mt-3 pt-3 border-t border-gray-200 flex justify-end items-center space-x-2">
-                                    <button class="status-btn p-2 rounded-full flex items-center space-x-2 text-sm ${status === 'achieved' ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-green-500 hover:text-white'}" data-task-id="${task.id}" data-status="achieved"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg><span>Achieved</span></button>
-                                    <button class="status-btn p-2 rounded-full flex items-center space-x-2 text-sm ${status === 'failed' ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-600 hover:bg-red-500 hover:text-white'}" data-task-id="${task.id}" data-status="failed"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.697a1 1 0 010-1.414z" clip-rule="evenodd" /></svg><span>Failed</span></button>
-                                    <button class="delete-btn p-2 rounded-full text-gray-400 hover:bg-red-100 hover:text-red-500" data-task-id="${task.id}" data-is-default="${task.isDefault}">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
-                                    </button>
+                            <div class="glass-card p-5 rounded-xl ${borderClass} ${opacityClass} relative group transition-all duration-300">
+                                ${activeIndicator}
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-lg font-light text-white">${task.name}</p>
+                                        <p class="text-xs font-mono text-gray-500 mt-1">${task.startTime} - ${task.endTime}</p>
+                                    </div>
+                                    
+                                    <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                        <!-- Done Btn -->
+                                        <button class="status-btn w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:bg-emerald-500/20 hover:border-emerald-500/50 transition-all ${status === 'achieved' ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400' : 'text-gray-400'}" 
+                                            data-task-id="${task.id}" data-status="achieved">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                                        </button>
+                                        
+                                        <!-- Fail Btn -->
+                                        <button class="status-btn w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:bg-rose-500/20 hover:border-rose-500/50 transition-all ${status === 'failed' ? 'bg-rose-500/20 border-rose-500 text-rose-400' : 'text-gray-400'}" 
+                                            data-task-id="${task.id}" data-status="failed">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.697a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                        </button>
+
+                                        <!-- Delete Btn -->
+                                        <button class="delete-btn w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-all ml-2" 
+                                            data-task-id="${task.id}" data-is-default="${task.isDefault}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>`;
                             taskContainer.innerHTML += card;
@@ -363,7 +499,7 @@
                     }
                 } catch (error) {
                     console.error("Error updating dashboard:", error);
-                    taskContainer.innerHTML = `<p class="text-red-500 text-center">Could not load tasks. Please try refreshing the page.</p>`;
+                    taskContainer.innerHTML = `<p class="text-rose-500 text-center font-mono text-xs">System Malfunction. Refresh Required.</p>`;
                 }
             };
             
@@ -374,7 +510,8 @@
                 if (statusButton) {
                     const { taskId, status } = statusButton.dataset;
                     const dateKey = getTodaysDateKey();
-                    const docRef = doc(db, "users", userId, "taskHistory", dateKey);
+                    // Using artifacts path
+                    const docRef = doc(db, "artifacts", appId, "users", userId, "taskHistory", dateKey);
                     const currentStatuses = await getTaskStatuses(userId, dateKey);
                     const newStatus = currentStatuses[taskId] === status ? 'unmarked' : status;
                     await setDoc(docRef, { statuses: { ...currentStatuses, [taskId]: newStatus } }, { merge: true });
@@ -383,13 +520,14 @@
                 if (deleteButton) {
                     const { taskId, isDefault } = deleteButton.dataset;
                     const isDefaultBool = isDefault === 'true';
+                    // Using artifacts path
                     const collectionName = isDefaultBool ? 'defaultSchedule' : `dailyTasks/${getTodaysDateKey()}/tasks`;
-                    const docRef = doc(db, 'users', userId, collectionName, taskId);
+                    const docRef = doc(db, 'artifacts', appId, 'users', userId, collectionName, taskId);
                     await deleteDoc(docRef);
                 }
                 
                 if(statusButton || deleteButton) {
-                    scheduleCache = []; // Clear cache to force a re-fetch
+                    scheduleCache = []; 
                     await updateDashboard();
                 }
             });
@@ -398,25 +536,34 @@
                 const now = new Date();
                 const dateOptions = { weekday: 'long', month: 'long', day: 'numeric' };
                 dateHeadingEl.textContent = now.toLocaleDateString('en-US', dateOptions);
+                // Changed hour12 to true for 12-hour clock format (AM/PM)
                 timeEl.textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
             };
 
-            // --- INITIALIZATION ---
+            // --- AUTH & INIT ---
+            const initAuth = async () => {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            };
+
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     userId = user.uid;
+                    document.getElementById('status-indicator').classList.remove('opacity-50');
+                    document.getElementById('status-indicator').classList.add('opacity-100');
                     await updateDashboard();
                     updateClock();
                     setInterval(updateClock, 1000);
                 } else {
-                    signInAnonymously(auth).catch((error) => {
-                        console.error("Anonymous sign-in failed:", error);
-                        document.body.innerHTML = `<div class="flex items-center justify-center h-screen bg-gray-100 text-center p-4"><div class="p-8 bg-white rounded-lg shadow-md"><h1 class="text-2xl font-bold text-red-600 mb-2">Connection Error</h1><p class="text-gray-600">Could not load your tasks. Please ensure you have enabled Anonymous Authentication in your Firebase project's sign-in methods and then refresh the page.</p></div></div>`;
-                    });
+                    // console.log("Waiting for auth...");
                 }
             });
+            
+            initAuth();
         });
     </script>
 </body>
 </html>
-
