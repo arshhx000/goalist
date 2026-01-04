@@ -3,360 +3,550 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Information</title>
+    <title>ACADEMIC | Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            black: '#0F0F0F',
+                            dark: '#141414',
+                            surface: '#1F1F1F',
+                            elevated: '#2D2D2D',
+                            border: 'rgba(255, 255, 255, 0.1)',
+                            accent: '#ffffff'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9; /* Lighter gray background */
+            background-color: #0F0F0F;
+            color: #e5e5e5;
+            -webkit-font-smoothing: antialiased;
         }
-        /* Custom styles for a cleaner table design */
-        .custom-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            margin-bottom: 2rem;
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(30, 30, 30, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
-        .custom-table th, .custom-table td {
-            padding: 1rem;
-            text-align: left;
-            font-size: 0.9rem;
-            border-bottom: 1px solid #e2e8f0;
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
         }
-        .custom-table th {
-            background-color: #f8fafc;
-            color: #475569;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
         }
-         .custom-table thead th:first-child {
-            border-top-left-radius: 0.75rem;
-        }
-        .custom-table thead th:last-child {
-            border-top-right-radius: 0.75rem;
-        }
-         .custom-table tbody tr:last-child td:first-child {
-            border-bottom-left-radius: 0.75rem;
-        }
-        .custom-table tbody tr:last-child td:last-child {
-            border-bottom-right-radius: 0.75rem;
-        }
-        .custom-table tbody tr:hover {
-            background-color: #f1f5f9;
-        }
-        .highlight-text {
-            color: #ef4444;
-            font-weight: 600;
-        }
-        .ok-text {
-            color: #22c55e;
-            font-weight: 600;
-        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0F0F0F; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+        /* Utilities */
+        .text-balance { text-wrap: balance; }
+        
+        /* Table Styles */
+        .table-row-hover:hover td { background: rgba(255,255,255,0.03); }
+        .thin-border { border-bottom: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="min-h-screen flex flex-col">
 
-    <!-- Header Section -->
-    <header class="bg-white shadow-sm sticky top-0 z-10">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="index.html" class="text-lg font-semibold text-gray-700 hover:text-blue-600 transition-colors duration-300">Home</a>
-        </nav>
-    </header>
-    
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 glass-panel border-b-0 border-t-0 border-x-0 h-16">
+        <div class="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="text-sm tracking-[0.2em] uppercase font-light">Academic</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <div id="status-indicator" class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+            </div>
+        </div>
+    </nav>
+
     <!-- Main Content -->
-    <main class="container mx-auto px-4 sm:px-6 py-12">
-        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-lg">
-            
-            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Today's Timetable</h2>
-            
-            <div id="vertical-timetable" class="space-y-4">
-                <!-- Timetable will be dynamically generated here -->
-                <p class="text-gray-500">Loading today's schedule...</p>
-            </div>
-            
-            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mt-12 mb-6">Attendance Record</h2>
-            <div class="bg-gray-50 p-4 rounded-xl">
-                <div class="overflow-x-auto">
-                    <table id="attendance-table" class="custom-table">
-                        <thead>
-                            <tr>
-                                <th>Code</th>
-                                <th>Subject</th>
-                                <th>Classes</th>
-                                <th>Present</th>
-                                <th>Absent</th>
-                                <th>Attendance %</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendance-tbody" class="bg-white">
-                            <!-- Attendance data will be dynamically rendered here -->
-                        </tbody>
-                    </table>
+    <main class="flex-grow pt-24 pb-12 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Left Col: Timetable (4 cols) -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- Date Header -->
+                <div class="mb-8">
+                    <h2 class="text-3xl font-light font-serif italic text-gray-400">Today's Schedule</h2>
+                    <p id="current-date" class="text-xs tracking-widest text-gray-500 uppercase mt-1">...</p>
+                </div>
+
+                <!-- Timeline Container -->
+                <div id="timetable-container" class="space-y-4">
+                    <!-- Loading State -->
+                    <div class="animate-pulse space-y-4">
+                        <div class="h-32 bg-white/5 rounded-lg"></div>
+                        <div class="h-32 bg-white/5 rounded-lg"></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Collapsible Subjects Section -->
-            <div id="subjects-section" class="mt-10">
-                <div id="toggle-subjects" class="p-4 rounded-xl hover:bg-gray-50 cursor-pointer flex justify-between items-center select-none transition-colors">
-                    <h2 class="text-lg font-semibold text-blue-600">
-                        View Subjects, Faculty, and Classrooms
-                    </h2>
-                    <svg id="subjects-arrow" class="w-6 h-6 transform transition-transform text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            <!-- Right Col: Stats & Attendance (8 cols) -->
+            <div class="lg:col-span-8 space-y-6">
+                
+                <!-- Quick Stats Row (Bento Grid) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Overall Attendance Card -->
+                    <div class="glass-panel p-8 rounded-xl relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 p-32 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-white/10 transition-colors"></div>
+                        <h3 class="text-xs uppercase tracking-widest text-gray-500 mb-2">Overall Attendance</h3>
+                        <div class="flex items-baseline gap-2 relative z-10">
+                            <span id="overall-percentage" class="text-6xl font-light">--%</span>
+                            <span class="text-sm text-gray-400 font-serif italic">cumulative</span>
+                        </div>
+                    </div>
+
+                    <!-- Classes Attended Card -->
+                    <div class="glass-panel p-8 rounded-xl relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 p-32 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-white/10 transition-colors"></div>
+                        <h3 class="text-xs uppercase tracking-widest text-gray-500 mb-2">Classes Attended</h3>
+                        <div class="flex items-baseline gap-2 relative z-10">
+                            <span id="total-attended" class="text-6xl font-light">--</span>
+                            <span class="text-sm text-gray-400 font-serif italic">sessions</span>
+                        </div>
+                    </div>
                 </div>
-                <div id="subjects-content" class="overflow-x-auto hidden transition-all duration-500 mt-4">
-                     <div class="bg-gray-50 p-4 rounded-xl">
-                        <table class="custom-table bg-white">
-                            <thead>
+
+                <!-- Detailed Attendance Table -->
+                <div class="glass-panel rounded-xl overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-white/10 flex justify-between items-center">
+                        <h3 class="font-serif italic text-xl">Course Performance</h3>
+                        <div class="flex gap-2 text-xs">
+                            <span class="flex items-center gap-1 text-emerald-400"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Safe (>75%)</span>
+                            <span class="flex items-center gap-1 text-rose-400"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>Risk (<75%)</span>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="text-xs text-gray-500 uppercase tracking-wider bg-white/5">
                                 <tr>
-                                    <th>Code</th><th>Subject</th><th>L-T-P-C</th><th>Faculty(s)</th><th>Classroom(s)</th>
+                                    <th class="px-6 py-4 font-medium">Subject Code</th>
+                                    <th class="px-6 py-4 font-medium">Faculty</th>
+                                    <th class="px-6 py-4 font-medium text-center">Attended / Total</th>
+                                    <th class="px-6 py-4 font-medium text-right">Status</th>
                                 </tr>
                             </thead>
-                           <tbody id="subjects-tbody">
-                                <!-- Subject details will be loaded here -->
-                           </tbody>
+                            <tbody id="attendance-tbody" class="divide-y divide-white/5">
+                                <!-- Dynamic Content -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
+
+                <!-- Course Directory Accordion -->
+                <div class="glass-panel rounded-xl overflow-hidden">
+                    <button id="toggle-directory" class="w-full p-6 flex justify-between items-center hover:bg-white/5 transition-colors text-left">
+                        <div>
+                            <h3 class="font-serif italic text-xl">Course Directory</h3>
+                            <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">View Credits & Locations</p>
+                        </div>
+                        <i id="directory-arrow" class="fas fa-chevron-down text-gray-500 transition-transform"></i>
+                    </button>
+                    <div id="directory-content" class="hidden border-t border-white/10 bg-black/20">
+                        <div class="p-6 grid gap-4" id="directory-grid">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>
 
-    <footer class="mt-12 py-6">
-        <div class="container mx-auto px-6 text-center text-gray-500"></div>
-    </footer>
-
+    <!-- Firebase Logic -->
     <script type="module">
-        // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, writeBatch, getDocs, query } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, writeBatch, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Your Firebase configuration
+        // --- Configuration ---
         const firebaseConfig = {
-          apiKey: "AIzaSyDX8H-_OfG4LMbPMji9IJEgHJfanyedEGY",
-          authDomain: "goalist-a6573.firebaseapp.com",
-          projectId: "goalist-a6573",
-          storageBucket: "goalist-a6573.appspot.com",
-          messagingSenderId: "850792903925",
-          appId: "1:850792903925:web:8bdf55f3de7926b19e81bc",
-          measurementId: "G-HZQ897N97C"
+          apiKey: "AIzaSyA-89SA71JDCDbCE3PjIdWHZHJs0qN-1Pc",
+          authDomain: "project---11.firebaseapp.com",
+          projectId: "project---11",
+          storageBucket: "project---11.firebasestorage.app",
+          messagingSenderId: "958555644000",
+          appId: "1:958555644000:web:405109efd428b349f62305",
+          measurementId: "G-DPGZ8CS3SP"
         };
 
-        // Initialize Firebase
+        const appId = "project-11";
+        
+        // Initialize
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        let currentUser = null;
 
-        let userId = null;
-        let scheduleCache = null;
-        let attendanceCache = null;
-
-        // --- DATA FUNCTIONS ---
-        const seedInitialData = async (uid) => {
-            const batch = writeBatch(db);
-            
-            // Seed Schedule
-            const scheduleRef = collection(db, "users", uid, "classSchedule");
-            const defaultSchedule = {
-                monday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "02:00-02:50", subject: "CSC 202", location: "S 606", code: "CSC202" }, { time: "03:00-03:50", subject: "AEC 108", location: "S 606", code: "AEC108" }, { time: "04:00-05:30", subject: "AEC 108", location: "S 606", code: "AEC108_2" }],
-                tuesday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "10:00-10:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "11:00-11:50", subject: "CSC 201", location: "S 606", code: "CSC201" }, { time: "01:00-01:50", subject: "CSC 203 Lab", location: "S 603", code: "CSC203L" }, { time: "02:00-02:50", subject: "CSC 203 Lab", location: "S 603", code: "CSC203L_2" }],
-                wednesday: [{ time: "09:00-09:50", subject: "MGT 286", location: "C 608", code: "MGT286" }, { time: "10:00-10:50", subject: "SEC 102", location: "S 414", code: "SEC102" }, { time: "11:00-11:50", subject: "SEC 102", location: "S 414", code: "SEC102_2" }, { time: "01:00-01:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "02:00-02:50", subject: "CSC 201", location: "S 606", code: "CSC201" }, { time: "03:00-03:50", subject: "CSC 201 Lab", location: "S 606", code: "CSC201L" }, { time: "04:00-05:30", subject: "VAC 104", location: "-", code: "VAC104" }],
-                thursday: [{ time: "09:00-09:50", subject: "AEC 108", location: "S 606", code: "AEC108" }, { time: "11:00-11:50", subject: "CSC 203", location: "S 606", code: "CSC203" }, { time: "01:00-01:50", subject: "CSC 202 Lab", location: "X 201", code: "CSC202L" }],
-                friday: [{ time: "09:00-09:50", subject: "CSC 201 Lab", location: "C 801", code: "CSC201L" }, { time: "10:00-10:50", subject: "CSC 201 Lab", location: "C 801", code: "CSC201L_2" }, { time: "02:00-02:50", subject: "CSC 202", location: "S 606", code: "CSC202" }]
-            };
-            batch.set(doc(scheduleRef, "weekly"), defaultSchedule);
-
-            // Seed Subject Info
-            const subjectsRef = collection(db, "users", uid, "subjects");
-            const subjectDetails = [
-                { id: "AEC108", code: "AEC 108", subject: "Problem Solving Skills", ltpc: "1-0-1-2", faculty: "Mr. ISCP00005 (V00005)", rooms: "S 606" },
-                { id: "CSC201", code: "CSC 201", subject: "Object Oriented Programming with C++", ltpc: "3-0-1-4", faculty: "Dr. Asit Kumar Das, Dr. Prasant Kumar Mohanty", rooms: "C 801, S 606" },
-                { id: "CSC202", code: "CSC 202", subject: "Digital Electronics", ltpc: "3-0-1-4", faculty: "Dr. Jyotibhusan Padhi, Dr. Manoj Kumar Yadav, Dr. Ayoub Sofi", rooms: "S 606, X 201" },
-                { id: "CSC203", code: "CSC 203", subject: "Design and Analysis of Algorithms", ltpc: "3-0-1-4", faculty: "Dr. Asit Kumar Das, Dr. Niladri Sett", rooms: "S 603, S 606" },
-                { id: "MGT286", code: "MGT 286", subject: "Sales and Relationship Marketing", ltpc: "3-0-0-3", faculty: "Dr. Md Faiz Ahmad", rooms: "C 608" },
-                { id: "SEC102", code: "SEC 102", subject: "Digital Literacy", ltpc: "1-0-2-2", faculty: "Dr. Chinmoy Das", rooms: "S 414" },
-                { id: "VAC104", code: "VAC 104", subject: "Community Service and Social Responsibility", ltpc: "0-0-2-0", faculty: "-", rooms: "-" }
-            ];
-            subjectDetails.forEach(sub => batch.set(doc(subjectsRef, sub.id), sub));
-
-            // Seed Attendance
-            const attendanceRef = doc(db, "users", uid, "attendance", "summary");
-             const defaultAttendance = {
-                'AEC 108': { classes: 19, present: 12, absent: 7 }, 'CSC 201': { classes: 34, present: 22, absent: 12 }, 'CSC 202': { classes: 34, present: 27, absent: 7 }, 'CSC 203': { classes: 34, present: 21, absent: 13 }, 'MGT 286': { classes: 24, present: 13, absent: 11 }, 'SEC 102': { classes: 8, present: 6, absent: 2 }, 'VAC 104': { classes: 0, present: 0, absent: 0 }
-            };
-            batch.set(attendanceRef, defaultAttendance);
-            
-            await batch.commit();
+        // --- Data Definitions (Updated Semester) ---
+        const DEFAULT_SCHEDULE = {
+            monday: [
+                { time: "15:00", end: "15:50", subject: "Full Stack Dev", code: "CSC211", location: "S 712" }, 
+                { time: "16:00", end: "17:30", subject: "Full Stack Dev", code: "CSC211", location: "S 712" }
+            ],
+            tuesday: [
+                { time: "10:00", end: "10:50", subject: "Comp Org & Arch", code: "CSC205", location: "S 712" }, 
+                { time: "11:00", end: "11:50", subject: "Comp Org & Arch", code: "CSC205", location: "S 712" },
+                { time: "13:00", end: "13:50", subject: "DBMS", code: "CSC207", location: "C 804" },
+                { time: "14:00", end: "14:50", subject: "DBMS", code: "CSC207", location: "C 804" }
+            ],
+            wednesday: [
+                { time: "13:00", end: "13:50", subject: "DBMS", code: "CSC207", location: "S 712" },
+                { time: "14:00", end: "14:50", subject: "DBMS", code: "CSC207", location: "S 712" }
+            ],
+            thursday: [
+                { time: "11:00", end: "11:50", subject: "Comp Org & Arch", code: "CSC205", location: "S 712" },
+                { time: "12:00", end: "12:50", subject: "DBMS", code: "CSC207", location: "S 712" },
+                { time: "16:00", end: "17:30", subject: "Marketing Services", code: "MGT302", location: "S 313" }
+            ],
+            friday: [
+                { time: "11:00", end: "11:50", subject: "Comp Org & Arch", code: "CSC205", location: "C 801" },
+                { time: "12:00", end: "12:50", subject: "Comp Org & Arch", code: "CSC205", location: "C 801" },
+                { time: "14:00", end: "14:50", subject: "Full Stack Dev", code: "CSC211", location: "S 712" },
+                { time: "15:00", end: "15:50", subject: "Full Stack Dev", code: "CSC211", location: "S 712" },
+                { time: "16:00", end: "17:30", subject: "Marketing Services", code: "MGT302", location: "S 313" }
+            ],
+            saturday: [], sunday: []
         };
 
-        const getSchedule = async (uid) => {
-            if (scheduleCache) return scheduleCache;
-            const docRef = doc(db, "users", uid, "classSchedule", "weekly");
-            const docSnap = await getDoc(docRef);
-            if (!docSnap.exists()) {
-                await seedInitialData(uid);
-                return getSchedule(uid);
+        const SUBJECTS_DB = [
+            { id: "CSC205", code: "CSC 205", subject: "Comp Org & Architecture", ltpc: "3-0-1-4", faculty: "Dr. Firoj Gazi", room: "C 801, S 712" },
+            { id: "CSC207", code: "CSC 207", subject: "Database Mgmt Systems", ltpc: "3-0-1-4", faculty: "Mr. P. Anantharao", room: "C 804, S 712" },
+            { id: "CSC211", code: "CSC 211", subject: "Full Stack Development", ltpc: "2-0-2-4", faculty: "Mr. ISCP0005", room: "S 712" },
+            { id: "MGT302", code: "MGT 302", subject: "Marketing of Services", ltpc: "3-0-0-3", faculty: "Dr. Munish Saini", room: "S 313" }
+        ];
+
+        // --- Logic ---
+
+        // 1. Auth & Init
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth failed:", error);
             }
-            scheduleCache = docSnap.data();
-            return scheduleCache;
         };
 
-        const getAttendance = async (uid) => {
-             if (attendanceCache) return attendanceCache;
-            const docRef = doc(db, "users", uid, "attendance", "summary");
-            const docSnap = await getDoc(docRef);
-            attendanceCache = docSnap.exists() ? docSnap.data() : {};
-            return attendanceCache;
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('status-indicator').classList.add('bg-emerald-500');
+                
+                await checkAndSeedData(user.uid);
+                loadDashboard(user.uid);
+            }
+        });
+
+        // 2. Seeding
+        const checkAndSeedData = async (uid) => {
+            const summaryRef = doc(db, 'artifacts', appId, 'users', uid, 'attendance', 'summary');
+            const schedRef = doc(db, 'artifacts', appId, 'users', uid, 'schedule', 'weekly');
+            
+            // Check if summary exists to determine if we need to seed initial data
+            const snap = await getDoc(summaryRef);
+            
+            // FORCE UPDATE SCHEDULE for new semester
+            // This ensures even if user has data, the schedule is updated to new constant
+            await setDoc(schedRef, DEFAULT_SCHEDULE);
+
+            if (!snap.exists()) {
+                const batch = writeBatch(db);
+                
+                // Seed Attendance Summary
+                const initialSummary = {};
+                SUBJECTS_DB.forEach(sub => {
+                    initialSummary[sub.id] = {
+                        code: sub.code,
+                        subject: sub.subject,
+                        faculty: sub.faculty,
+                        total: 0, 
+                        present: 0,
+                        absent: 0
+                    };
+                });
+                batch.set(summaryRef, initialSummary);
+                // Schedule is already set above
+                await batch.commit();
+                console.log("Data seeded.");
+            } else {
+                // Optional: Check if new subjects need to be added to existing summary
+                // For simplicity, we assume if summary exists, we keep it. 
+                // User might need to manually reset attendance if it's a fresh semester start.
+                console.log("Schedule updated to new semester.");
+            }
         };
 
-        const getSubjects = async(uid) => {
-            const querySnapshot = await getDocs(collection(db, "users", uid, "subjects"));
-            return querySnapshot.docs.map(doc => doc.data());
-        }
+        // 3. Rendering
+        const loadDashboard = async (uid) => {
+            renderDate();
+            
+            // Fetch Data in Parallel
+            const summaryRef = doc(db, 'artifacts', appId, 'users', uid, 'attendance', 'summary');
+            const historyRef = doc(db, 'artifacts', appId, 'users', uid, 'history', getTodayDateStr());
+            const scheduleRef = doc(db, 'artifacts', appId, 'users', uid, 'schedule', 'weekly');
 
-        // --- RENDERING FUNCTIONS ---
-        const renderAttendanceRecord = (attendanceData) => {
+            const [summarySnap, historySnap, scheduleSnap] = await Promise.all([
+                getDoc(summaryRef),
+                getDoc(historyRef),
+                getDoc(scheduleRef)
+            ]);
+
+            const summary = summarySnap.exists() ? summarySnap.data() : {};
+            const history = historySnap.exists() ? historySnap.data() : {};
+            // Prefer DB schedule, which we forced to update in seed function
+            const schedule = scheduleSnap.exists() ? scheduleSnap.data() : DEFAULT_SCHEDULE;
+
+            renderAttendanceTable(summary);
+            renderStats(summary);
+            renderTimetable(schedule, history);
+            renderDirectory();
+        };
+
+        const renderDate = () => {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', options);
+        };
+
+        const renderStats = (summary) => {
+            let totalClasses = 0;
+            let totalPresent = 0;
+            
+            Object.values(summary).forEach(sub => {
+                totalClasses += sub.total;
+                totalPresent += sub.present;
+            });
+
+            const overall = totalClasses > 0 ? Math.round((totalPresent / totalClasses) * 100) : 0;
+            
+            // Animation for numbers
+            animateValue("overall-percentage", 0, overall, 1000, "%");
+            animateValue("total-attended", 0, totalPresent, 1000, "");
+        };
+
+        const renderAttendanceTable = (summary) => {
             const tbody = document.getElementById('attendance-tbody');
             tbody.innerHTML = '';
-            for (const subjectName in attendanceData) {
-                const data = attendanceData[subjectName];
-                const percentage = data.classes > 0 ? ((data.present / data.classes) * 100).toFixed(2) : '0.00';
-                const percentageClass = percentage >= 75 ? 'ok-text' : 'highlight-text';
-                const row = `<tr><td class="font-semibold text-gray-700">${data.code || subjectName}</td><td>${data.subject}</td><td>${data.classes}</td><td>${data.present}</td><td>${data.absent}</td><td class="${percentageClass} text-center">${percentage}%</td></tr>`;
-                const fullAttendanceData = (await getSubjects(userId)).reduce((acc, subj) => {
-                    acc[subj.subject] = { ...subj, ...(attendanceData[subj.subject] || { classes: 0, present: 0, absent: 0})};
-                    return acc;
-                }, {});
-                tbody.innerHTML = Object.values(fullAttendanceData).map(data => {
-                     const percentage = data.classes > 0 ? ((data.present / data.classes) * 100).toFixed(2) : '0.00';
-                     const percentageClass = percentage >= 75 ? 'ok-text' : 'highlight-text';
-                     return `<tr><td class="font-semibold text-gray-700">${data.code}</td><td>${data.subject}</td><td>${data.classes}</td><td>${data.present}</td><td>${data.absent}</td><td class="${percentageClass} text-center">${percentage}%</td></tr>`;
-                }).join('');
-            }
+
+            // Use SUBJECTS_DB order for consistent rendering, looking up data in summary
+            // If summary is missing a new subject, we might need to handle gracefully
+            // For now, we iterate summary keys or merge. 
+            // Better to iterate SUBJECTS_DB and pull from summary to ensure all new subjects show
+            
+            SUBJECTS_DB.forEach(sub => {
+                // Find matching summary data by ID (e.g., CSC205)
+                const item = summary[sub.id] || { 
+                    code: sub.code, 
+                    subject: sub.subject, 
+                    faculty: sub.faculty, 
+                    total: 0, present: 0 
+                };
+
+                const percentage = item.total > 0 ? (item.present / item.total) * 100 : 0;
+                const isSafe = percentage >= 75;
+                const statusColor = isSafe ? 'text-emerald-400' : 'text-rose-400';
+                const progressColor = isSafe ? 'bg-emerald-500' : 'bg-rose-500';
+
+                const row = `
+                    <tr class="table-row-hover transition-colors thin-border last:border-0">
+                        <td class="px-6 py-4">
+                            <span class="font-mono text-xs text-gray-400 block">${item.code}</span>
+                            <span class="font-medium">${item.subject}</span>
+                        </td>
+                        <td class="px-6 py-4 text-xs text-gray-400">${item.faculty}</td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex flex-col items-center gap-1">
+                                <span class="text-xs font-mono">${item.present} / ${item.total}</span>
+                                <div class="w-24 h-1 bg-white/10 rounded-full overflow-hidden">
+                                    <div class="h-full ${progressColor}" style="width: ${percentage}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <span class="${statusColor} font-bold text-lg">${percentage.toFixed(1)}%</span>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
         };
 
-        const renderSubjects = async(uid) => {
-            const subjects = await getSubjects(uid);
-            const tbody = document.getElementById('subjects-tbody');
-            tbody.innerHTML = subjects.map(s => `<tr><td>${s.code}</td><td>${s.subject}</td><td>${s.ltpc}</td><td>${s.faculty}</td><td>${s.rooms}</td></tr>`).join('');
-        };
-        
-        const renderTimetable = async (uid) => {
-            userId = uid;
-            const schedule = await getSchedule(uid);
-            const timetableContainer = document.getElementById('vertical-timetable');
-            const dayMap = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-            const today = new Date();
-            const todayString = dayMap[today.getDay()];
-            const dateString = today.toISOString().split('T')[0];
-            const dailyHistoryRef = doc(db, "users", uid, "dailyAttendance", dateString);
-            const dailyHistorySnap = await getDoc(dailyHistoryRef);
-            const dailyHistory = dailyHistorySnap.exists() ? dailyHistorySnap.data() : {};
+        const renderTimetable = (schedule, history) => {
+            const container = document.getElementById('timetable-container');
+            const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+            const todayKey = days[new Date().getDay()];
+            const classes = schedule[todayKey] || [];
 
-            const todaysClasses = schedule[todayString] || [];
-            if (todaysClasses.length === 0) {
-                timetableContainer.innerHTML = `<div class="text-center bg-gray-50 rounded-2xl p-8"><p class="text-lg font-semibold text-gray-500">No classes scheduled today.</p></div>`;
+            container.innerHTML = '';
+
+            if (classes.length === 0) {
+                container.innerHTML = `
+                    <div class="p-8 glass-panel rounded-xl text-center border-dashed border-2 border-white/10">
+                        <p class="text-gray-500 italic font-serif">No classes scheduled for today.</p>
+                        <p class="text-xs text-gray-600 mt-2 uppercase tracking-widest">Enjoy your free time</p>
+                    </div>`;
                 return;
             }
 
-            let html = '';
-            for (const cls of todaysClasses) {
-                const status = dailyHistory[cls.code] || 'unmarked';
-                let statusColorClass = 'border-gray-300';
-                if (status === 'attended') statusColorClass = 'border-green-500';
-                if (status === 'absent') statusColorClass = 'border-red-500';
-                // HTML structure from your provided file
-                html += `<div id="class-${cls.code}" class="class-item bg-white rounded-2xl shadow-sm border-l-4 ${statusColorClass} overflow-hidden transition-all duration-300" data-status="${status}"><div class="p-5"><div class="flex flex-col sm:flex-row sm:justify-between sm:items-start"><div><p class="font-bold text-xl text-gray-800">${cls.subject}</p><div class="flex items-center text-gray-500 mt-2 text-sm space-x-4"><span class="flex items-center"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>${cls.time}</span><span class="flex items-center"><svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>${cls.location}</span></div></div><div class="mt-4 sm:mt-0 flex items-center justify-end space-x-2 flex-shrink-0"><button class="mark-btn text-sm font-medium py-2 px-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors" data-code="${cls.code}" data-subject="${cls.subject}">Mark</button><div class="options hidden" data-code="${cls.code}"><button class="attended-btn text-sm font-medium py-2 px-3 rounded-lg bg-green-500 text-white hover:bg-green-600 flex items-center" data-code="${cls.code}" data-subject="${cls.subject}"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Attended</button><button class="absent-btn text-sm font-medium py-2 px-3 rounded-lg bg-red-500 text-white hover:bg-red-600 flex items-center" data-code="${cls.code}" data-subject="${cls.subject}"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>Absent</button></div></div></div></div></div>`;
-            }
-            timetableContainer.innerHTML = html;
-            addEventListeners();
-        };
+            // Sort classes by time
+            classes.sort((a, b) => a.time.localeCompare(b.time));
 
-        // --- LOGIC FUNCTIONS ---
-        const markAttendance = async (code, subject, newStatus) => {
-            const dateString = new Date().toISOString().split('T')[0];
-            const dailyHistoryRef = doc(db, "users", userId, "dailyAttendance", dateString);
-            const attendanceSummaryRef = doc(db, "users", userId, "attendance", "summary");
-            
-            const classItem = document.getElementById(`class-${code}`);
-            const previousStatus = classItem.dataset.status;
+            classes.forEach(cls => {
+                const status = history[cls.code] || null;
+                const isMarked = status !== null;
+                
+                let statusBadge = '';
+                let actions = '';
 
-            if (previousStatus === newStatus) return;
-
-            const attendanceSummary = await getAttendance(userId);
-            const record = attendanceSummary[subject];
-
-            if (previousStatus === 'unmarked') {
-                if (newStatus === 'attended') record.present++; else record.absent++;
-            } else if (previousStatus === 'attended' && newStatus === 'absent') {
-                record.present--; record.absent++;
-            } else if (previousStatus === 'absent' && newStatus === 'attended') {
-                record.absent--; record.present++;
-            }
-
-            try {
-                const batch = writeBatch(db);
-                batch.set(dailyHistoryRef, { [code]: newStatus }, { merge: true });
-                batch.set(attendanceSummaryRef, { [subject]: record }, { merge: true });
-                await batch.commit();
-
-                attendanceCache = null; // Invalidate cache
-                renderDashboard(userId); // Re-render everything
-            } catch (e) {
-                console.error("Error updating document: ", e);
-            }
-        };
-
-        const addEventListeners = () => {
-            document.querySelectorAll('.mark-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const code = e.target.dataset.code;
-                    e.target.classList.add('hidden');
-                    document.querySelector(`.options[data-code="${code}"]`).classList.remove('hidden');
-                });
-            });
-            document.querySelectorAll('.attended-btn, .absent-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const { code, subject } = e.currentTarget.dataset;
-                    const newStatus = e.currentTarget.classList.contains('attended-btn') ? 'attended' : 'absent';
-                    markAttendance(code, subject, newStatus);
-                });
-            });
-        };
-        
-        const renderDashboard = async (uid) => {
-            const attendanceData = await getAttendance(uid);
-            await renderTimetable(uid);
-            renderAttendanceRecord(attendanceData);
-            await renderSubjects(uid);
-        };
-
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const toggleButton = document.getElementById('toggle-subjects');
-            const content = document.getElementById('subjects-content');
-            const arrow = document.getElementById('subjects-arrow');
-
-            toggleButton.addEventListener('click', () => {
-                content.classList.toggle('hidden');
-                arrow.classList.toggle('rotate-180');
-            });
-
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    userId = user.uid;
-                    await renderDashboard(userId);
+                if (isMarked) {
+                    const color = status === 'present' ? 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' : 'text-rose-400 border-rose-500/30 bg-rose-500/10';
+                    statusBadge = `<span class="px-3 py-1 text-xs uppercase tracking-widest border rounded ${color}">${status}</span>`;
                 } else {
-                    signInAnonymously(auth).catch((error) => {
-                         console.error("Anonymous sign-in failed:", error)
-                         document.body.innerHTML = `<div class="flex items-center justify-center h-screen bg-gray-100 text-center p-4"><div class="p-8 bg-white rounded-lg shadow-md"><h1 class="text-2xl font-bold text-red-600 mb-2">Connection Error</h1><p class="text-gray-600">Could not load your tasks. Please ensure you have enabled Anonymous Authentication in your Firebase project's sign-in methods and then refresh the page.</p></div></div>`;
-                    });
+                    // Note: passed ID needs to match SUBJECTS_DB ID (e.g. CSC205)
+                    // The schedule 'code' is usually CSC205.
+                    actions = `
+                        <div class="flex gap-2">
+                            <button onclick="window.markAttendance('${cls.code}', '${cls.code}', 'present')" class="flex-1 py-2 px-3 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-400 rounded text-xs uppercase tracking-wider transition-all">Present</button>
+                            <button onclick="window.markAttendance('${cls.code}', '${cls.code}', 'absent')" class="flex-1 py-2 px-3 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 text-rose-400 rounded text-xs uppercase tracking-wider transition-all">Absent</button>
+                        </div>
+                    `;
                 }
+
+                const card = `
+                    <div class="glass-card p-5 rounded-xl border-l-2 ${status === 'present' ? 'border-l-emerald-500' : (status === 'absent' ? 'border-l-rose-500' : 'border-l-white/20')}">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="font-medium text-lg leading-tight">${cls.subject}</h3>
+                                <p class="text-xs text-gray-500 font-mono mt-1">${cls.code} • ${cls.location}</p>
+                            </div>
+                            <span class="text-sm font-mono text-gray-400">${cls.time} - ${cls.end}</span>
+                        </div>
+                        <div class="mt-4">
+                            ${isMarked ? statusBadge : actions}
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += card;
             });
+        };
+
+        const renderDirectory = () => {
+            const grid = document.getElementById('directory-grid');
+            grid.innerHTML = SUBJECTS_DB.map(sub => `
+                <div class="flex justify-between items-center p-4 bg-white/5 rounded-lg">
+                    <div>
+                        <p class="font-medium text-sm">${sub.subject}</p>
+                        <p class="text-xs text-gray-500">${sub.faculty}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-mono text-xs text-gray-400">${sub.ltpc}</p>
+                        <p class="text-xs text-gray-500">${sub.room}</p>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        // --- Interaction Logic ---
+        
+        window.markAttendance = async (code, subjectId, status) => {
+            if (!currentUser) return;
+            const uid = currentUser.uid;
+            
+            const batch = writeBatch(db);
+            const dateStr = getTodayDateStr();
+
+            // 1. Update Daily History
+            const historyRef = doc(db, 'artifacts', appId, 'users', uid, 'history', dateStr);
+            batch.set(historyRef, { [code]: status }, { merge: true });
+
+            // 2. Update Stats
+            const summaryRef = doc(db, 'artifacts', appId, 'users', uid, 'attendance', 'summary');
+            const summarySnap = await getDoc(summaryRef);
+            
+            if (summarySnap.exists()) {
+                const data = summarySnap.data();
+                const key = subjectId; // Direct mapping
+                
+                // Initialize if missing (new semester subject)
+                if (!data[key]) {
+                    const subInfo = SUBJECTS_DB.find(s => s.id === key);
+                    if (subInfo) {
+                        data[key] = {
+                            code: subInfo.code,
+                            subject: subInfo.subject,
+                            faculty: subInfo.faculty,
+                            total: 0, present: 0, absent: 0
+                        };
+                    }
+                }
+
+                if (data[key]) {
+                    data[key].total += 1;
+                    if (status === 'present') data[key].present += 1;
+                    else data[key].absent += 1;
+                    batch.update(summaryRef, { [key]: data[key] });
+                }
+            }
+
+            await batch.commit();
+            loadDashboard(uid); // Reload
+        };
+
+        // Helpers
+        function getTodayDateStr() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function animateValue(id, start, end, duration, suffix) {
+            const obj = document.getElementById(id);
+            if (!obj) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start) + suffix;
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Toggle Directory
+        document.getElementById('toggle-directory').addEventListener('click', () => {
+            const content = document.getElementById('directory-content');
+            const arrow = document.getElementById('directory-arrow');
+            content.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-180');
         });
+
+        initAuth();
+
     </script>
 </body>
 </html>
-
