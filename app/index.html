@@ -117,7 +117,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         
-        // --- Firebase Configuration ---
+        // --- Firebase Configuration (Project 11) ---
         const firebaseConfig = {
           apiKey: "AIzaSyA-89SA71JDCDbCE3PjIdWHZHJs0qN-1Pc",
           authDomain: "project---11.firebaseapp.com",
@@ -143,17 +143,17 @@
                 
                 // Check if we have a valid timestamp and it's within 11 hours
                 if (lastLogin && (now - parseInt(lastLogin) < SESSION_TIMEOUT_MS)) {
-                    // Valid Session: Redirect to dashboard
+                    // Valid Session: Redirect to dashboard (now located at login.html)
                     document.body.style.opacity = '0';
                     document.body.style.transition = 'opacity 0.5s ease';
                     setTimeout(() => {
-                        window.location.href = 'index.html'; 
+                        window.location.href = 'login.html'; 
                     }, 500);
                 } else {
-                    // Session Expired or No Timestamp found
+                    // Session Expired or No Timestamp found: Force Logout
                     console.warn("Session expired or invalid timestamp. Logging out.");
                     await signOut(auth);
-                    localStorage.removeItem('last_login'); 
+                    localStorage.removeItem('last_login'); // Clear invalid timestamp
                     
                     const errorMessage = document.getElementById('error-message');
                     errorMessage.textContent = "Session expired. Please verify credentials.";
@@ -179,18 +179,17 @@
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            
-            // CRITICAL FIX: Set session time BEFORE auth request
-            // This prevents the race condition where onAuthStateChanged fires before we save the time
+
+            // Set session time BEFORE auth request to prevent race condition
             localStorage.setItem('last_login', Date.now());
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                // Auth success -> onAuthStateChanged fires -> sees timestamp -> redirects.
+                // onAuthStateChanged will handle the redirect
             } catch (error) {
                 // If failed, clear the speculative timestamp
                 localStorage.removeItem('last_login');
-                
+
                 // Reset Button
                 submitBtn.innerText = originalBtnText;
                 submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
