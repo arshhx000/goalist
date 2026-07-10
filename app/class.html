@@ -3,550 +3,391 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ACADEMIC | Portal</title>
+    <title>Disystem</title>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            black: '#0F0F0F',
-                            dark: '#141414',
-                            surface: '#1F1F1F',
-                            elevated: '#2D2D2D',
-                            border: 'rgba(255, 255, 255, 0.1)',
-                            accent: '#ffffff'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
-                    },
-                }
-            }
-        }
-    </script>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         body {
-            background-color: #0F0F0F;
-            color: #e5e5e5;
-            -webkit-font-smoothing: antialiased;
+            font-family: "FK Grotesk", "Inter", sans-serif;
+            font-weight: 400;
+            background-color: #e5e5e5; 
+            background-image: radial-gradient(#d1d1d1 1px, transparent 0);
+            background-size: 20px 20px;
         }
 
-        /* Glassmorphism */
-        .glass-panel {
-            background: rgba(30, 30, 30, 0.4);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        button,
+        input,
+        label,
+        select,
+        textarea,
+        .font-sans {
+            font-family: "FK Grotesk", "Inter", sans-serif;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
-        }
-        .glass-card:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.15);
+        /* Base prominent shadow for panels */
+        .te-shadow { 
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1); 
+            transition: all 0.1s ease;
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0F0F0F; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-
-        /* Utilities */
-        .text-balance { text-wrap: balance; }
+        /* Small shadow for buttons/inputs */
+        .te-shadow-sm { 
+            box-shadow: 2px 2px 0px 0px rgba(0,0,0,1); 
+            transition: all 0.1s ease;
+        }
         
-        /* Table Styles */
-        .table-row-hover:hover td { background: rgba(255,255,255,0.03); }
-        .thin-border { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        /* Active states simulating physical pressing down */
+        .te-active:active { 
+            box-shadow: 0px 0px 0px 0px rgba(0,0,0,1) !important; 
+            transform: translate(2px, 2px) !important; 
+        }
+
+        /* Inner shadow for "sunken" areas */
+        .te-inset-shadow {
+            box-shadow: inset 2px 2px 0px 0px rgba(0,0,0,0.1);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #e5e5e5; border-left: 1px solid #000; border-top: 1px solid #000; }
+        ::-webkit-scrollbar-thumb { background: #000; border: 1px solid #e5e5e5; }
+
+        .date-shock {
+            position: relative;
+            display: inline-block;
+            animation: dateShock 650ms steps(2, end);
+        }
+
+        .date-shock::before,
+        .date-shock::after {
+            content: attr(data-text);
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .date-shock::before {
+            color: #FF6B00;
+            transform: translate(2px, -1px);
+            opacity: 0.85;
+            clip-path: inset(0 0 45% 0);
+        }
+
+        .date-shock::after {
+            color: #00E5FF;
+            transform: translate(-2px, 1px);
+            opacity: 0.75;
+            clip-path: inset(55% 0 0 0);
+        }
+
+        @keyframes dateShock {
+            0% { transform: skewX(0deg) scale(1); }
+            20% { transform: skewX(10deg) scale(1.04); }
+            40% { transform: skewX(-10deg) scale(0.98); }
+            60% { transform: skewX(6deg) scale(1.03); }
+            100% { transform: skewX(0deg) scale(1); }
+        }
+
+        .nav-core {
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+            transform-origin: center;
+        }
+
+        .nav-core:hover {
+            transform: rotate(-8deg) scale(1.08);
+            box-shadow: 0 0 0 2px #000, 5px 5px 0 0 #FF6B00;
+            background-color: #111;
+        }
+
+        .shock-card {
+            transition: transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+            transform-origin: center;
+        }
+
+        .shock-card:hover {
+            transform: translate(-3px, -3px) rotate(-0.35deg);
+            box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+            background-color: #fffdf4;
+        }
+
+        .task-pop {
+            position: relative;
+            transition: transform 0.14s ease, background-color 0.14s ease;
+        }
+
+        .task-pop:hover {
+            transform: translateX(3px);
+        }
+
+        .task-check {
+            position: relative;
+            transition: transform 0.14s ease, background-color 0.14s ease;
+        }
+
+        .task-pop.is-done .task-check {
+            animation: checkBurst 380ms ease-out;
+            box-shadow: 0 0 0 2px #000, 0 0 0 6px rgba(255, 107, 0, 0.18);
+        }
+
+        .task-pop.is-done::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 107, 0, 0.22), transparent);
+            transform: translateX(-110%);
+            animation: taskSweep 520ms ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes checkBurst {
+            0% { transform: scale(0.8) rotate(-8deg); }
+            60% { transform: scale(1.16) rotate(6deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        @keyframes taskSweep {
+            0% { transform: translateX(-110%); opacity: 0.2; }
+            40% { opacity: 1; }
+            100% { transform: translateX(110%); opacity: 0; }
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body>
+    <div id="root"></div>
 
-    <!-- Navbar -->
-    <nav class="fixed w-full z-50 glass-panel border-b-0 border-t-0 border-x-0 h-16">
-        <div class="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <span class="text-sm tracking-[0.2em] uppercase font-light">Academic</span>
-            </div>
-            <div class="flex items-center gap-4">
-                <div id="status-indicator" class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
-            </div>
-        </div>
-    </nav>
+    <script type="text/babel">
+        const { useEffect, useState } = React;
 
-    <!-- Main Content -->
-    <main class="flex-grow pt-24 pb-12 px-6">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-            <!-- Left Col: Timetable (4 cols) -->
-            <div class="lg:col-span-4 space-y-6">
-                <!-- Date Header -->
-                <div class="mb-8">
-                    <h2 class="text-3xl font-light font-serif italic text-gray-400">Today's Schedule</h2>
-                    <p id="current-date" class="text-xs tracking-widest text-gray-500 uppercase mt-1">...</p>
-                </div>
-
-                <!-- Timeline Container -->
-                <div id="timetable-container" class="space-y-4">
-                    <!-- Loading State -->
-                    <div class="animate-pulse space-y-4">
-                        <div class="h-32 bg-white/5 rounded-lg"></div>
-                        <div class="h-32 bg-white/5 rounded-lg"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Col: Stats & Attendance (8 cols) -->
-            <div class="lg:col-span-8 space-y-6">
-                
-                <!-- Quick Stats Row (Bento Grid) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Overall Attendance Card -->
-                    <div class="glass-panel p-8 rounded-xl relative overflow-hidden group">
-                        <div class="absolute right-0 top-0 p-32 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-white/10 transition-colors"></div>
-                        <h3 class="text-xs uppercase tracking-widest text-gray-500 mb-2">Overall Attendance</h3>
-                        <div class="flex items-baseline gap-2 relative z-10">
-                            <span id="overall-percentage" class="text-6xl font-light">--%</span>
-                            <span class="text-sm text-gray-400 font-serif italic">cumulative</span>
-                        </div>
-                    </div>
-
-                    <!-- Classes Attended Card -->
-                    <div class="glass-panel p-8 rounded-xl relative overflow-hidden group">
-                        <div class="absolute right-0 top-0 p-32 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-white/10 transition-colors"></div>
-                        <h3 class="text-xs uppercase tracking-widest text-gray-500 mb-2">Classes Attended</h3>
-                        <div class="flex items-baseline gap-2 relative z-10">
-                            <span id="total-attended" class="text-6xl font-light">--</span>
-                            <span class="text-sm text-gray-400 font-serif italic">sessions</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Detailed Attendance Table -->
-                <div class="glass-panel rounded-xl overflow-hidden flex flex-col">
-                    <div class="p-6 border-b border-white/10 flex justify-between items-center">
-                        <h3 class="font-serif italic text-xl">Course Performance</h3>
-                        <div class="flex gap-2 text-xs">
-                            <span class="flex items-center gap-1 text-emerald-400"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Safe (>75%)</span>
-                            <span class="flex items-center gap-1 text-rose-400"><span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>Risk (<75%)</span>
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead class="text-xs text-gray-500 uppercase tracking-wider bg-white/5">
-                                <tr>
-                                    <th class="px-6 py-4 font-medium">Subject Code</th>
-                                    <th class="px-6 py-4 font-medium">Faculty</th>
-                                    <th class="px-6 py-4 font-medium text-center">Attended / Total</th>
-                                    <th class="px-6 py-4 font-medium text-right">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="attendance-tbody" class="divide-y divide-white/5">
-                                <!-- Dynamic Content -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Course Directory Accordion -->
-                <div class="glass-panel rounded-xl overflow-hidden">
-                    <button id="toggle-directory" class="w-full p-6 flex justify-between items-center hover:bg-white/5 transition-colors text-left">
-                        <div>
-                            <h3 class="font-serif italic text-xl">Course Directory</h3>
-                            <p class="text-xs text-gray-500 mt-1 uppercase tracking-widest">View Credits & Locations</p>
-                        </div>
-                        <i id="directory-arrow" class="fas fa-chevron-down text-gray-500 transition-transform"></i>
-                    </button>
-                    <div id="directory-content" class="hidden border-t border-white/10 bg-black/20">
-                        <div class="p-6 grid gap-4" id="directory-grid">
-                            <!-- Dynamic Content -->
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </main>
-
-    <!-- Firebase Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, writeBatch, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-        // --- Configuration ---
-        const firebaseConfig = {
-          apiKey: "AIzaSyA-89SA71JDCDbCE3PjIdWHZHJs0qN-1Pc",
-          authDomain: "project---11.firebaseapp.com",
-          projectId: "project---11",
-          storageBucket: "project---11.firebasestorage.app",
-          messagingSenderId: "958555644000",
-          appId: "1:958555644000:web:405109efd428b349f62305",
-          measurementId: "G-DPGZ8CS3SP"
-        };
-
-        const appId = "project-11";
-        
-        // Initialize
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        let currentUser = null;
-
-        // --- Data Definitions (Updated Semester) ---
-        const DEFAULT_SCHEDULE = {
-            monday: [
-                { time: "15:00", end: "15:50", subject: "Full Stack Dev", code: "CSC211", location: "S 712" }, 
-                { time: "16:00", end: "17:30", subject: "Full Stack Dev", code: "CSC211", location: "S 712" }
-            ],
-            tuesday: [
-                { time: "10:00", end: "10:50", subject: "Comp Org & Arch", code: "CSC205", location: "S 712" }, 
-                { time: "11:00", end: "11:50", subject: "Comp Org & Arch", code: "CSC205", location: "S 712" },
-                { time: "13:00", end: "13:50", subject: "DBMS", code: "CSC207", location: "C 804" },
-                { time: "14:00", end: "14:50", subject: "DBMS", code: "CSC207", location: "C 804" }
-            ],
-            wednesday: [
-                { time: "13:00", end: "13:50", subject: "DBMS", code: "CSC207", location: "S 712" },
-                { time: "14:00", end: "14:50", subject: "DBMS", code: "CSC207", location: "S 712" }
-            ],
-            thursday: [
-                { time: "11:00", end: "11:50", subject: "Comp Org & Arch", code: "CSC205", location: "S 712" },
-                { time: "12:00", end: "12:50", subject: "DBMS", code: "CSC207", location: "S 712" },
-                { time: "16:00", end: "17:30", subject: "Marketing Services", code: "MGT302", location: "S 313" }
-            ],
-            friday: [
-                { time: "11:00", end: "11:50", subject: "Comp Org & Arch", code: "CSC205", location: "C 801" },
-                { time: "12:00", end: "12:50", subject: "Comp Org & Arch", code: "CSC205", location: "C 801" },
-                { time: "14:00", end: "14:50", subject: "Full Stack Dev", code: "CSC211", location: "S 712" },
-                { time: "15:00", end: "15:50", subject: "Full Stack Dev", code: "CSC211", location: "S 712" },
-                { time: "16:00", end: "17:30", subject: "Marketing Services", code: "MGT302", location: "S 313" }
-            ],
-            saturday: [], sunday: []
-        };
-
-        const SUBJECTS_DB = [
-            { id: "CSC205", code: "CSC 205", subject: "Comp Org & Architecture", ltpc: "3-0-1-4", faculty: "Dr. Firoj Gazi", room: "C 801, S 712" },
-            { id: "CSC207", code: "CSC 207", subject: "Database Mgmt Systems", ltpc: "3-0-1-4", faculty: "Mr. P. Anantharao", room: "C 804, S 712" },
-            { id: "CSC211", code: "CSC 211", subject: "Full Stack Development", ltpc: "2-0-2-4", faculty: "Mr. ISCP0005", room: "S 712" },
-            { id: "MGT302", code: "MGT 302", subject: "Marketing of Services", ltpc: "3-0-0-3", faculty: "Dr. Munish Saini", room: "S 313" }
+        const QUOTES = [
+            "Habits are the compound interest of self-improvement.",
+            "Every action is a vote for who you wish to become.",
+            "You do not rise to the level of your goals.",
+            "You fall to the level of your systems.",
+            "Focus on systems, not goals.",
+            "Small changes. Remarkable results.",
+            "Success is the product of daily habits.",
+            "Be patient. Be consistent.",
+            "Identity drives behavior.",
+            "Make it obvious.",
+            "Make it attractive.",
+            "Make it easy.",
+            "Make it satisfying.",
+            "Environment shapes behavior.",
+            "Motion is not action.",
+            "Professionals stick to the schedule.",
+            "Amateurs wait until they feel like it.",
+            "The cost of good habits is in the present.",
+            "The cost of bad habits is in the future.",
+            "You become what you repeatedly do.",
+            "Your outcomes are a lagging measure of your habits.",
+            "Your habits shape your identity.",
+            "Every habit begins with a cue.",
+            "The secret to results is consistency.",
+            "Tiny improvements compound over time.",
+            "Master the system, not the outcome.",
+            "Progress requires persistence.",
+            "Change your habits, change your life.",
+            "The quality of your life depends on your habits.",
+            "The greatest threat to success is not failure, but boredom."
         ];
 
-        // --- Logic ---
-
-        // 1. Auth & Init
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth failed:", error);
-            }
-        };
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                document.getElementById('status-indicator').classList.add('bg-emerald-500');
-                
-                await checkAndSeedData(user.uid);
-                loadDashboard(user.uid);
-            }
-        });
-
-        // 2. Seeding
-        const checkAndSeedData = async (uid) => {
-            const summaryRef = doc(db, 'artifacts', appId, 'users', uid, 'attendance', 'summary');
-            const schedRef = doc(db, 'artifacts', appId, 'users', uid, 'schedule', 'weekly');
-            
-            // Check if summary exists to determine if we need to seed initial data
-            const snap = await getDoc(summaryRef);
-            
-            // FORCE UPDATE SCHEDULE for new semester
-            // This ensures even if user has data, the schedule is updated to new constant
-            await setDoc(schedRef, DEFAULT_SCHEDULE);
-
-            if (!snap.exists()) {
-                const batch = writeBatch(db);
-                
-                // Seed Attendance Summary
-                const initialSummary = {};
-                SUBJECTS_DB.forEach(sub => {
-                    initialSummary[sub.id] = {
-                        code: sub.code,
-                        subject: sub.subject,
-                        faculty: sub.faculty,
-                        total: 0, 
-                        present: 0,
-                        absent: 0
-                    };
-                });
-                batch.set(summaryRef, initialSummary);
-                // Schedule is already set above
-                await batch.commit();
-                console.log("Data seeded.");
-            } else {
-                // Optional: Check if new subjects need to be added to existing summary
-                // For simplicity, we assume if summary exists, we keep it. 
-                // User might need to manually reset attendance if it's a fresh semester start.
-                console.log("Schedule updated to new semester.");
-            }
-        };
-
-        // 3. Rendering
-        const loadDashboard = async (uid) => {
-            renderDate();
-            
-            // Fetch Data in Parallel
-            const summaryRef = doc(db, 'artifacts', appId, 'users', uid, 'attendance', 'summary');
-            const historyRef = doc(db, 'artifacts', appId, 'users', uid, 'history', getTodayDateStr());
-            const scheduleRef = doc(db, 'artifacts', appId, 'users', uid, 'schedule', 'weekly');
-
-            const [summarySnap, historySnap, scheduleSnap] = await Promise.all([
-                getDoc(summaryRef),
-                getDoc(historyRef),
-                getDoc(scheduleRef)
-            ]);
-
-            const summary = summarySnap.exists() ? summarySnap.data() : {};
-            const history = historySnap.exists() ? historySnap.data() : {};
-            // Prefer DB schedule, which we forced to update in seed function
-            const schedule = scheduleSnap.exists() ? scheduleSnap.data() : DEFAULT_SCHEDULE;
-
-            renderAttendanceTable(summary);
-            renderStats(summary);
-            renderTimetable(schedule, history);
-            renderDirectory();
-        };
-
-        const renderDate = () => {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', options);
-        };
-
-        const renderStats = (summary) => {
-            let totalClasses = 0;
-            let totalPresent = 0;
-            
-            Object.values(summary).forEach(sub => {
-                totalClasses += sub.total;
-                totalPresent += sub.present;
+        function App() {
+            const [plans, setPlans] = useState([]);
+            const [showIntro, setShowIntro] = useState(true);
+            const [shockDate, setShockDate] = useState(false);
+            const [introQuote] = useState(() => {
+                const randomIndex = Math.floor(Math.random() * QUOTES.length);
+                return QUOTES[randomIndex];
             });
+            const currentDate = new Intl.DateTimeFormat("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }).format(new Date());
 
-            const overall = totalClasses > 0 ? Math.round((totalPresent / totalClasses) * 100) : 0;
-            
-            // Animation for numbers
-            animateValue("overall-percentage", 0, overall, 1000, "%");
-            animateValue("total-attended", 0, totalPresent, 1000, "");
-        };
+            useEffect(() => {
+                const timer = window.setTimeout(() => {
+                    setShowIntro(false);
+                    setShockDate(true);
+                }, 5000);
 
-        const renderAttendanceTable = (summary) => {
-            const tbody = document.getElementById('attendance-tbody');
-            tbody.innerHTML = '';
+                const shockResetTimer = window.setTimeout(() => {
+                    setShockDate(false);
+                }, 5800);
 
-            // Use SUBJECTS_DB order for consistent rendering, looking up data in summary
-            // If summary is missing a new subject, we might need to handle gracefully
-            // For now, we iterate summary keys or merge. 
-            // Better to iterate SUBJECTS_DB and pull from summary to ensure all new subjects show
-            
-            SUBJECTS_DB.forEach(sub => {
-                // Find matching summary data by ID (e.g., CSC205)
-                const item = summary[sub.id] || { 
-                    code: sub.code, 
-                    subject: sub.subject, 
-                    faculty: sub.faculty, 
-                    total: 0, present: 0 
+                return () => {
+                    window.clearTimeout(timer);
+                    window.clearTimeout(shockResetTimer);
                 };
+            }, []);
 
-                const percentage = item.total > 0 ? (item.present / item.total) * 100 : 0;
-                const isSafe = percentage >= 75;
-                const statusColor = isSafe ? 'text-emerald-400' : 'text-rose-400';
-                const progressColor = isSafe ? 'bg-emerald-500' : 'bg-rose-500';
+            // Helper to format title case for "This Ok" casing
+            const toTitleCase = (str) => {
+                return str.replace(/_/g, " ").toLowerCase().split(" ").map(word =>
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                ).join(" ");
+            };
 
-                const row = `
-                    <tr class="table-row-hover transition-colors thin-border last:border-0">
-                        <td class="px-6 py-4">
-                            <span class="font-mono text-xs text-gray-400 block">${item.code}</span>
-                            <span class="font-medium">${item.subject}</span>
-                        </td>
-                        <td class="px-6 py-4 text-xs text-gray-400">${item.faculty}</td>
-                        <td class="px-6 py-4 text-center">
-                            <div class="flex flex-col items-center gap-1">
-                                <span class="text-xs font-mono">${item.present} / ${item.total}</span>
-                                <div class="w-24 h-1 bg-white/10 rounded-full overflow-hidden">
-                                    <div class="h-full ${progressColor}" style="width: ${percentage}%"></div>
+            const handleFileUpload = (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const json = JSON.parse(e.target.result);
+                        let newPlans = Array.isArray(json) ? json : [json];
+                        newPlans = newPlans.map(plan => ({
+                            id: crypto.randomUUID(),
+                            title: toTitleCase(plan.title || "Untitled Plan"),
+                            days: (plan.days || []).map(d => ({
+                                ...d,
+                                tasks: (d.tasks || []).map(t => ({ ...t, title: toTitleCase(t.title || "") }))
+                            })),
+                            currentDayIndex: 0
+                        }));
+                        setPlans(prev => [...prev, ...newPlans]);
+                    } catch (err) {
+                        console.error(err);
+                    }
+                };
+                reader.readAsText(file);
+                event.target.value = "";
+            };
+
+            const downloadSampleJSON = () => {
+                const sample = { title: "7_Day_Pushup_Protocol", days: [{ day: 1, tasks: [{ id: 1, title: "Warmup_Stretch", completed: false }] }] };
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(sample, null, 2));
+                const a = document.createElement("a");
+                a.href = dataStr;
+                a.download = "plan.json";
+                a.click();
+            };
+
+            const toggleTask = (planId, dayIndex, taskId) => {
+                setPlans(plans.map(p => p.id === planId ? { ...p, days: p.days.map((d, i) => i === dayIndex ? { ...d, tasks: d.tasks.map(t => t.id === taskId ? { ...t, completed: !t.completed } : t) } : d) } : p));
+            };
+
+            const setDay = (planId, dayIndex) => {
+                setPlans(plans.map(p => p.id === planId ? { ...p, currentDayIndex: dayIndex } : p));
+            };
+
+            const deletePlan = (planId) => {
+                setPlans(plans.filter(p => p.id !== planId));
+            };
+
+            const getProgress = (day) => {
+                if (!day || !day.tasks || day.tasks.length === 0) return 0;
+                return Math.round((day.tasks.filter(t => t.completed).length / day.tasks.length) * 100);
+            };
+
+            if (showIntro) {
+                return (
+                    <div className="min-h-screen bg-black text-[#FF6B00] flex items-center justify-center px-6">
+                        <div className="max-w-3xl text-center">
+                            <p className="text-3xl md:text-5xl leading-tight font-sans font-semibold">
+                                {introQuote}
+                            </p>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="min-h-screen p-4 md:p-8">
+                    <div className="max-w-xl mx-auto space-y-6">
+                        {/* Compact Control Deck */}
+                        <div className="border-2 border-black bg-white p-3 te-shadow flex items-center justify-between">
+                            <div className="nav-core bg-black text-white p-2 border-2 border-black">
+                                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18"/><path d="M7 8l4 4-4 4M13 16h4"/></svg>
+                            </div>
+                            <div className="flex-1 px-3">
+                                <div
+                                    data-text={currentDate}
+                                    className={`text-xs md:text-sm font-medium text-center text-black truncate ${shockDate ? "date-shock" : ""}`}
+                                >
+                                    {currentDate}
                                 </div>
                             </div>
-                        </td>
-                        <td class="px-6 py-4 text-right">
-                            <span class="${statusColor} font-bold text-lg">${percentage.toFixed(1)}%</span>
-                        </td>
-                    </tr>
-                `;
-                tbody.innerHTML += row;
-            });
-        };
-
-        const renderTimetable = (schedule, history) => {
-            const container = document.getElementById('timetable-container');
-            const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-            const todayKey = days[new Date().getDay()];
-            const classes = schedule[todayKey] || [];
-
-            container.innerHTML = '';
-
-            if (classes.length === 0) {
-                container.innerHTML = `
-                    <div class="p-8 glass-panel rounded-xl text-center border-dashed border-2 border-white/10">
-                        <p class="text-gray-500 italic font-serif">No classes scheduled for today.</p>
-                        <p class="text-xs text-gray-600 mt-2 uppercase tracking-widest">Enjoy your free time</p>
-                    </div>`;
-                return;
-            }
-
-            // Sort classes by time
-            classes.sort((a, b) => a.time.localeCompare(b.time));
-
-            classes.forEach(cls => {
-                const status = history[cls.code] || null;
-                const isMarked = status !== null;
-                
-                let statusBadge = '';
-                let actions = '';
-
-                if (isMarked) {
-                    const color = status === 'present' ? 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10' : 'text-rose-400 border-rose-500/30 bg-rose-500/10';
-                    statusBadge = `<span class="px-3 py-1 text-xs uppercase tracking-widest border rounded ${color}">${status}</span>`;
-                } else {
-                    // Note: passed ID needs to match SUBJECTS_DB ID (e.g. CSC205)
-                    // The schedule 'code' is usually CSC205.
-                    actions = `
-                        <div class="flex gap-2">
-                            <button onclick="window.markAttendance('${cls.code}', '${cls.code}', 'present')" class="flex-1 py-2 px-3 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 text-emerald-400 rounded text-xs uppercase tracking-wider transition-all">Present</button>
-                            <button onclick="window.markAttendance('${cls.code}', '${cls.code}', 'absent')" class="flex-1 py-2 px-3 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 text-rose-400 rounded text-xs uppercase tracking-wider transition-all">Absent</button>
-                        </div>
-                    `;
-                }
-
-                const card = `
-                    <div class="glass-card p-5 rounded-xl border-l-2 ${status === 'present' ? 'border-l-emerald-500' : (status === 'absent' ? 'border-l-rose-500' : 'border-l-white/20')}">
-                        <div class="flex justify-between items-start mb-3">
-                            <div>
-                                <h3 class="font-medium text-lg leading-tight">${cls.subject}</h3>
-                                <p class="text-xs text-gray-500 font-mono mt-1">${cls.code} • ${cls.location}</p>
+                            <div className="flex gap-2">
+                                <button onClick={downloadSampleJSON} className="border-2 border-black bg-[#00E5FF] p-2 te-shadow-sm te-active">
+                                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4H3v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                </button>
+                                <label className="border-2 border-black bg-[#FF6B00] p-2 te-shadow-sm te-active cursor-pointer">
+                                    <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4H3v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                    <input type="file" accept=".json" onChange={handleFileUpload} className="hidden" />
+                                </label>
                             </div>
-                            <span class="text-sm font-mono text-gray-400">${cls.time} - ${cls.end}</span>
                         </div>
-                        <div class="mt-4">
-                            ${isMarked ? statusBadge : actions}
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += card;
-            });
-        };
 
-        const renderDirectory = () => {
-            const grid = document.getElementById('directory-grid');
-            grid.innerHTML = SUBJECTS_DB.map(sub => `
-                <div class="flex justify-between items-center p-4 bg-white/5 rounded-lg">
-                    <div>
-                        <p class="font-medium text-sm">${sub.subject}</p>
-                        <p class="text-xs text-gray-500">${sub.faculty}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-mono text-xs text-gray-400">${sub.ltpc}</p>
-                        <p class="text-xs text-gray-500">${sub.room}</p>
+                        {plans.length === 0 ? (
+                            <div className="border-2 border-black bg-white p-8 text-center te-shadow">
+                                <h2 className="text-xl">Awaiting Input</h2>
+                            </div>
+                        ) : (
+                            plans.map(plan => (
+                                <div key={plan.id} className="shock-card border-2 border-black bg-white te-shadow">
+                                    {/* Compact Header */}
+                                    <div className="border-b-2 border-black p-4 bg-[#FFD600] flex justify-between items-center">
+                                        <h2 className="text-xl truncate">{plan.title}</h2>
+                                        <div className="flex items-center gap-3">
+                                            <div className="text-sm border-2 border-black bg-black text-[#FFD600] px-2 py-0.5">{Math.round(plan.days.reduce((acc, d) => acc + getProgress(d), 0) / plan.days.length || 0)}%</div>
+                                            <button onClick={() => deletePlan(plan.id)} className="border-2 border-black bg-red-500 text-white px-2 py-0.5 text-xs te-shadow-sm te-active">Del</button>
+                                        </div>
+                                    </div>
+
+                                    {/* Day Navigation */}
+                                    <div className="flex border-b-2 border-black bg-[#d4d4d4] p-1 gap-1 overflow-x-auto">
+                                        {plan.days.map((day, idx) => (
+                                            <button key={idx} onClick={() => setDay(plan.id, idx)} className={`px-3 py-1 text-sm border-2 border-black ${plan.currentDayIndex === idx ? "bg-[#FF6B00] te-shadow-sm" : "bg-white"}`}>
+                                                Day {day.day}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    <div className="p-4 bg-white">
+                                        {plan.days[plan.currentDayIndex] && (
+                                            <div>
+                                                <div className="flex justify-between items-center mb-4 border-b border-black pb-2">
+                                                    <h3 className="text-lg">Day {plan.days[plan.currentDayIndex].day}</h3>
+                                                    <span className="text-sm bg-gray-200 px-2 py-0.5 border border-black">{getProgress(plan.days[plan.currentDayIndex])}%</span>
+                                                </div>
+                                                <div className="space-y-3">
+                                                    {plan.days[plan.currentDayIndex].tasks.map(task => (
+                                                        <div key={task.id} onClick={() => toggleTask(plan.id, plan.currentDayIndex, task.id)} className={`task-pop border-2 border-black p-2 flex items-center gap-3 cursor-pointer overflow-hidden ${task.completed ? "is-done bg-gray-100" : "bg-white"}`}>
+                                                            <div className={`task-check w-6 h-6 border-2 border-black ${task.completed ? "bg-[#00E5FF]" : ""}`}></div>
+                                                            <span className={`text-base ${task.completed ? "line-through text-gray-500" : ""}`}>{task.title}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
-            `).join('');
-        };
-
-        // --- Interaction Logic ---
-        
-        window.markAttendance = async (code, subjectId, status) => {
-            if (!currentUser) return;
-            const uid = currentUser.uid;
-            
-            const batch = writeBatch(db);
-            const dateStr = getTodayDateStr();
-
-            // 1. Update Daily History
-            const historyRef = doc(db, 'artifacts', appId, 'users', uid, 'history', dateStr);
-            batch.set(historyRef, { [code]: status }, { merge: true });
-
-            // 2. Update Stats
-            const summaryRef = doc(db, 'artifacts', appId, 'users', uid, 'attendance', 'summary');
-            const summarySnap = await getDoc(summaryRef);
-            
-            if (summarySnap.exists()) {
-                const data = summarySnap.data();
-                const key = subjectId; // Direct mapping
-                
-                // Initialize if missing (new semester subject)
-                if (!data[key]) {
-                    const subInfo = SUBJECTS_DB.find(s => s.id === key);
-                    if (subInfo) {
-                        data[key] = {
-                            code: subInfo.code,
-                            subject: subInfo.subject,
-                            faculty: subInfo.faculty,
-                            total: 0, present: 0, absent: 0
-                        };
-                    }
-                }
-
-                if (data[key]) {
-                    data[key].total += 1;
-                    if (status === 'present') data[key].present += 1;
-                    else data[key].absent += 1;
-                    batch.update(summaryRef, { [key]: data[key] });
-                }
-            }
-
-            await batch.commit();
-            loadDashboard(uid); // Reload
-        };
-
-        // Helpers
-        function getTodayDateStr() {
-            return new Date().toISOString().split('T')[0];
+            );
         }
 
-        function animateValue(id, start, end, duration, suffix) {
-            const obj = document.getElementById(id);
-            if (!obj) return;
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.innerHTML = Math.floor(progress * (end - start) + start) + suffix;
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        }
-
-        // Toggle Directory
-        document.getElementById('toggle-directory').addEventListener('click', () => {
-            const content = document.getElementById('directory-content');
-            const arrow = document.getElementById('directory-arrow');
-            content.classList.toggle('hidden');
-            arrow.classList.toggle('rotate-180');
-        });
-
-        initAuth();
-
+        const root = ReactDOM.createRoot(document.getElementById("root"));
+        root.render(<App />);
     </script>
 </body>
 </html>
